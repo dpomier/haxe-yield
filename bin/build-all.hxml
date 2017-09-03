@@ -1,0 +1,31 @@
+-cp tests
+-main Tests
+
+-dce full
+
+--each
+
+-js bin/js/Tests.js
+--next
+-as3 bin/as3
+--next
+-swf bin/swf/Tests.swf
+--flash-strict
+-swf-version 9
+--next
+-cs bin/cs
+--next
+-cpp bin/cpp
+--next
+-java bin/java
+--next
+-neko bin/neko/Tests.n
+--next
+-php bin/php5
+--next
+-D php7
+-php bin/php7
+--next
+-python bin/python/Tests.py
+--next
+-hl bin/hl/Tests.hl 
