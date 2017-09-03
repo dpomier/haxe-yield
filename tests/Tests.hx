@@ -3,9 +3,6 @@ import haxe.unit.TestRunner;
 import misc.InferenceTests;
 import misc.AccessionTests;
 import eparsers.ESwitchTests;
-import yield.Yield;
-import yield.macrotime.Tools;
-
 import misc.ImportTests;
 import misc.IterationTests;
 import misc.AbstractTests;
@@ -18,7 +15,7 @@ import eparsers.ETryTests;
 import eparsers.EWhileTests;
 import eparsers.EIfTests;
 
-class Tests implements Yield
+class Tests
 {
 
 	public function new() { }
@@ -47,12 +44,10 @@ class Tests implements Yield
 		
 		var success:Bool = r.run();
 		
-		#if sys
-			Sys.exit(success ? 0 : 1);
-		#elseif flash
-			flash.system.System.exit(success ? 0 : 1);
-		#else
-			if (!success) throw "failed";
+		#if travix
+			travix.Logger.exit(success ? 0 : 1);
+		#elseif sys
+			Sys.getChar(false);
 		#end
 	}
 	
