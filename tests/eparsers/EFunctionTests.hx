@@ -5,9 +5,12 @@ import yield.Yield;
 
 class EFunctionTests extends TestCase implements Yield
 {
+	private static var NULL_INT:Int;
 
 	public function new () {
 		super();
+		var n:Null<Int> = null;
+		NULL_INT = n;
 	}
 	
 	function testFunDeclaration () {
@@ -466,5 +469,23 @@ class EFunctionTests extends TestCase implements Yield
 				@yield return 8;
 			}
 		}
+	}
+	
+	function testInitialization () {
+		var it = initialization();
+		assertTrue(it.hasNext());
+		assertEquals(NULL_INT, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	function initialization () {
+		
+		var v:Int;
+		
+		function f () {
+			v = 3;
+		}
+		
+		@yield return v;
 	}
 }

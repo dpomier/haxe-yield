@@ -377,6 +377,24 @@ class ScopeTests extends TestCase implements Yield
 		
 		@yield return a;
 	}
+	
+	
+	function testEfunction () {
+		var it = efunction();
+		assertTrue(it.hasNext());
+		assertEquals(0, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	function efunction () {
+		
+		var v:Int = 0;
+		
+		function f () v = 3;
+		
+		@yield return v;
+	}
+	
 	function testSelf () {
 		var it = self();
 		

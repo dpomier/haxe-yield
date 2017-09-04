@@ -271,6 +271,12 @@ class ETryTests extends TestCase implements Yield
 		var it = initialization();
 		assertTrue(it.hasNext());
 		assertEquals(2, it.next());
+		try {
+			it.next();
+			assertTrue(false);
+		} catch (err:Dynamic) {
+			assertTrue(true);
+		}
 		assertFalse(it.hasNext());
 	}
 	
@@ -283,12 +289,20 @@ class ETryTests extends TestCase implements Yield
 			v = 1;
 			throw 5;
 			
+		} catch (err:String) {
+			throw null;
 		} catch (err:Int) {
 			v = 2;
 		} catch (err:Dynamic) {
 			v = 3;
 			@yield return err;
 		}
+		
+		@yield return v;
+		
+		var v:Int;
+		
+		throw null;
 		
 		@yield return v;
 	}

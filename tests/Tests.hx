@@ -17,8 +17,6 @@ import eparsers.EIfTests;
 
 class Tests
 {
-
-	public function new() { }
 	
 	static function main () {
 		

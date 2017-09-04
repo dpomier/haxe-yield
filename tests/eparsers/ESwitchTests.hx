@@ -362,6 +362,39 @@ class ESwitchTests extends TestCase implements Yield
 		@yield return a();
 	}
 	
+	function testInitialization () {
+		var it = initialization();
+		assertTrue(it.hasNext());
+		assertEquals(2, it.next());
+		assertEquals(3, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	function initialization () {
+		
+		var v:Int;
+		
+		switch (2) {
+			case 0: v = 0;
+			case 1: throw null;
+			case 2: v = 2;
+			default: v = 3;
+		}
+		
+		@yield return v;
+		
+		var v:Int;
+		
+		switch (4) {
+			case 0: v = 0;
+			case 1: throw null;
+			case 2: v = 2;
+			case _: v = 3;
+		}
+		
+		@yield return v;
+	}
+	
 }
 
 enum Data {

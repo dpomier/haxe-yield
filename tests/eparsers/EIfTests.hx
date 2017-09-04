@@ -260,4 +260,28 @@ class EIfTests extends TestCase implements Yield
 		};
 	}
 	
+	function testInitialization () {
+		var it = initialization(2);
+		assertTrue(it.hasNext());
+		assertEquals(2, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	function initialization (a:Int) {
+		
+		var v:Int;
+		
+		if (a == 0) {
+			v = 0;
+		} else if (a == 1) {
+			throw null;
+		} else if (a == 2) {
+			v = 2;
+		} else {
+			v = 3;
+		}
+		
+		@yield return v;
+	}
+	
 }
