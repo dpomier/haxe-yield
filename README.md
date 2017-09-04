@@ -7,7 +7,7 @@ Implements iterator patterns through the `@yield` metadata.
 
 The `@yield` metadata defines iterator blocks and indicates that the function, operator (see [operator overloading](https://haxe.org/manual/types-abstract-operator-overloading.html)), or accessor in which it appears is an iterator.
 
-When defining an iterator with `@yield`, an extra class is implicitly created to hold the state for an iteration likewise implementing the [Iterator\<T\>](http://api.haxe.org/Iterator.html) or [Iterable\<T\>](http://api.haxe.org/Iterable.html) pattern for a custom type (see [iterators](https://haxe.org/manual/lf-iterators.html) for an example).
+When defining an iterator with `@yield`, an extra class is implicitly created to hold the state for an iteration likewise implementing the [Iterator&lt;T&gt;](http://api.haxe.org/Iterator.html) or [Iterable&lt;T&gt;](http://api.haxe.org/Iterable.html) pattern for a custom type (see [iterators](https://haxe.org/manual/lf-iterators.html) for an example).
 
 Usage
 -----
@@ -23,7 +23,7 @@ Use a `@yield break` statement to end the iteration.
 
 Iterator methods can be run through using a `for` expression or [Lambda](https://haxe.org/manual/std-Lambda.html) functions. When a `yield return` statement is reached in the iterator method, `expression` is returned. Execution is restarted from that location the next time that the iterator function is called.
 
-The return type must be [Iterator\<T\>](http://api.haxe.org/Iterator.html) or [Iterable\<T\>](http://api.haxe.org/Iterable.html). If no return type is defined, the type will be [Dynamic](https://haxe.org/manual/types-dynamic.html), and can be unified to both Iterator or Iterable.
+The return type must be [Iterator&lt;T&gt;](http://api.haxe.org/Iterator.html) or [Iterable&lt;T&gt;](http://api.haxe.org/Iterable.html). If no return type is defined, the type will be [Dynamic](https://haxe.org/manual/types-dynamic.html), and can be unified to both Iterator or Iterable.
 
 Exemple
 -----
@@ -44,7 +44,7 @@ for (word in sayHello(“World”)) {
 }
 ```
 
-Call the sayHello method returns an Iterator<String>. The body of the method is not executed yet. 
+Call the sayHello method returns an Iterator&lt;String&gt;. The body of the method is not executed yet. 
 <br/>The `for` loop iterates over the iterator while the `Iterator<String>.hasNext` method returns true. 
 <br/>The method `Iterator<String>.hasNext` executes only once the body of sayHello until the next `@yield` statement is reached. 
 In case of a `@yield return` statement, `Iterator<String>.hasNext` will return true, and the result of the execution can be get once by calling `Iterator<String>.next`.
