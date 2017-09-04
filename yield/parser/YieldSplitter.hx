@@ -280,7 +280,7 @@ class YieldSplitter
 			case EThrow(_e):
 				parse(_e, true, ic);
 				if (!subParsing) addIntoBlock(e);
-				workEnv.addLocalThrow(e.pos);
+				workEnv.addLocalThrow();
 				
 			case EConst(_c): 
 				econstParser.run(e, subParsing, _c, IdentChannel.Normal);

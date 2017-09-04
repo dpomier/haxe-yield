@@ -4,7 +4,7 @@
   <output>
     <movie outputType="CustomBuild" />
     <movie input="" />
-    <movie path="bin\build-dev.hxml" />
+    <movie path="bin\build-all.hxml" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
@@ -24,7 +24,7 @@
     <option noInlineOnDebug="False" />
     <option mainClass="Tests" />
     <option enabledebug="False" />
-    <option additional="" />
+    <option additional="-dce full" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>

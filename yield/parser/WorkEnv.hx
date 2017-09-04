@@ -36,7 +36,6 @@ import yield.parser.checks.InitializationChecker;
 import yield.parser.checks.TypeInferencer;
 import yield.parser.idents.*;
 import yield.parser.idents.IdentRef.IdentRefTyped;
-import yield.parser.idents.ParentIdentData;
 import yield.parser.tools.FieldTools;
 import yield.parser.tools.IdentCategory;
 
@@ -45,7 +44,7 @@ typedef Scope = {
 	var children:Array<Scope>;
 	var level:UInt;
 	var id:UInt;
-	var localIdentStack:Array<IdentData>;
+	var localIdentStack:Array<Statement>;
 	var conditional:Bool;
 	var conditionalAlternatives:Array<Scope>;
 	var defaultCondition:Bool;
@@ -87,11 +86,11 @@ class WorkEnv
 	 */
 	public var functionsPack (default, null):Array<String>;
 	
-	public var localIdentStack		(default, null):Array<IdentData>;
-	public var instanceIdentStack	(default, null):Array<IdentData>;
-	public var parentDependencies	(default, null):Array<WorkEnv>;
-	public var parentAsVarDependencies (default, null):Array<{env:WorkEnv, identData:ParentIdentData}>;
-	public var parentIdentStack		(default, null):Array<ParentIdentData>;
+	public var localStack     (default, null):Array<Statement>;
+	public var instanceStack  (default, null):Array<Statement>;
+	public var parentStack    (default, null):Array<Statement>;
+	public var parentDependencies	   (default, null):Array<WorkEnv>;
+	public var parentAsVarDependencies (default, null):Array<{env:WorkEnv, identData:IdentData}>;
 	
 	public var functionArguments (default, null):Array<ArgIdentData>;
 	
@@ -155,7 +154,7 @@ class WorkEnv
 			conditional            : false,
 			conditionalAlternatives: null,
 			defaultCondition       : false,
-			localIdentStack: new Array<IdentData>()
+			localIdentStack: new Array<Statement>()
 		};
 		scopeCounter = 0;
 		yieldMode    = true;
@@ -166,9 +165,9 @@ class WorkEnv
 	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, pos:Position): Void {
 		
 		// reset
-		localIdentStack    = new Array<IdentData>();
-		instanceIdentStack = new Array<IdentData>();
-		parentIdentStack   = new Array<ParentIdentData>();
+		localStack    = new Array<Statement>();
+		instanceStack = new Array<Statement>();
+		parentStack   = new Array<Statement>();
 		
 		gotoActions  = new Array<LinkedPosition>();
 		setActions   = new Array<LinkedPosition>();
@@ -205,9 +204,9 @@ class WorkEnv
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferArg(arg);
 			if (ltype == null) ltype = macro:StdTypes.Dynamic;
 			
-			var identData:IdentData = addLocalDefinition([arg.name], [true], [ltype], IdentRef.IEVars(evars), IdentChannel.Normal, IdentOption.None, evars.pos);
+			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], IdentRef.IEVars(evars), IdentChannel.Normal, IdentOption.None, evars.pos);
 			
-			functionArguments.push({ definition: identData, originalArg: arg });
+			functionArguments.push({ definition: data, originalArg: arg });
 		}
 	}
 	
@@ -245,17 +244,17 @@ class WorkEnv
 		}
 	}
 	
-	public function addParentAsVarDependencies (of:WorkEnv, ident:ParentIdentData): Void {
+	public function addParentAsVarDependencies (of:WorkEnv, data:IdentData): Void {
 		
 		if (this != of) {
 			
 			for (item in parentAsVarDependencies) {
-				if (item.env == of && item.identData.names[0] == ident.names[0])
+				if (item.env == of && item.identData.names[0] == data.names[0])
 					return;
 			}
 			
-			parentAsVarDependencies.push({ env: of, identData: ident });
-			parent.addParentAsVarDependencies(of, ident);
+			parentAsVarDependencies.push({ env: of, identData: data });
+			parent.addParentAsVarDependencies(of, data);
 		}
 	}
 	
@@ -295,7 +294,7 @@ class WorkEnv
 			conditional            : isConditional,
 			conditionalAlternatives: null,
 			defaultCondition       : false,
-			localIdentStack: new Array<IdentData>()
+			localIdentStack: new Array<Statement>()
 		};
 		
 		if (s.conditional) {
@@ -335,22 +334,22 @@ class WorkEnv
 	
 	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, ident:IdentRef, ic:IdentChannel, option:IdentOption, pos:Position): IdentData {
 		
-		var identData:IdentData = {
-			identType:   IdentType.Definition(ic), 
+		var data:IdentData = {
+			names:       names, 
 			initialized: initialized,
 			types:       types,
-			env:         this,
-			names:       names, 
 			ident:       ident,
-			pos:         pos,
+			channel:     ic,
+			option:      option,
 			scope:       currentScope,
-			option:      option
+			env:         this,
+			pos:         pos
 		};
 		
-		localIdentStack.push(identData);
-		currentScope.localIdentStack.push(identData);
+		localStack.push(Statement.Definitions(data));
+		currentScope.localIdentStack.push(Statement.Definitions(data));
 		
-		return identData;
+		return data;
 	}
 	
 	public function addLocalAccession (name:String, initialized:Bool, type:ComplexType, ident:IdentRef, ic:IdentChannel, pos:Position): Void {
@@ -366,42 +365,44 @@ class WorkEnv
 			initialized = defIdent.initialized[defIdent.names.indexOf(name)];
 		}
 		
-		var identData:IdentData = {
-			identType:   IdentType.Accession(ic, defIdent), 
+		var data:IdentData = {
+			names:       [name], 
 			initialized: [initialized],
 			types:       [type],
-			env:         this,
-			names:       [name], 
 			ident:       ident,
-			pos:         pos,
+			channel:     ic,
+			option:      IdentOption.None,
 			scope:       currentScope,
-			option:      IdentOption.None
+			env:         this,
+			pos:         pos
 		};
 		
 		if (!initialized) {
-			if (!InitializationChecker.hasBeenInitialized(identData, defIdent, identData.scope))
+			if (!InitializationChecker.hasBeenInitialized(data, defIdent, data.scope))
 				Context.fatalError("Local variable " + name + " used without being initialized", pos);
 			else 
-				identData.initialized = [true];
+				data.initialized = [true];
 		}
 		
-		localIdentStack.push(identData);
-		currentScope.localIdentStack.push(identData);
+		localStack.push(Statement.Accession(data, defIdent));
+		currentScope.localIdentStack.push(Statement.Accession(data, defIdent));
 	}
 	
 	public function addInstanceAccession (field:Null<String>, type:ComplexType, ident:IdentRef, ic:IdentChannel, pos:Position): Void {
 		
-		instanceIdentStack.push({
-			identType:   IdentType.Accession(ic, null), 
+		var data:IdentData = {
+			names:       field == null ? null : [field], 
 			initialized: null,
 			types:       [type],
-			env:         this,
-			names:       field == null ? null : [field], 
 			ident:       ident,
-			pos:         pos,
+			channel:     ic,
+			option:      IdentOption.None,
 			scope:       currentScope,
-			option:      IdentOption.None
-		});
+			env:         this,
+			pos:         pos
+		};
+		
+		instanceStack.push(Statement.Accession(data, null));
 		
 		addInstanceDependency();
 	}
@@ -465,52 +466,38 @@ class WorkEnv
 		}
 	}
 	
-	public function addLocalThrow (pos:Position): Void {
+	public function addLocalThrow (): Void {
 		
-		var identData:IdentData = {
-			identType:   IdentType.Throw, 
-			initialized: null,
-			types:       null,
-			env:         this,
-			names:       null, 
-			ident:       null,
-			pos:         pos,
-			scope:       currentScope,
-			option:      IdentOption.None
-		};
-		
-		localIdentStack.push(identData);
-		currentScope.localIdentStack.push(identData);
+		localStack.push(Statement.Throw);
+		currentScope.localIdentStack.push(Statement.Throw);
 	}
 	
 	public function getLocalDefinitionOf (name:String, ic:IdentChannel): Null<IdentData> {
 		
-		var defType:Int = IdentType.Definition(ic).getIndex();
-		var i:Int = localIdentStack.length;
+		var defType:Int = Statement.Definitions(null).getIndex();
+		var i:Int = localStack.length;
 		while (--i >= 0) {
 			
-			if (localIdentStack[i].identType.getIndex() == defType &&
-				(localIdentStack[i].scope.id == currentScope.id || isParentScope(localIdentStack[i].scope, currentScope))
-				) {
-				
-				for (lname in localIdentStack[i].names) {
-					if (lname == name) {
-						return localIdentStack[i];
+			switch (localStack[i]) {
+				case Statement.Definitions(_data) if (_data.scope.id == currentScope.id || isParentScope(_data.scope, currentScope)):
+					for (lname in _data.names) {
+						if (lname == name) {
+							return _data;
+						}
 					}
-				}
+				case _:
 			}
-			
 		}
 		
 		return parent != null ? parent.getLocalDefinitionOf(name, ic) : null;
 	}
 	
-	public function getIdentCategoryOf (name:String): IdentCategory {
+	public function getIdentCategoryOf (name:String, ic:IdentChannel): IdentCategory {
 		
-		var identData:IdentData = getLocalDefinitionOf(name, IdentChannel.Normal);
+		var data:IdentData = getLocalDefinitionOf(name, ic);
 		
-		if (identData != null) {
-			return IdentCategory.LocalVar(identData.env, identData);
+		if (data != null) {
+			return IdentCategory.LocalVar(data);
 		} else {
 			return FieldTools.resolveIdent(name, classType, classFields, importedFields);
 		}

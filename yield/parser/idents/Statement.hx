@@ -23,9 +23,10 @@
  */
 #if macro
 package yield.parser.idents;
-import yield.parser.WorkEnv;
 
-typedef ParentIdentData = { > IdentData,
-	var parent:WorkEnv;
+enum Statement {
+	Definitions(data:IdentData);
+	Accession(data:IdentData, defData:IdentData);
+	Throw;
 }
 #end

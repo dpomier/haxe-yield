@@ -28,7 +28,7 @@ import yield.parser.idents.IdentData;
 
 enum IdentCategory 
 {
-	LocalVar(of:WorkEnv, definition:IdentData);
+	LocalVar(definition:IdentData);
 	InstanceField(type:Null<ComplexType>);
 	InstanceStaticField(type:Null<ComplexType>);
 	ImportedField(type:Null<ComplexType>);

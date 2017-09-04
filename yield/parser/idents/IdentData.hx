@@ -47,7 +47,7 @@ typedef IdentData = {
 	
 	var ident:IdentRef;
 	
-	var identType:IdentType;
+	var channel:IdentChannel;
 	
 	var option:IdentOption;
 	

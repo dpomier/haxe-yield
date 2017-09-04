@@ -25,7 +25,7 @@
 package yield.parser.checks;
 import yield.parser.WorkEnv.Scope;
 import yield.parser.idents.IdentData;
-import yield.parser.idents.IdentType;
+import yield.parser.idents.Statement;
 
 class InitializationChecker
 {
@@ -103,26 +103,26 @@ class InitializationChecker
 	private static function isInitializedInScope (accession:IdentData, definition:IdentData, scope:Scope, info:{ definitionReached:Bool }): Bool {
 		
 		var j:Int = scope.localIdentStack.length;
-		var ident:IdentData;
+		var statement:Statement;
 		while (--j != -1) {
-			ident = scope.localIdentStack[j];
+			statement = scope.localIdentStack[j];
 			
-			if (ident == definition) {
+			switch statement {
 				
-				info.definitionReached = true;
-				return ident.initialized[ident.names.indexOf(accession.names[0])];
-				
-			} else {
-				switch (ident.identType) {
-					case IdentType.Accession(_c, _definition):
+				case Statement.Definitions(_data):
+					if (_data == definition) {
 						
-						if (_definition == definition) {
-							return true; // stop the research, this ident will do the rest.
-						}
-						
-					case IdentType.Throw: return true;
-					case _:
-				}
+						info.definitionReached = true;
+						return _data.initialized[_data.names.indexOf(accession.names[0])];
+					}
+					
+				case Statement.Accession(_data, _definition):
+					if (_definition == definition) {
+						return true; // stop the research, this ident will do the rest.
+					}
+					
+				case Statement.Throw:
+					return true;
 			}
 		}
 		

@@ -23,11 +23,13 @@
  */
 #if macro
 package yield.parser.eparsers;
+import yield.parser.idents.Statement;
 import haxe.macro.Expr;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentRef;
-import yield.parser.idents.ParentIdentData;
+import yield.parser.idents.IdentData;
+import yield.parser.WorkEnv;
 import yield.parser.tools.IdentCategory;
 
 class EConstParser extends BaseParser
@@ -53,7 +55,7 @@ class EConstParser extends BaseParser
 					
 				} else {
 					
-					var exprCat:IdentCategory = m_we.getIdentCategoryOf(_s);
+					var exprCat:IdentCategory = m_we.getIdentCategoryOf(_s, ic);
 					
 					switch (exprCat) {
 						
@@ -63,40 +65,39 @@ class EConstParser extends BaseParser
 							
 							m_we.addInstanceAccession(_s, type, IdentRef.IEConst(e), ic, e.pos);
 							
-						case IdentCategory.LocalVar(__of, __definition):
+						case IdentCategory.LocalVar(__definition):
 							
 							var defIndex:Int = __definition.names.indexOf(_s);
 							
 							var type:ComplexType = __definition.types[defIndex];
 							var initialized:Bool = initialized ? true : __definition.initialized[defIndex];
 							
-							if (__of == m_we) {
+							if (__definition.env == m_we) {
 								
 								m_we.addLocalAccession(_s, initialized, type, IdentRef.IEConst(e), ic, e.pos);
 								
 							} else {
 								
-								var identData:ParentIdentData = {
-									identType:   IdentType.Accession(ic, __definition), 
+								var data:IdentData = {
+									names:       [_s],
 									initialized: [initialized],
 									types:       [type],
-									names:       [_s], 
 									ident:       IdentRef.IEConst(e),
-									pos:         e.pos, 
-									parent:      __of, 
-									scope:       WorkEnv.currentScope, 
+									channel:     ic,
+									option:      __definition.option,
+									scope:       WorkEnv.currentScope,
 									env:         m_we,
-									option:      __definition.option
+									pos:         e.pos
 								};
 								
 								if (__definition.option == IdentOption.KeepAsVar) {
-									m_we.addParentAsVarDependencies(__of, identData);
+									m_we.addParentAsVarDependencies(__definition.env, data);
 								} else {
-									m_we.addParentDependencies(__of);
-									__of.addLocalAccession(_s, initialized, type, IdentRef.IEConst(e), ic, e.pos);
+									m_we.addParentDependencies(__definition.env);
+									__definition.env.addLocalAccession(_s, initialized, type, IdentRef.IEConst(e), ic, e.pos);
 								}
 								
-								m_we.parentIdentStack.push(identData);
+								m_we.parentStack.push(Statement.Accession(data, __definition));
 								
 							}
 							

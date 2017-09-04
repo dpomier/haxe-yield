@@ -42,7 +42,7 @@ import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentData;
 import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentRef;
-import yield.parser.idents.IdentType;
+import yield.parser.idents.Statement;
 import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.FieldTools;
 import yield.parser.tools.IdentCategory;
@@ -228,12 +228,7 @@ class DefaultGenerator
 			
 			// Add the local variable as a field
 			
-			var ic:IdentChannel = switch (dependence.identData.identType)  {
-				case IdentType.Accession(_ic, _definition): _ic;
-				default: throw "irrelevant ident type : " + dependence.identData.identType;
-			};
-			
-			var fieldName:String = NameController.parentVar(dependence.identData.names[0], dependence.identData.scope, ic, dependence.env.getParentCount());
+			var fieldName:String = NameController.parentVar(dependence.identData.names[0], dependence.identData.scope, dependence.identData.channel, dependence.env.getParentCount());
 			
 			addProperty(bd, fieldName, [APrivate], dependence.identData.types[0], pos);
 			
@@ -260,7 +255,7 @@ class DefaultGenerator
 				
 				bd.givenArguments.push(econst);
 				
-				dependence.env.addLocalAccession(dependence.identData.names[0], dependence.identData.initialized[0], dependence.identData.types[0], IdentRef.IEConst(econst), ic, econst.pos);
+				dependence.env.addLocalAccession(dependence.identData.names[0], dependence.identData.initialized[0], dependence.identData.types[0], IdentRef.IEConst(econst), dependence.identData.channel, econst.pos);
 				
 			} else {
 				bd.givenArguments.push({
@@ -541,21 +536,27 @@ class DefaultGenerator
 		
 		// Transform instance accessions
 		
-		for (identData in workEnv.instanceIdentStack) {
+		for (statement in workEnv.instanceStack) {
 			
-			switch (identData.ident) {
+			switch (statement) {
+			case Statement.Accession(_data, _defData):
+				
+				switch (_data.ident) {
 				case IdentRef.IEConst(eRef):
 					
-					if (identData.names == null) {
+					if (_data.names == null) {
 						eRef.expr = EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, NameController.fieldInstance() );
 					} else {
 						eRef.expr = EField({
 							expr: EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, NameController.fieldInstance() ),
 							pos : eRef.pos
-						}, identData.names[0]);
+						}, _data.names[0]);
 					}
 					
-				default: throw "irrelevant ident reference : " + identData.ident;
+				default: throw "irrelevant ident reference : " + _data.ident;
+				}
+				
+			default: throw "irrelevant statement : " + statement;
 			}
 		}
 	}
@@ -564,56 +565,52 @@ class DefaultGenerator
 		
 		// Transform parent accessions
 		
-		for (identData in workEnv.parentIdentStack) {
+		for (statement in workEnv.parentStack) {
 			
-			if (identData.option != IdentOption.KeepAsVar) {
+			switch (statement) {
+			case Statement.Accession(_data, _defData):
 				
-				var parentFieldName:String = NameController.fieldParent(workEnv, identData.parent);
-				
-				switch (identData.ident) {
-					case IdentRef.IEConst(eRef):
-						
-						if (identData.names[0] == null) {
-							eRef.expr = EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName );
-						} else {
+				if (_data.option != IdentOption.KeepAsVar) {
+					
+					var parentFieldName:String = NameController.fieldParent(workEnv, _defData.env);
+					
+					switch (_data.ident) {
+						case IdentRef.IEConst(eRef):
 							
-							var lfield:Expr = {
-								expr: EField({
-									expr: EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName ),
-									pos : eRef.pos
-								}, identData.names[0] ),
-								pos: eRef.pos
-							};
+							if (_data.names[0] == null) {
+								eRef.expr = EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName );
+							} else {
+								
+								var lfield:Expr = {
+									expr: EField({
+										expr: EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName ),
+										pos : eRef.pos
+									}, _data.names[0] ),
+									pos: eRef.pos
+								};
+								
+								eRef.expr = lfield.expr;
+							}
 							
-							eRef.expr = lfield.expr;
-						}
-						
-					default: throw "irrelevant ident reference : " + identData.ident;
+						default: throw "irrelevant ident reference : " + _data.ident;
+					}
+					
+				} else {
+					
+					var parentFieldName:String = NameController.parentVar(_data.names[0], _data.scope, _data.channel, _defData.env.getParentCount());
+					
+					// rename accession
+					
+					switch (_data.ident) {
+						case IdentRef.IEConst(eRef):
+							eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, parentFieldName);
+							
+							eRef.expr = EConst(CIdent(parentFieldName));
+						default: throw "irrelevant ident reference : " + _data.ident;
+					}
 				}
 				
-			} else {
-				
-				var ic:IdentChannel;
-				var definition:IdentData;
-				
-				switch (identData.identType)  {
-					case IdentType.Accession(_ic, _definition): 
-						ic = _ic;
-						definition = _definition;
-					default: throw "irrelevant ident type : " + identData.identType;
-				};
-				
-				var parentFieldName:String = NameController.parentVar(identData.names[0], identData.scope, ic, definition.env.getParentCount());
-				
-				// rename accession
-				
-				switch (identData.ident) {
-					case IdentRef.IEConst(eRef):
-						eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, parentFieldName);
-						
-						eRef.expr = EConst(CIdent(parentFieldName));
-					default: throw "irrelevant ident reference : " + identData.ident;
-				}
+			default:				
 			}
 		}
 	}
@@ -635,30 +632,30 @@ class DefaultGenerator
 		var newNames:Map<String, String>;
 		var nameCounter:Map<String, UInt>;
 		
-		for (identData in workEnv.localIdentStack) {
+		for (statement in workEnv.localStack) {
 			
-			switch (identData.identType) {
+			switch (statement) {
 				
-				case IdentType.Accession(_ic, _definition):
+				case Statement.Accession(_data, _definition):
 					
 					if (_definition == null) {
-						Context.fatalError("Unknown identifier : " + identData.names[0], identData.pos);
+						Context.fatalError("Unknown identifier : " + _data.names[0], _data.pos);
 					}
 					
 					var scopeDefenition:Scope;
 					
-					if (newNameChannels[_ic].exists(_definition.scope.id)) {
+					if (newNameChannels[_data.channel].exists(_definition.scope.id)) {
 						scopeDefenition = _definition.scope;
 					} else {
-						Context.fatalError("Unknown identifier : " + identData.names[0], identData.pos);
+						Context.fatalError("Unknown identifier : " + _data.names[0], _data.pos);
 					}
 					
-					newNames    = newNameChannels[_ic][scopeDefenition.id];
-					nameCounter = nameCounterChannels[_ic][scopeDefenition.id];
+					newNames    = newNameChannels[_data.channel][scopeDefenition.id];
+					nameCounter = nameCounterChannels[_data.channel][scopeDefenition.id];
 					
 					// Change the accession
 					
-					switch (identData.ident) {
+					switch (_data.ident) {
 						
 						case IdentRef.IEConst(eRef) | IdentRef.IEField(eRef):
 							
@@ -667,53 +664,53 @@ class DefaultGenerator
 								case EConst(_c):
 									
 									if (_definition.option != IdentOption.KeepAsVar) {
-										eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, newNames[identData.names[0]]);
+										eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, newNames[_data.names[0]]);
 									} else {
-										eRef.expr = EConst(CIdent(newNames[identData.names[0]]));
+										eRef.expr = EConst(CIdent(newNames[_data.names[0]]));
 									}
 									
 								case EField(_e, _field):
 									
-									eRef.expr = EField(_e, newNames[identData.names[0]]);
+									eRef.expr = EField(_e, newNames[_data.names[0]]);
 									
 								default: throw "accession not supported : " + eRef.expr;
 							}
 							
-						default: throw "irrelevant ident reference : " + identData.ident;
+						default: throw "irrelevant ident reference : " + _data.ident;
 					}
 					
-				case IdentType.Definition(ic):
+				case Statement.Definitions(_data):
 					
-					if (!newNameChannels[ic].exists(identData.scope.id)) {
-						newNameChannels[ic].set( identData.scope.id, new Map<String, String>() );
-						nameCounterChannels[ic].set( identData.scope.id, new Map<String, UInt>() );
+					if (!newNameChannels[_data.channel].exists(_data.scope.id)) {
+						newNameChannels[_data.channel].set( _data.scope.id, new Map<String, String>() );
+						nameCounterChannels[_data.channel].set( _data.scope.id, new Map<String, UInt>() );
 					}
 					
-					newNames    = newNameChannels[ic][identData.scope.id];
-					nameCounter = nameCounterChannels[ic][identData.scope.id];
+					newNames    = newNameChannels[_data.channel][_data.scope.id];
+					nameCounter = nameCounterChannels[_data.channel][_data.scope.id];
 					
-					if (identData.names[0] == null) continue;
+					if (_data.names[0] == null) continue;
 					
 					// Define the new identifier
 					
 					var counter:UInt;
-					for (i in 0...identData.names.length) {
+					for (i in 0..._data.names.length) {
 						
-						if (!nameCounter.exists(identData.names[i])) counter = 0;
-						else counter = nameCounter[identData.names[i]];
+						if (!nameCounter.exists(_data.names[i])) counter = 0;
+						else counter = nameCounter[_data.names[i]];
 						
 						var newNameRc:String;
 						do {
-							newNameRc = NameController.localVar(identData.names[i], identData.scope, ic, ++counter);
-						} while (workEnv.getIdentCategoryOf(newNameRc) != IdentCategory.Unknown);
+							newNameRc = NameController.localVar(_data.names[i], _data.scope, _data.channel, ++counter);
+						} while (workEnv.getIdentCategoryOf(newNameRc, _data.channel) != IdentCategory.Unknown);
 						
-						nameCounter.set( identData.names[i], counter );
-						newNames.set( identData.names[i], newNameRc );
+						nameCounter.set( _data.names[i], counter );
+						newNames.set( _data.names[i], newNameRc );
 					}
 					
 					// Change the declaration
 					
-					switch (identData.ident) {
+					switch (_data.ident) {
 						
 						case IdentRef.IEVars(eRef): switch (eRef.expr) {
 							case EVars(_vars):
@@ -724,13 +721,13 @@ class DefaultGenerator
 									
 									var __var = _vars[i];
 									
-									if (__var.name == identData.names[i]) {
+									if (__var.name == _data.names[i]) {
 										
-										__var.name = newNames[identData.names[i]];
+										__var.name = newNames[_data.names[i]];
 										
 										// add local variable as field
 										
-										if (identData.option != IdentOption.KeepAsVar) {
+										if (_data.option != IdentOption.KeepAsVar) {
 											
 											var lfieldDecl:Field;
 											
@@ -742,7 +739,7 @@ class DefaultGenerator
 											else
 												lfieldDecl = FieldTools.makeFieldFromVar(__var, [APublic], null, eRef.pos);
 											
-											lfieldDecl.name = newNames[identData.names[i]];
+											lfieldDecl.name = newNames[_data.names[i]];
 											bd.typeDefinition.fields.push( lfieldDecl );
 										}
 									}
@@ -750,7 +747,7 @@ class DefaultGenerator
 								
 								// transform var declaration into field assignment
 								
-								if (identData.option != IdentOption.KeepAsVar) {
+								if (_data.option != IdentOption.KeepAsVar) {
 									
 									var assignations:Array<Expr> = [];
 									
@@ -758,7 +755,7 @@ class DefaultGenerator
 									while (--i != -1) {
 										
 										if (_vars[i].expr != null)
-											assignations.push( FieldTools.makeFieldAssignation(newNames[identData.names[i]], _vars[i].expr) );
+											assignations.push( FieldTools.makeFieldAssignation(newNames[_data.names[i]], _vars[i].expr) );
 										else
 											_vars.splice(i, 1);
 									}
@@ -775,36 +772,36 @@ class DefaultGenerator
 						case IdentRef.IEFunction(eRef): switch (eRef.expr) {
 							case EFunction(_name, _f):
 								
-								if (identData.option != IdentOption.KeepAsVar) {
+								if (_data.option != IdentOption.KeepAsVar) {
 									
 									// add local function as field
-									var lfieldDecl:Field = FieldTools.makeField(newNames[identData.names[0]], [APublic], {expr:EConst(CIdent("null")), pos: eRef.pos}, eRef.pos);
+									var lfieldDecl:Field = FieldTools.makeField(newNames[_data.names[0]], [APublic], {expr:EConst(CIdent("null")), pos: eRef.pos}, eRef.pos);
 									bd.typeDefinition.fields.push( lfieldDecl );
 									
 									// transform function declaration into field assignment
-									eRef.expr = FieldTools.makeFieldAssignation(newNames[identData.names[0]], {expr:EFunction(null, _f), pos: eRef.pos}).expr;
+									eRef.expr = FieldTools.makeFieldAssignation(newNames[_data.names[0]], {expr:EFunction(null, _f), pos: eRef.pos}).expr;
 									
 								} else {
 									
-									eRef.expr = EFunction(newNames[identData.names[0]], _f);
+									eRef.expr = EFunction(newNames[_data.names[0]], _f);
 								}
 								
 							default:
 						}
 						case IdentRef.IEConst(eRef): switch (eRef.expr) {
 							case EConst(_c):
-								eRef.expr = EConst(CIdent(newNames[identData.names[0]]));
+								eRef.expr = EConst(CIdent(newNames[_data.names[0]]));
 								
 							default:
 						}
 						
 						case IdentRef.ICatch(cRef):
-							cRef.name = newNames[identData.names[0]];
+							cRef.name = newNames[_data.names[0]];
 							
 						case IdentRef.IArg(aRef, pos):
-							aRef.name = newNames[identData.names[0]];
+							aRef.name = newNames[_data.names[0]];
 							
-						default: throw "irrelevant ident reference : " + identData.ident;
+						default: throw "irrelevant ident reference : " + _data.ident;
 					}
 					
 				case _:

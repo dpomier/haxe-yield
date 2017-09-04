@@ -47,12 +47,12 @@ class EVarsParser extends BaseParser
 			var typeInferred:Bool = false;
 			
 			if (!WorkEnv.isDynamicTarget()) {
-				TypeInferencer.checkLocalVariableType(_vars[j], m_we, e.pos); // Force typing because the type is required for member variables on static targets
+				TypeInferencer.checkLocalVariableType(_vars[j], m_we, ic, e.pos); // Force typing because the type is required for member variables on static targets
 				types.push(_vars[j].type != null ? _vars[j].type : macro:StdTypes.Dynamic);
 			} else {
 				
 				if (_vars[j].type == null) {
-					var inferred:Null<ComplexType> = TypeInferencer.tryInferExpr(_vars[j].expr, m_we);
+					var inferred:Null<ComplexType> = TypeInferencer.tryInferExpr(_vars[j].expr, m_we, ic);
 					if (inferred != null) {
 						_vars[j].type = inferred;
 					}

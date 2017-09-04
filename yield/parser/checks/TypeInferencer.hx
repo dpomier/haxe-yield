@@ -38,7 +38,7 @@ class TypeInferencer
 	/**
 	 * @return Returns the complex type of `expr` if it can be determined.
 	 */
-	public static function tryInferExpr (expr:Null<Expr>, ?env:WorkEnv): Null<ComplexType> {
+	public static function tryInferExpr (expr:Null<Expr>, ?env:WorkEnv, ?ic:IdentChannel): Null<ComplexType> {
 		
 		if (expr == null) return null;
 		
@@ -67,10 +67,12 @@ class TypeInferencer
 									return null;
 								} else {
 									
-									var identCat:IdentCategory = env.getIdentCategoryOf(__s);
+									if (ic == null) throw "ident channel needs to be specified when env does";
+									
+									var identCat:IdentCategory = env.getIdentCategoryOf(__s, ic);
 									
 									switch (identCat) {
-										case IdentCategory.LocalVar(_, _definition):
+										case IdentCategory.LocalVar(_definition):
 											return _definition.types[_definition.names.indexOf(__s)];
 											
 										case IdentCategory.InstanceField(_type)
@@ -205,9 +207,9 @@ class TypeInferencer
 		}
 	}
 	
-	public static function checkLocalVariableType (v:Var, env:WorkEnv, pos:Position): Void {
+	public static function checkLocalVariableType (v:Var, env:WorkEnv, ic:IdentChannel, pos:Position): Void {
 		if (v.type == null) {
-			v.type = TypeInferencer.tryInferExpr(v.expr, env);
+			v.type = TypeInferencer.tryInferExpr(v.expr, env, ic);
 			if (v.type == null) throwTypeRequiredFor(v.name, pos);
 		}
 	}
