@@ -120,7 +120,8 @@ class InitializationChecker
 							return true; // stop the research, this ident will do the rest.
 						}
 						
-					default:
+					case IdentType.Throw: return true;
+					case _:
 				}
 			}
 		}

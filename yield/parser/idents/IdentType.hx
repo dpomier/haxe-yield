@@ -27,5 +27,6 @@ package yield.parser.idents;
 enum IdentType {
 	Definition(c:IdentChannel);
 	Accession(c:IdentChannel, definition:IdentData);
+	Throw;
 }
 #end

@@ -29,6 +29,7 @@ import yield.parser.PositionManager.LinkedPosition;
 import yield.parser.eactions.ActionParser;
 import yield.parser.eparsers.*;
 import yield.parser.idents.IdentChannel;
+import yield.parser.WorkEnv;
 
 typedef IteratorBlock = Array<Expr>;
 
@@ -279,6 +280,7 @@ class YieldSplitter
 			case EThrow(_e):
 				parse(_e, true, ic);
 				if (!subParsing) addIntoBlock(e);
+				workEnv.addLocalThrow(e.pos);
 				
 			case EConst(_c): 
 				econstParser.run(e, subParsing, _c, IdentChannel.Normal);

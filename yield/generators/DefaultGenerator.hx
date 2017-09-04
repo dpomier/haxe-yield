@@ -806,6 +806,8 @@ class DefaultGenerator
 							
 						default: throw "irrelevant ident reference : " + identData.ident;
 					}
+					
+				case _:
 			}
 			
 		}

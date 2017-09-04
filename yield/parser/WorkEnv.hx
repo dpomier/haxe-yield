@@ -465,12 +465,31 @@ class WorkEnv
 		}
 	}
 	
+	public function addLocalThrow (pos:Position): Void {
+		
+		var identData:IdentData = {
+			identType:   IdentType.Throw, 
+			initialized: null,
+			types:       null,
+			env:         this,
+			names:       null, 
+			ident:       null,
+			pos:         pos,
+			scope:       currentScope,
+			option:      IdentOption.None
+		};
+		
+		localIdentStack.push(identData);
+		currentScope.localIdentStack.push(identData);
+	}
+	
 	public function getLocalDefinitionOf (name:String, ic:IdentChannel): Null<IdentData> {
 		
-		var i = localIdentStack.length;
+		var defType:Int = IdentType.Definition(ic).getIndex();
+		var i:Int = localIdentStack.length;
 		while (--i >= 0) {
 			
-			if (localIdentStack[i].identType.getIndex() == IdentType.Definition(ic).getIndex() &&
+			if (localIdentStack[i].identType.getIndex() == defType &&
 				(localIdentStack[i].scope.id == currentScope.id || isParentScope(localIdentStack[i].scope, currentScope))
 				) {
 				
