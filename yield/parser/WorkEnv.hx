@@ -66,6 +66,7 @@ class WorkEnv
 	
 	public static var YIELD_KEYWORD  (default, null):String;
 	public static var YIELD_EXPLICIT (default, null):Bool;
+	public static var YIELD_EXTEND   (default, null):Bool;
 	
 	public static var currentScope (default, null):Scope;
 	
@@ -142,10 +143,11 @@ class WorkEnv
 		parent = null;
 	}
 	
-	public function setOptions (yieldKeywork:String, yieldExplicit:Bool): Void {
+	public function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
 		
 		YIELD_KEYWORD  = yieldKeywork;
 		YIELD_EXPLICIT = yieldExplicit;
+		YIELD_EXTEND   = yieldExtend;
 	}
 	
 	public function setFieldData (f:Field, fun:Function): Void {

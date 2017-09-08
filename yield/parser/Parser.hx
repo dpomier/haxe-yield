@@ -149,6 +149,7 @@ class Parser
 		
 		var yieldKeyword:String = null;
 		var yieldExplicit:Bool = null;
+		var yieldExtend:Bool = null;
 		
 		function throwInvalidOpt (pos:Position)
 			Context.fatalError("Invalid option", pos);
@@ -159,13 +160,21 @@ class Parser
 		for (opt in options) {
 			
 			switch (opt) {
-			case (macro YieldOption.Explicit) | (macro yield.YieldOption.Explicit):
+			case (macro YieldOption.Extend) | (macro yield.YieldOption.Extend):
+				if (yieldExtend == null) yieldExtend = true;
+				else throwDuplicatedOpt("Extend", opt.pos);
+			case (macro YieldOption.Extend($s)) | (macro yield.YieldOption.Extend($s)):
+				var ident:String = ExpressionTools.getConstIdent(s);
+				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
+				if (value == null) throwInvalidOpt(opt.pos);
 				
+				if (yieldExtend == null) yieldExtend = value;
+				else throwDuplicatedOpt("Extend", opt.pos);
+				
+			case (macro YieldOption.Explicit) | (macro yield.YieldOption.Explicit):
 				if (yieldExplicit == null) yieldExplicit = true;
 				else throwDuplicatedOpt("ExplicitTyping", opt.pos);
-				
 			case (macro YieldOption.Explicit($s)) | (macro yield.YieldOption.Explicit($s)):
-				
 				var ident:String = ExpressionTools.getConstIdent(s);
 				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
 				if (value == null) throwInvalidOpt(opt.pos);
@@ -174,7 +183,6 @@ class Parser
 				else throwDuplicatedOpt("ExplicitTyping", opt.pos);
 				
 			case (macro YieldOption.Keywork($s)) | (macro yield.YieldOption.Keywork($s)):
-				
 				var name:String = ExpressionTools.getConstString(s);
 				if (name == null) throwInvalidOpt(opt.pos);
 				
@@ -187,8 +195,13 @@ class Parser
 		
 		ExpressionTools.defineVarAsDirective(yieldKeyword, "yield");
 		ExpressionTools.defineVarAsDirective(yieldExplicit, false);
+		ExpressionTools.defineVarAsDirective(yieldExtend, false);
 		
-		workEnv.setOptions( yieldKeyword, yieldExplicit );
+		if (yieldExtend) {
+			workEnv.classType.meta.add(":autoBuild", [macro yield.parser.Parser.run($a{options})] , workEnv.classType.pos);
+		}
+		
+		workEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
 	}
 	
 	private static function parseClass (ct:ClassType, t:Type, options:Array<ExprOf<YieldOption>>): Array<Field> {

@@ -5,13 +5,13 @@
     <movie outputType="CustomBuild" />
     <movie input="" />
     <movie path="bin\build-all.hxml" />
-    <movie fps="0" />
-    <movie width="0" />
-    <movie height="0" />
+    <movie fps="60" />
+    <movie width="960" />
+    <movie height="640" />
     <movie version="0" />
     <movie minorVersion="0" />
     <movie platform="hxml" />
-    <movie background="#FFFFFF" />
+    <movie background="#F68712" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -28,7 +28,7 @@
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <!-- example: <library name="..." /> -->
+    <library name="yield" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>

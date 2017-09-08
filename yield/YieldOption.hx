@@ -35,4 +35,12 @@ extern enum YieldOption
 	 * needs to be explicitly specified. This is disabled by default.
 	 */
 	Explicit(?v:Bool);
+	
+	/**
+	 * If the option is enabled, all extending classes will be able
+	 * to use yield statements. If this option affects an interface,
+	 * all implementing classes and all extending interfaces will
+	 * be able to use yield statements. This is disabled by default.
+	 */
+	Extend(?v:Bool);
 }

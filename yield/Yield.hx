@@ -23,6 +23,7 @@
  */
 package yield;
 
+@:deprecated
 @:remove 
 @:autoBuild(yield.parser.Parser.run())
 extern interface Yield { }

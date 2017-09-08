@@ -9,6 +9,7 @@ import misc.AbstractTests;
 import misc.ScopeTests;
 import misc.UsingTests;
 import misc.YieldTests;
+import misc.InheritanceTests;
 import eparsers.EForTests;
 import eparsers.EFunctionTests;
 import eparsers.ETryTests;
@@ -39,6 +40,7 @@ class Tests
 		r.add(new AbstractTests());
 		r.add(new AccessionTests());
 		r.add(new InferenceTests());
+		r.add(new InheritanceTests());
 		
 		var success:Bool = r.run();
 		
