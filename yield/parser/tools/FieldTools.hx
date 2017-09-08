@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser.tools;
+import haxe.macro.Compiler;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.Access;
@@ -69,41 +70,6 @@ class FieldTools
 		}
 	}
 	
-	public static function getImportedFields (): Array<String> {
-		
-		var importedExprs:Array<ImportExpr> = Context.getLocalImports();
-		var ret:Array<String> = new Array<String>();
-		
-		for (iexpr in importedExprs) {
-			switch (iexpr.mode) {
-				case IAsName(alias):
-					ret.push(alias);
-				case IAll:
-					
-					var tp:TypePath = {
-						name : iexpr.path[iexpr.path.length - 1].name,
-						pack : [for (i in 0...iexpr.path.length-1) iexpr.path[i].name]
-					};
-					
-					var complexType:ComplexType = ComplexType.TPath(tp);
-					var t:Type = Context.resolveType(complexType, iexpr.path[iexpr.path.length - 1].pos );
-					
-					var classType:ClassType = TypeTools.getClass(t);
-					
-					var statics:Array<ClassField> = classType.statics.get();
-					
-					for (i in 0...statics.length)
-						if (statics[i].isPublic)
-							ret.push( statics[i].name );
-					
-				case INormal:
-				default:
-			}
-		}
-		
-		return ret;
-	}
-	
 	/**
 	 * Determine the nature of the identifier `e`.
 	 */
@@ -122,8 +88,6 @@ class FieldTools
 		if (lcat != null) return lcat;
 		
 		// Imported fields
-		
-		if (importedFields == null) importedFields = getImportedFields();
 		
 		lcat = getImportedField(importedFields, s);
 		if (lcat != null) return lcat;

@@ -2,7 +2,7 @@ package misc;
 import haxe.unit.TestCase;
 import yield.Yield;
 
-using misc.pack.MiscFunctions;
+using pack.pack1.MiscFunctions;
 
 using Lambda;
 

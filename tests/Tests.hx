@@ -44,6 +44,8 @@ class Tests
 		
 		#if travix
 			travix.Logger.exit(success ? 0 : 1);
+		#elseif interp
+			Sys.exit(0);
 		#elseif sys
 			Sys.getChar(false);
 		#end

@@ -101,7 +101,7 @@ class DefaultGenerator
 	/**
 	 * Define all the type definitions from the queue.
 	 */
-	public static function run (): Void {
+	public static function run (env:WorkEnv): Void {
 		
 		var usings:Array<TypePath> = [];
 		var c:ClassType;
@@ -120,7 +120,7 @@ class DefaultGenerator
 					if (moduleName == c.name) {
 						tp = {
 							name:c.name,
-							pack:c.pack.copy()
+							pack:c.pack
 						};
 					} else {
 						tp = {
@@ -136,9 +136,7 @@ class DefaultGenerator
 			}
 		}
 		
-		var imports:Array<ImportExpr> = Context.getLocalImports();
-		
-		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, imports, usings);
+		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.imports, usings);
 		
 		typeDefinitionStack = new Array<TypeDefinition>();
 	}

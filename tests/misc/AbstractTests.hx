@@ -1,7 +1,7 @@
 package misc;
 
 import haxe.unit.TestCase;
-import misc.pack.OperatorOverloading2;
+import pack.pack1.OperatorOverloading2;
 import yield.Yield;
 import yield.parser.Parser;
 

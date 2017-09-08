@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser;
+import yield.parser.tools.ImportTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.ComplexType;
@@ -68,19 +69,20 @@ class WorkEnv
 	
 	public static var currentScope (default, null):Scope;
 	
-	public var classType 		(default, null):ClassType; // FIXME: rename to localClass
-	public var localType 		(default, null):Type;
-	public var classField 		(default, null):Field;
-	public var classFunction 	(default, null):Function;
-	public var isAbstract 		(default, null):Bool;
-	public var abstractType 	(default, null):AbstractType;
+	public var classType        (default, null):ClassType; // FIXME: rename to localClass
+	public var localType        (default, null):Type;
+	public var classField       (default, null):Field;
+	public var classFunction    (default, null):Function;
+	public var isAbstract       (default, null):Bool;
+	public var abstractType     (default, null):AbstractType;
 	public var classComplexType (default, null):ComplexType;
-	public var classFields 		(default, null):Array<Field>;
-	public var importedFields 	(default, null):Array<String>;
+	public var classFields      (default, null):Array<Field>;
+	public var importedFields   (default, null):Array<String>;
+	public var imports          (default, null):Array<ImportExpr>;
 	
-	public var fieldName 		(default, null):String;
-	public var functionRetType 	(default, null):RetType;
-	public var returnType 		(default, null):ComplexType;
+	public var fieldName        (default, null):String;
+	public var functionRetType  (default, null):RetType;
+	public var returnType       (default, null):ComplexType;
 	public var defaultReturnType (default, null):Expr;
 	
 	/**
@@ -131,7 +133,8 @@ class WorkEnv
 		}
 		
 		classFields    = Context.getBuildFields();
-		importedFields = FieldTools.getImportedFields();
+		imports        = Context.getLocalImports();
+		importedFields = ImportTools.getFieldShorthands(imports);
 		functionsPack  = [classType.name];
 		
 		parentDependencies      = [];

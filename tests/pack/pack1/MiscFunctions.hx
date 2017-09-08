@@ -1,4 +1,4 @@
-package misc.pack;
+package pack.pack1;
 
 class MiscFunctions
 {

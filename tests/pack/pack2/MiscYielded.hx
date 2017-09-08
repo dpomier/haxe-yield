@@ -1,4 +1,4 @@
-package misc.pack;
+package pack.pack2;
 import yield.Yield;
 
 class MiscYielded implements Yield

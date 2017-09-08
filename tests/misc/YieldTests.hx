@@ -1,7 +1,7 @@
 package misc;
 
 import haxe.unit.TestCase;
-import misc.pack.MiscYielded;
+import pack.pack2.MiscYielded;
 import yield.Yield;
 
 class YieldTests extends TestCase implements Yield

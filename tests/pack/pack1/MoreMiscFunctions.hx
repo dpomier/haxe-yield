@@ -1,4 +1,4 @@
-package misc.pack;
+package pack.pack1;
 import misc.ImportTests;
 
 class MoreMiscFunctions

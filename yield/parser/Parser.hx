@@ -35,6 +35,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
 #end
+import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
 import haxe.macro.Type.Ref;
@@ -70,8 +71,6 @@ class Parser
 				
 				workEnv = new WorkEnv(ct, t);
 				
-				checkImports();
-				
 				initOptions(options);
 				
 				return parseClass();
@@ -96,15 +95,6 @@ class Parser
 		classType.meta.add(":yield_processed", [], classType.pos);
 	}
 	
-	private static function checkImports (): Void {
-		
-		var imports:Array<ImportExpr> = Context.getLocalImports();
-		var i:Int = imports.length;
-		
-		while (--i != -1)
-			if (imports[i].mode == ImportMode.IAll)
-				Context.fatalError("Imports are not allowed to have `.*` wildcards or `in s` shorthands when using " + WorkEnv.YIELD_KEYWORD + " statement", Context.getLocalClass().get().pos);
-	}
 	
 	private static function initOptions (options:Array<Expr>): Void {
 		
@@ -154,13 +144,8 @@ class Parser
 	
 	private static function parseClass (): Array<Field> {
 		
-		for (field in workEnv.classFields) {
-			
-			if (field.access.indexOf(Access.AMacro) != -1)
-				Context.fatalError("Expression macros cannot be in modules containing Yield implementations", field.pos);
-				
+		for (field in workEnv.classFields)
 			parseField(field);
-		}
 		
 		return workEnv.classFields;
 	}
@@ -203,7 +188,7 @@ class Parser
 		var success:Bool = parseFunction(field.name, func, field.pos, workEnv);
 		
 		if (success) {
-			DefaultGenerator.run();
+			DefaultGenerator.run(workEnv);
 		}
 	}
 	
