@@ -55,16 +55,20 @@ class Parser
 		
 		#if macro
 			
-			switch (Context.getLocalType()) {
+			var t:Type = Context.getLocalType();
+			
+			switch (t) {
 			case null: return null;
 			case TInst(_, _): 
 				
-				workEnv = new WorkEnv();
+				var ct:ClassType = Context.getLocalClass().get();
 				
-				if (workEnv.alreadyPrecessed())
+				if (alreadyProcessed(ct))
 					return null;
 				
-				workEnv.markHasProcessed();
+				markHasProcessed(ct);
+				
+				workEnv = new WorkEnv(ct, t);
 				
 				checkImports();
 				
@@ -83,6 +87,14 @@ class Parser
 	}
 	
 	#if macro
+	
+	private static function alreadyProcessed (classType:ClassType): Bool {
+		return classType.meta.has(":yield_processed");
+	}
+	
+	private static function markHasProcessed (classType:ClassType): Void {
+		classType.meta.add(":yield_processed", [], classType.pos);
+	}
 	
 	private static function checkImports (): Void {
 		

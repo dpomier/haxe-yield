@@ -28,8 +28,9 @@ import haxe.macro.Expr;
 import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.Field;
 import haxe.macro.Expr.Function;
-import haxe.macro.Type.AbstractType;
+import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
+import haxe.macro.Type.AbstractType;
 import yield.generators.DefaultGenerator;
 import yield.parser.PositionManager.LinkedPosition;
 import yield.parser.checks.InitializationChecker;
@@ -67,7 +68,8 @@ class WorkEnv
 	
 	public static var currentScope (default, null):Scope;
 	
-	public var classType 		(default, null):ClassType;
+	public var classType 		(default, null):ClassType; // FIXME: rename to localClass
+	public var localType 		(default, null):Type;
 	public var classField 		(default, null):Field;
 	public var classFunction 	(default, null):Function;
 	public var isAbstract 		(default, null):Bool;
@@ -109,13 +111,14 @@ class WorkEnv
 	
 	private static var scopeCounter:UInt;
 	
-	public function new () {
+	public function new (ct:ClassType, t:Type) {
 		
-		classType = Context.getLocalClass().get();
-		classComplexType = Context.toComplexType(Context.getLocalType());
+		classType = ct;
+		localType = t;
+		classComplexType = Context.toComplexType(t);
 		
-		switch (Context.getLocalType()) {
-			case haxe.macro.Type.TInst(_.get() => _t, _params):
+		switch (t) {
+			case Type.TInst(_.get() => _t, _params):
 				switch (_t.kind) {
 					case KAbstractImpl(_.get() => __a):
 						abstractType = __a;
@@ -210,17 +213,9 @@ class WorkEnv
 		}
 	}
 	
-	public function alreadyPrecessed (): Bool {
-		return classType.meta.has(":yield_processed");
-	}
-	
-	public function markHasProcessed (): Void {
-		classType.meta.add(":yield_processed", [], classType.pos);
-	}
-	
 	public function getInheritedData (): WorkEnv {
 		
-		var we:WorkEnv = new WorkEnv();
+		var we:WorkEnv = new WorkEnv(classType, localType);
 		
 		we.functionsPack = functionsPack.copy();
 		we.functionsPack.push( fieldName );
