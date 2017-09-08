@@ -1,4 +1,5 @@
 -cp tests
+-lib yield
 -main Tests
 
 -dce full

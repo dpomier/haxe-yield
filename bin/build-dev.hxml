@@ -1,5 +1,7 @@
 -cp tests
+-lib yield
 -main Tests
+--times
 
 --each
 

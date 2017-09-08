@@ -43,12 +43,6 @@ import yield.YieldOption;
 
 class Parser
 {
-	#if macro
-	
-	private static var workEnv:WorkEnv;
-	
-	#end
-	
 	/**
 	 * Implement iterators from iterator blocks defined with yield statements.
 	 */
@@ -67,13 +61,7 @@ class Parser
 				if (alreadyProcessed(ct))
 					return null;
 				
-				markHasProcessed(ct);
-				
-				workEnv = new WorkEnv(ct, t);
-				
-				initOptions(options);
-				
-				return parseClass();
+				return parseClass(ct, t, options);
 				
 			default: return null;
 			}
@@ -87,6 +75,68 @@ class Parser
 	
 	#if macro
 	
+	private static var workEnv:WorkEnv;
+	
+	private static var runBuild (default, never):String = ExprTools.toString(macro yield.parser.Parser.run);
+	
+	private static function autoRun (): Array<Field> {
+		
+		var t:Type = Context.getLocalType();
+		
+		switch (t) {
+			case null: return null;
+			case TInst(_, _): 
+				
+				var ct:ClassType = Context.getLocalClass().get();
+				
+				if (alreadyProcessed(ct))
+					return null;
+				
+				var yieldMeta:MetadataEntry = null;
+				var hasBuildRun:Bool = false;
+				
+				function hasBuildYield (ct:ClassType): Bool {
+					for (md in ct.meta.get())
+						if (md.name == ":build" && md.params != null && md.params.length == 1)
+							switch (md.params[0].expr) {
+							case ExprDef.ECall(_e1, _):
+								if (ExprTools.toString(_e1) == runBuild)
+									return true;
+							default:
+							}
+					return false;
+				}
+				
+				for (md in ct.meta.get())
+					if (md.name == ":build" 
+					&& md.params != null 
+					&& md.params.length == 1)
+						switch (md.params[0].expr) {
+						case ExprDef.ECall(_e1, _):
+							if (ExprTools.toString(_e1) == runBuild)
+								hasBuildRun = true;
+						default:
+						}
+					else if (md.name == ":yield")
+						yieldMeta = md;
+				
+				if (yieldMeta == null)
+					return null;
+				else if (!hasBuildRun) 
+					return parseClass(ct, t, yieldMeta.params);
+				else
+					return Context.fatalError("Meta @:yield and @:build(yield.parser.Parser.run()) can't be defined on the same class", ct.pos);
+				
+				
+				
+			default: return null;
+		}
+	}
+	
+	private static function auto (): Void {
+		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
+	} 
+	
 	private static function alreadyProcessed (classType:ClassType): Bool {
 		return classType.meta.has(":yield_processed");
 	}
@@ -94,7 +144,6 @@ class Parser
 	private static function markHasProcessed (classType:ClassType): Void {
 		classType.meta.add(":yield_processed", [], classType.pos);
 	}
-	
 	
 	private static function initOptions (options:Array<Expr>): Void {
 		
@@ -142,7 +191,13 @@ class Parser
 		workEnv.setOptions( yieldKeyword, yieldExplicit );
 	}
 	
-	private static function parseClass (): Array<Field> {
+	private static function parseClass (ct:ClassType, t:Type, options:Array<ExprOf<YieldOption>>): Array<Field> {
+		
+		markHasProcessed(ct);
+		
+		workEnv = new WorkEnv(ct, t);
+		
+		initOptions(options);
 		
 		for (field in workEnv.classFields)
 			parseField(field);
