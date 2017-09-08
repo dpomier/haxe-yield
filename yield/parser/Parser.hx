@@ -54,24 +54,31 @@ class Parser
 	public static macro function run (options:Array<ExprOf<YieldOption>>): Array<Field> {
 		
 		#if macro
-		
-		workEnv = new WorkEnv();
-		
-		if (workEnv.alreadyPrecessed())
-			return null;
-		
-		workEnv.markHasProcessed();
-		
-		checkImports();
-		
-		initOptions(options);
-		
-		return parseClass();
-		
+			
+			switch (Context.getLocalType()) {
+			case null: return null;
+			case TInst(_, _): 
+				
+				workEnv = new WorkEnv();
+				
+				if (workEnv.alreadyPrecessed())
+					return null;
+				
+				workEnv.markHasProcessed();
+				
+				checkImports();
+				
+				initOptions(options);
+				
+				return parseClass();
+				
+			default: return null;
+			}
+			
 		#else
-		
-		return null;
-		
+			
+			return null;
+			
 		#end
 	}
 	
