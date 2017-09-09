@@ -182,7 +182,7 @@ class Parser
 				if (yieldExplicit == null) yieldExplicit = value;
 				else throwDuplicatedOpt("ExplicitTyping", opt.pos);
 				
-			case (macro YieldOption.Keywork($s)) | (macro yield.YieldOption.Keywork($s)):
+			case (macro YieldOption.Keyword($s)) | (macro yield.YieldOption.Keyword($s)):
 				var name:String = ExpressionTools.getConstString(s);
 				if (name == null) throwInvalidOpt(opt.pos);
 				
@@ -190,6 +190,7 @@ class Parser
 				else throwDuplicatedOpt("YieldKeyword", opt.pos);
 				
 			default:
+				throwInvalidOpt(opt.pos);
 			}
 		}
 		

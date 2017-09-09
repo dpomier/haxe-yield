@@ -28,7 +28,7 @@ extern enum YieldOption
 	/**
 	 * Use a custom keyword instead of "yield".
 	 */
-	Keywork(s:String);
+	Keyword(s:String);
 	
 	/**
 	 * If the option is enabled, the return type of iterative functions
