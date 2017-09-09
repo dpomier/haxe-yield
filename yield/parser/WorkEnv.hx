@@ -138,7 +138,7 @@ class WorkEnv
 		parent = null;
 	}
 	
-	public function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
+	public static function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
 		
 		YIELD_KEYWORD  = yieldKeywork;
 		YIELD_EXPLICIT = yieldExplicit;

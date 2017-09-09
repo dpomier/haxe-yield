@@ -23,7 +23,10 @@
  */
 package yield;
 
-extern enum YieldOption 
+#if !macro
+extern
+#end
+enum YieldOption 
 {
 	/**
 	 * Use a custom keyword instead of "yield".

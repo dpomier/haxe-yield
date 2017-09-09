@@ -3,6 +3,7 @@ package misc;
 import haxe.unit.TestCase;
 import yield.YieldOption;
 
+@:build(yield.parser.Parser.run())
 @:yield(YieldOption.Extend)
 class Parent extends TestCase
 {

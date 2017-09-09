@@ -192,7 +192,8 @@ abstract SFWrapper<T>(T) from T {
 }
 #end
 
-class Statics implements Yield {
+@:yield
+class Statics {
 	public static function makeSource<T>(i:T):Iterator<T> {
 		while (true) @yield return i;
 	}

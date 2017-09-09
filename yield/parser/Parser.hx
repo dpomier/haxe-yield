@@ -45,6 +45,8 @@ class Parser
 {
 	/**
 	 * Implement iterators from iterator blocks defined with yield statements.
+	 * Preferably use `:yield` metadata instead of `:build` or `:autoBuild` metadata
+	 * except when dealing with abstracts.
 	 */
 	public static macro function run (options:Array<ExprOf<YieldOption>>): Array<Field> {
 		
@@ -59,7 +61,17 @@ class Parser
 				if (alreadyProcessed(ct))
 					return null;
 				
-				return parseClass(ct, t, options);
+				var hasAutoBuild:Bool = false;
+				
+				for (md in ct.meta.get())
+					if (md.name == ":yield" && md.params != null)
+						for (p in md.params) options.push(p);
+					else if (isBuildMeta(":autoBuild", md))
+						hasAutoBuild = true;
+				
+				initEnv(ct, t, options, hasAutoBuild);
+				
+				return parseClass();
 				
 			default: return null;
 			}
@@ -75,9 +87,11 @@ class Parser
 	
 	private static var workEnv:WorkEnv;
 	
-	private static var runBuild (default, never):String = ExprTools.toString(macro yield.parser.Parser.run);
+	private static function auto (): Void {
+		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
+	}
 	
-	private static function autoRun (): Array<Field> {
+	private static macro function autoRun (): Array<Field> {
 		
 		var t:Type = Context.getLocalType();
 		
@@ -88,50 +102,70 @@ class Parser
 				if (alreadyProcessed(ct))
 					return null;
 				
-				var yieldMeta:MetadataEntry = null;
-				var hasBuildRun:Bool = false;
+				var hasYieldMeta:Bool    = false;
+				var hasAutoBuild:Bool = false;
 				
-				function hasBuildYield (ct:ClassType): Bool {
-					for (md in ct.meta.get())
-						if (md.name == ":build" && md.params != null && md.params.length == 1)
-							switch (md.params[0].expr) {
-							case ExprDef.ECall(_e1, _):
-								if (ExprTools.toString(_e1) == runBuild)
-									return true;
-							default:
-							}
-					return false;
-				}
+				var options:Array<Expr> = null;
 				
 				for (md in ct.meta.get())
-					if (md.name == ":build" 
-					&& md.params != null 
-					&& md.params.length == 1)
-						switch (md.params[0].expr) {
-						case ExprDef.ECall(_e1, _):
-							if (ExprTools.toString(_e1) == runBuild)
-								hasBuildRun = true;
-						default:
-						}
-					else if (md.name == ":yield")
-						yieldMeta = md;
+					if (md.name == ":yield") {
+						hasYieldMeta = true;
+						options = md.params != null ? md.params : [];
+					}
+					else if (isBuildMeta(":build", md))
+						return null;
+					else if (isBuildMeta(":autoBuild", md))
+						hasAutoBuild = true;
 				
-				if (yieldMeta == null)
+				if (!hasYieldMeta)
 					return null;
-				else if (!hasBuildRun) 
-					return parseClass(ct, t, yieldMeta.params);
-				else
-					return Context.fatalError("Meta @:yield and @:build(yield.parser.Parser.run()) can't be defined on the same class", ct.pos);
 				
+				initEnv(ct, t, options, hasAutoBuild);
 				
+				return parseClass();
 				
 			default: return null;
 		}
 	}
 	
-	private static function auto (): Void {
-		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
-	} 
+	public static macro function extendedRun (options:Array<ExprOf<YieldOption>>): Array<Field> {
+		
+		var t:Type = Context.getLocalType();
+		
+		switch (t) {
+		case null: return null;
+		case TInst(_.get() => ct, _):
+			
+			if (alreadyProcessed(ct))
+				return null;
+			
+			var hasAutoBuild:Bool = false;
+			
+			for (md in ct.meta.get())
+				if (md.name == ":yield" || isBuildMeta(":build", md)) 
+					return null;
+			
+			initEnv(ct, t, options, false);
+			
+			return parseClass();
+			
+		default: return null;
+		}
+	}
+	
+	private static function isBuildMeta (buildName:String, md:MetadataEntry): Bool {
+		
+		return if (md.name == buildName && md.params != null && md.params.length == 1)
+			switch (md.params[0].expr) {
+			case ExprDef.ECall(_e, _):
+				switch (_e) {
+				case (macro yield.parser.Parser.run): true;
+				default: false;
+				}
+			default: false;
+			}
+		else false;
+	}
 	
 	private static function alreadyProcessed (classType:ClassType): Bool {
 		return classType.meta.has(":yield_processed");
@@ -141,7 +175,14 @@ class Parser
 		classType.meta.add(":yield_processed", [], classType.pos);
 	}
 	
-	private static function initOptions (options:Array<Expr>): Void {
+	private static function initEnv (ct:ClassType, t:Type, options:Array<Expr>, hasAutoBuild:Bool): Void {
+		
+		markHasProcessed(ct);
+		workEnv = new WorkEnv(ct, t);
+		initOptions(options, !hasAutoBuild);
+	}
+	
+	private static function initOptions (options:Array<Expr>, canExtend:Bool): Void {
 		
 		var yieldKeyword:String = null;
 		var yieldExplicit:Bool = null;
@@ -149,41 +190,51 @@ class Parser
 		
 		function throwInvalidOpt (pos:Position)
 			Context.fatalError("Invalid option", pos);
-			
+		
 		function throwDuplicatedOpt (opt:String, pos:Position)
 			Context.fatalError(opt + " is already defined", pos);
 		
-		for (opt in options) {
+		function throwConflict (opt:String, pos:Position)
+			Context.fatalError(opt + " and :autoBuild(" + ExprTools.toString(macro yield.parser.Parser.run()) + ") metadata are conflicted", pos);
+		
+		var i:Int = options.length;
+		var opt:Expr;
+		while (--i != -1) {
+			opt = options[i];
 			
 			switch (opt) {
 			case (macro YieldOption.Extend) | (macro yield.YieldOption.Extend):
-				if (yieldExtend == null) yieldExtend = true;
-				else throwDuplicatedOpt("Extend", opt.pos);
+				if (!canExtend) throwConflict(YieldOption.Extend(true).getName(), opt.pos);
+				else if (yieldExtend == null) yieldExtend = true;
+				else throwDuplicatedOpt(YieldOption.Extend(true).getName(), opt.pos);
+				options.splice(i,1);
 			case (macro YieldOption.Extend($s)) | (macro yield.YieldOption.Extend($s)):
 				var ident:String = ExpressionTools.getConstIdent(s);
 				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
 				if (value == null) throwInvalidOpt(opt.pos);
 				
-				if (yieldExtend == null) yieldExtend = value;
-				else throwDuplicatedOpt("Extend", opt.pos);
+				if (!canExtend) throwConflict(YieldOption.Extend(true).getName(), opt.pos);
+				else if (yieldExtend == null) yieldExtend = value;
+				else throwDuplicatedOpt(YieldOption.Extend(true).getName(), opt.pos);
+				options.splice(i,1);
 				
 			case (macro YieldOption.Explicit) | (macro yield.YieldOption.Explicit):
 				if (yieldExplicit == null) yieldExplicit = true;
-				else throwDuplicatedOpt("ExplicitTyping", opt.pos);
+				else throwDuplicatedOpt(YieldOption.Explicit(true).getName(), opt.pos);
 			case (macro YieldOption.Explicit($s)) | (macro yield.YieldOption.Explicit($s)):
 				var ident:String = ExpressionTools.getConstIdent(s);
 				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
 				if (value == null) throwInvalidOpt(opt.pos);
 				
 				if (yieldExplicit == null) yieldExplicit = value;
-				else throwDuplicatedOpt("ExplicitTyping", opt.pos);
+				else throwDuplicatedOpt(YieldOption.Explicit(true).getName(), opt.pos);
 				
 			case (macro YieldOption.Keyword($s)) | (macro yield.YieldOption.Keyword($s)):
 				var name:String = ExpressionTools.getConstString(s);
 				if (name == null) throwInvalidOpt(opt.pos);
 				
 				if (yieldKeyword == null) yieldKeyword = name;
-				else throwDuplicatedOpt("YieldKeyword", opt.pos);
+				else throwDuplicatedOpt(YieldOption.Keyword("").getName(), opt.pos);
 				
 			default:
 				throwInvalidOpt(opt.pos);
@@ -195,19 +246,13 @@ class Parser
 		ExpressionTools.defineVarAsDirective(yieldExtend, false);
 		
 		if (yieldExtend) {
-			workEnv.classType.meta.add(":autoBuild", [macro yield.parser.Parser.run($a{options})] , workEnv.classType.pos);
+			workEnv.classType.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , workEnv.classType.pos);
 		}
 		
-		workEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
+		WorkEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
 	}
 	
-	private static function parseClass (ct:ClassType, t:Type, options:Array<ExprOf<YieldOption>>): Array<Field> {
-		
-		markHasProcessed(ct);
-		
-		workEnv = new WorkEnv(ct, t);
-		
-		initOptions(options);
+	private static function parseClass (): Array<Field> {
 		
 		for (field in workEnv.classFields)
 			parseField(field);
@@ -224,8 +269,8 @@ class Parser
 			
 			case FFun(_f):
 				
-				func				= _f;
-				alternativeRetType 	= null;
+				func               = _f;
+				alternativeRetType = null;
 				
 			case FProp(_, _, _t, _e) | FVar(_t, _e):
 				
@@ -233,10 +278,10 @@ class Parser
 				
 				if (MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, _e)) {
 					
-					func 				= MetaTools.selectedFunc;
-					alternativeRetType 	= switch (_t) {
+					func               = MetaTools.selectedFunc;
+					alternativeRetType = switch (_t) {
 						case ComplexType.TFunction(__args, __ret): 	__ret;
-						default: 									null;
+						default: null;
 					};
 					
 				} else {
@@ -343,4 +388,10 @@ class Parser
 	}
 	
 	#end
+}
+
+private typedef Options = {
+	yieldKeyword:String, 
+	yieldExplicit:Bool, 
+	yieldExtend:Bool
 }
