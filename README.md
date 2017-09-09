@@ -7,7 +7,7 @@ Implements iterator patterns through the `yield` metadata.
 
 The `yield` metadata defines iterator blocks and indicates that the function, operator (see [operator overloading](https://haxe.org/manual/types-abstract-operator-overloading.html)), or accessor in which it appears is an iterator.
 
-When defining an iterator with `yield`, an extra class is implicitly created to hold the state for an iteration likewise implementing the [Iterator&lt;T&gt;](http://api.haxe.org/Iterator.html) or [Iterable&lt;T&gt;](http://api.haxe.org/Iterable.html) pattern for a custom type (see [iterators](https://haxe.org/manual/lf-iterators.html) for an example).
+When defining an iterator with `yield` statements, an extra class is implicitly created to hold the state for an iteration likewise implementing the [Iterator&lt;T&gt;](http://api.haxe.org/Iterator.html) or [Iterable&lt;T&gt;](http://api.haxe.org/Iterable.html) pattern for a custom type (see [iterators](https://haxe.org/manual/lf-iterators.html) for an example).
 
 Usage
 -----
@@ -19,6 +19,7 @@ class MyClass {
     // ...
 }
 ```
+When dealing with abstracts, use `@:build(yield.parser.Parser.run())` instead of `@:yield`.
 
 The following example shows the two forms of the `yield` metadata:
 ```haxe
@@ -80,7 +81,7 @@ counter.next(); // n
 Advanced usage
 -----
 
-You can compile with some options or add `@:build(yield.parser.Parser.run())` to your classes instead of implementing `yield.Yield` to pass some arguments.
+You can compile with some options or pass several `yield.YieldOption` into the `:yield` metadata.
 
 Available options are:
 
