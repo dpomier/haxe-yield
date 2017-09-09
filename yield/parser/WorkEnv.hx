@@ -120,16 +120,11 @@ class WorkEnv
 		localType = t;
 		classComplexType = Context.toComplexType(t);
 		
-		switch (t) {
-			case Type.TInst(_.get() => _t, _params):
-				switch (_t.kind) {
-					case KAbstractImpl(_.get() => __a):
-						abstractType = __a;
-						isAbstract   = true;
-					default: 
-						isAbstract = false;
-				}
-			default:
+		switch (ct.kind) {
+			case KAbstractImpl(_.get() => __a):
+				abstractType = __a;
+				isAbstract   = true;
+			default: 
 				isAbstract = false;
 		}
 		

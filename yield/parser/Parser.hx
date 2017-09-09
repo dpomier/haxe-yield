@@ -54,9 +54,7 @@ class Parser
 			
 			switch (t) {
 			case null: return null;
-			case TInst(_, _): 
-				
-				var ct:ClassType = Context.getLocalClass().get();
+			case TInst(_.get() => ct, _): 
 				
 				if (alreadyProcessed(ct))
 					return null;
@@ -85,9 +83,7 @@ class Parser
 		
 		switch (t) {
 			case null: return null;
-			case TInst(_, _): 
-				
-				var ct:ClassType = Context.getLocalClass().get();
+			case TInst(_.get() => ct, _): 
 				
 				if (alreadyProcessed(ct))
 					return null;
