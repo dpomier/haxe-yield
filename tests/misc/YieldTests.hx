@@ -4,7 +4,8 @@ import haxe.unit.TestCase;
 import pack.pack2.MiscYielded;
 import yield.Yield;
 
-class YieldTests extends TestCase implements Yield
+@:yield
+class YieldTests extends TestCase
 {
 
 	public function new() 
