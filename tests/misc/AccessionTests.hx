@@ -26,7 +26,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	static var staticVarField:Bool = false;
 	
 	function staticVar () {
-		@yield return null;
+		@yield return 0;
 		staticVarField = true;
 	}
 	
@@ -46,7 +46,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	}
 	
 	function parentStaticVar () {
-		@yield return null;
+		@yield return 0;
 		Parent.privateStatic = true;
 		Parent.publicStatic  = true;
 	}
@@ -96,7 +96,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	}
 	
 	function parentMember () {
-		@yield return null;
+		@yield return 0;
 		privateMember = true;
 		publicMember  = true;
 	}
@@ -137,13 +137,16 @@ class AccessionTests extends misc.packs.Parent implements Yield
 		@yield return bIterator.next();
 	}
 	
+	#if (!cs && !java) // error: repeated modifier
 	function testAbstractAccessions () {
 		var a = new MyAbstract();
 		assertTrue(a.test());
 	}
+	#end
 	
 }
 
+#if (!cs && !java) // error: repeated modifier
 @:build(yield.parser.Parser.run())
 @:access(misc.packs.Parent)
 abstract MyAbstract (Parent) {
@@ -175,3 +178,4 @@ abstract MyAbstract (Parent) {
 		Parent.publicStatic  = true;
 	}
 }
+#end
