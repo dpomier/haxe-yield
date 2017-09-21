@@ -1,9 +1,10 @@
 package misc;
 
 import haxe.unit.TestCase;
+import misc.packs.Parent;
 import yield.Yield;
 
-class AccessionTests extends TestCase implements Yield
+class AccessionTests extends misc.packs.Parent implements Yield
 {
 
 	public function new() 
@@ -13,83 +14,164 @@ class AccessionTests extends TestCase implements Yield
 	
 	function testStaticVar () {
 		var it = staticVar();
+		staticVarField = false;
 		assertTrue(it.hasNext());
+		assertFalse(staticVarField);
 		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
+		assertFalse(staticVarField);
 		assertFalse(it.hasNext());
+		assertTrue(staticVarField);
 	}
 	
-	static var staticVar:Void->Iterator<Int> = function ():Iterator<Int> {
-		
-		for (i in 0...3) {
-			@yield return i;
-		}
-	};
+	static var staticVarField:Bool = false;
 	
-	function testRealStaticVar () {
-		var it = realStatic();
-		realStaticVar = false;
-		assertTrue(it.hasNext());
-		assertFalse(realStaticVar);
-		assertEquals(0, it.next());
-		assertFalse(realStaticVar);
-		assertFalse(it.hasNext());
-		assertTrue(realStaticVar);
-	}
-	
-	static var realStaticVar:Bool = false;
-	
-	function realStatic () {
+	function staticVar () {
 		@yield return null;
-		realStaticVar = true;
+		staticVarField = true;
 	}
 	
-	function testMember () {
-		var it = this.member();
+	function testParentStaticVar () {
+		var it = parentStaticVar();
+		Parent.privateStatic = false;
+		Parent.publicStatic  = false;
 		assertTrue(it.hasNext());
+		assertFalse(Parent.privateStatic);
+		assertFalse(Parent.publicStatic);
 		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
+		assertFalse(Parent.privateStatic);
+		assertFalse(Parent.publicStatic);
 		assertFalse(it.hasNext());
+		assertTrue(Parent.privateStatic);
+		assertTrue(Parent.publicStatic);
 	}
 	
-	var member:Void->Iterator<Int> = function ():Iterator<Int> {
-		
-		for (i in 0...3) {
-			@yield return i;
-		}
-	};
+	function parentStaticVar () {
+		@yield return null;
+		Parent.privateStatic = true;
+		Parent.publicStatic  = true;
+	}
 	
-	function testStaticProperty () {
-		var it = staticProperty();
+	var member:Int;
+	
+	function testInstanceAccess () {
+		
+		this.member = -4;
+		
+		var it:Iterator<Dynamic> = cast instanceAccess();
+		
+		assertEquals(-4, it.next());
+		assertEquals(-4, it.next());
+		assertEquals(-8, it.next());
+		assertEquals(member, -8);
+		
+		assertEquals(-8, it.next());
+		assertEquals(10, it.next());
+	}
+	
+	function instanceAccess (): Iterator<Int> {
+		
+		@yield return this.member;
+		@yield return member;
+		member = -8;
+		@yield return this.member;
+		
+		var member = 10;
+		@yield return this.member;
+		@yield return member;
+	}
+	
+	function testParentMember () {
+		var it = parentMember();
+		privateMember = false;
+		publicMember  = false;
 		assertTrue(it.hasNext());
+		assertFalse(privateMember);
+		assertFalse(publicMember);
 		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
+		assertFalse(privateMember);
+		assertFalse(publicMember);
 		assertFalse(it.hasNext());
+		assertTrue(privateMember);
+		assertTrue(publicMember);
 	}
 	
-	static var staticProperty(default, null) = function () {
-		
-		for (i in 0...3) {
-			@yield return i;
-		}
-	};
-	
-	function testProperty () {
-		var it = this.property();
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+	function parentMember () {
+		@yield return null;
+		privateMember = true;
+		publicMember  = true;
 	}
 	
-	var property(default, null) = function () {
+	function testNestedAccess () {
 		
-		for (i in 0...3) {
-			@yield return i;
+		this.member = 20;
+		
+		var it:Iterator<Dynamic> = cast nestedAccess();
+		
+		assertEquals(3, it.next());
+		assertEquals(3, it.next());
+		assertEquals(12, it.next());
+		assertEquals(2, it.next());
+		assertEquals(member, 20);
+	}
+	
+	function nestedAccess (): Iterator<Int> {
+		
+		var a = 0;
+		
+		function b () {
+			a = 3;
+			@yield return a;
+			@yield return a * 2;
+			var a = 1;
+			@yield return a*2;
+			@yield return member;
 		}
-	};
+		
+		var bIterator:Iterator<Dynamic> = cast b();
+		
+		@yield return bIterator.next();
+		@yield return a;
+		a = 6;
+		@yield return bIterator.next();
+		@yield return bIterator.next();
+		@yield return bIterator.next();
+	}
+	
+	function testAbstractAccessions () {
+		var a = new MyAbstract();
+		assertTrue(a.test());
+	}
+	
+}
+
+@:build(yield.parser.Parser.run())
+@:access(misc.packs.Parent)
+abstract MyAbstract (Parent) {
+	public inline function new() {
+		this = new Parent();
+	}
+	
+	public function test (): Bool {
+		this.publicMember  = false;
+		this.privateMember = false;
+		untyped Parent.privateStatic = false;
+		Parent.publicStatic  = false;
+		
+		var it = iterator();
+		return
+			it.hasNext()
+			&& !this.privateMember && !this.publicMember && !Parent.privateStatic && !Parent.publicStatic
+			&& it.next() == null
+			&& !this.privateMember && !this.publicMember && !Parent.privateStatic && !Parent.publicStatic
+			&& !it.hasNext()
+			&& this.privateMember && this.publicMember && Parent.privateStatic && Parent.publicStatic;
+	}
+	
+	function iterator () {
+		@yield return null;
+		this.privateMember = true;
+		this.publicMember  = true;
+		Parent.privateStatic = true;
+		Parent.publicStatic  = true;
+	}
 }

@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser.eparsers;
+import haxe.macro.Context;
 import yield.parser.idents.Statement;
 import haxe.macro.Expr;
 import yield.parser.idents.IdentChannel;
@@ -101,7 +102,12 @@ class EConstParser extends BaseParser
 								
 							}
 							
-						default:
+						case IdentCategory.InstanceStaticField(_t, _c):
+							
+							e.expr = EField(Context.parse(_c.module + "." + _c.name, e.pos), _s);
+							
+						case IdentCategory.ImportedField(_t):
+						case IdentCategory.Unknown:
 					}
 				}
 				

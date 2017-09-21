@@ -28,6 +28,70 @@ class YieldTests extends TestCase
 		@yield return 4;
 	}
 	
+	function testStaticVar () {
+		var it = staticVar();
+		assertTrue(it.hasNext());
+		assertEquals(0, it.next());
+		assertEquals(1, it.next());
+		assertEquals(2, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	static var staticVar:Void->Iterator<Int> = function ():Iterator<Int> {
+		
+		for (i in 0...3) {
+			@yield return i;
+		}
+	};
+	
+	function testMember () {
+		var it = this.member();
+		assertTrue(it.hasNext());
+		assertEquals(0, it.next());
+		assertEquals(1, it.next());
+		assertEquals(2, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	var member:Void->Iterator<Int> = function ():Iterator<Int> {
+		
+		for (i in 0...3) {
+			@yield return i;
+		}
+	};
+	
+	function testStaticProperty () {
+		var it = staticProperty();
+		assertTrue(it.hasNext());
+		assertEquals(0, it.next());
+		assertEquals(1, it.next());
+		assertEquals(2, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	static var staticProperty(default, null) = function () {
+		
+		for (i in 0...3) {
+			@yield return i;
+		}
+	};
+	
+	function testProperty () {
+		var it = this.propertyMember();
+		assertTrue(it.hasNext());
+		assertEquals(0, it.next());
+		assertEquals(1, it.next());
+		assertEquals(2, it.next());
+		assertFalse(it.hasNext());
+	}
+	
+	var propertyMember(default, null) = function () {
+		
+		for (i in 0...3) {
+			@yield return i;
+		}
+	};
+	
 	function testVarDeclaration () {
 		var it:Iterator<Dynamic> = cast varDeclaration();
 		
@@ -122,69 +186,6 @@ class YieldTests extends TestCase
 		var d:Int = (a:Int);
 		
 		@yield return null;
-	}var member:Int;
-	
-	function testInstanceAccess () {
-		
-		this.member = -4;
-		
-		var it:Iterator<Dynamic> = cast instanceAccess();
-		
-		assertEquals(-4, it.next());
-		assertEquals(-4, it.next());
-		assertEquals(-8, it.next());
-		assertEquals(member, -8);
-		
-		assertEquals(-8, it.next());
-		assertEquals(10, it.next());
-	}
-	
-	function instanceAccess (): Iterator<Int> {
-		
-		@yield return this.member;
-		@yield return member;
-		member = -8;
-		@yield return this.member;
-		
-		var member = 10;
-		@yield return this.member;
-		@yield return member;
-	}
-	
-	function testNestedAccess () {
-		
-		this.member = 20;
-		
-		var it:Iterator<Dynamic> = cast nestedAccess();
-		
-		assertEquals(3, it.next());
-		assertEquals(3, it.next());
-		assertEquals(12, it.next());
-		assertEquals(2, it.next());
-		assertEquals(member, 20);
-	}
-	
-	function nestedAccess (): Iterator<Int> {
-		
-		var a = 0;
-		
-		function b () {
-			a = 3;
-			@yield return a;
-			@yield return a * 2;
-			var a = 1;
-			@yield return a*2;
-			@yield return member;
-		}
-		
-		var bIterator:Iterator<Dynamic> = cast b();
-		
-		@yield return bIterator.next();
-		@yield return a;
-		a = 6;
-		@yield return bIterator.next();
-		@yield return bIterator.next();
-		@yield return bIterator.next();
 	}
 	
 	function func1 ():Iterator<Int> {

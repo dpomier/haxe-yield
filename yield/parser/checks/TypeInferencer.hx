@@ -76,7 +76,7 @@ class TypeInferencer
 											return _definition.types[_definition.names.indexOf(__s)];
 											
 										case IdentCategory.InstanceField(_type)
-										   | IdentCategory.InstanceStaticField(_type)
+										   | IdentCategory.InstanceStaticField(_type, _)
 										   | IdentCategory.ImportedField(_type): 
 											return _type;
 											

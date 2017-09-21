@@ -1,0 +1,21 @@
+package misc.packs;
+import haxe.unit.TestCase;
+
+/**
+ * ...
+ * @author Dimitri Pomier
+ */
+class Parent extends TestCase
+{
+
+	public function new() 
+	{
+		super();
+	}
+	
+	private static var privateStatic:Bool = false;
+	public static var publicStatic:Bool = false;
+	public var privateMember:Bool = false;
+	public var publicMember:Bool = false;
+	
+}

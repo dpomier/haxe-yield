@@ -838,33 +838,42 @@ class DefaultGenerator
 		};
 	}
 	
-	static function getTypePath (c:Type, isAbstract:Bool = false, abstractType:AbstractType = null): String {
+	static function getTypePath (?c:Type, ?ct:ClassType, isAbstract:Bool = false, abstractType:AbstractType = null): String {
 		
-		var classPackage:String;
+		var classPackage:String = "";
 		
-		switch (TypeTools.toComplexType(c)) {
+		var pack:Array<String>;
+		var name:String;
+		var sub:Null<String> = null;
+		
+		if (c == null && ct != null) {
+			
+			pack = isAbstract ? abstractType.pack : ct.pack;
+			name = isAbstract ? abstractType.name : ct.name;
+			
+		} else switch (TypeTools.toComplexType(c)) {
 			case TPath(tp):
-				
-				classPackage = "";
-				
-				var pack = tp.pack;
-				var name = tp.name;
 				
 				if (isAbstract) {
 					pack = abstractType.pack;
 					name = abstractType.name;
-				}
-				
-				if (pack.length != 0) classPackage += pack.join(".") + ".";
-				
-				if (tp.sub != null) {
-					classPackage += name + "." + tp.sub;
 				} else {
-					classPackage += name;
+					pack = tp.pack;
+					name = tp.name;
 				}
+				
+				sub = tp.sub;
 				
 			default:
 				throw "type not supported : " + ComplexTypeTools.toString(TypeTools.toComplexType(c));
+		}
+		
+		if (pack.length != 0) classPackage += pack.join(".") + ".";
+		
+		if (sub != null) {
+			classPackage += name + "." + sub;
+		} else {
+			classPackage += name;
 		}
 		
 		return classPackage;
@@ -874,11 +883,17 @@ class DefaultGenerator
 		
 		if (workEnv.classComplexType != null) {
 			
-			workEnv.generatedIteratorClass.meta.push({
-				name : ":access",
-				params : [Context.parse(getTypePath(Context.getLocalType(), workEnv.isAbstract, workEnv.abstractType), pos)],
-				pos : pos
-			});
+			function setAccess (c:ClassType) {
+				
+				workEnv.generatedIteratorClass.meta.push({
+					name : ":access",
+					params : [Context.parse(getTypePath(c, workEnv.isAbstract, workEnv.abstractType), pos)],
+					pos : pos
+				});
+				if (c.superClass != null) setAccess(c.superClass.t.get());
+			}
+			
+			setAccess(workEnv.classType);
 			
 			if (workEnv.isAbstract) {
 				

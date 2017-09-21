@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser.tools;
+import haxe.macro.Type.ClassType;
 import haxe.macro.Expr.ComplexType;
 import yield.parser.idents.IdentData;
 
@@ -30,7 +31,7 @@ enum IdentCategory
 {
 	LocalVar(definition:IdentData);
 	InstanceField(type:Null<ComplexType>);
-	InstanceStaticField(type:Null<ComplexType>);
+	InstanceStaticField(type:Null<ComplexType>, c:ClassType);
 	ImportedField(type:Null<ComplexType>);
 	Unknown;
 }

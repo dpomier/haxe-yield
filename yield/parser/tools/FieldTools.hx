@@ -113,11 +113,11 @@ class FieldTools
 		
 		for (i in 0...classFields.length)
 			if (classFields[i].name == name && classFields[i].access != null && classFields[i].access.indexOf(Access.AStatic) != -1)
-				return IdentCategory.InstanceStaticField(TypeInferencer.tryInferField(classFields[i].kind));
+				return IdentCategory.InstanceStaticField(TypeInferencer.tryInferField(classFields[i].kind), classType);
 		
 		if (classType.superClass != null) {
-			var cf:Null<ClassField> = TypeTools.findField( classType.superClass.t.get(), name, true );
-			if (cf != null) return IdentCategory.InstanceStaticField(null);
+			var c:Null<ClassType> = findClassOfStaticField( classType.superClass.t.get(), name );
+			if (c != null) return IdentCategory.InstanceStaticField(null, c);
 		}
 		
 		return null;
@@ -127,6 +127,16 @@ class FieldTools
 		
 		var i:Int = importedFields.indexOf(name);
 		return i != -1 ? IdentCategory.ImportedField(null) : null;
+	}
+	
+	/**
+	 * Returns the ClassType of the static field if it's resolved.
+	 */
+	private static function findClassOfStaticField (c:ClassType, name:String): Null<ClassType> {
+		var field = Lambda.find(c.statics.get(), function(field) return field.name == name);
+		return if(field != null) c;
+		       else if (c.superClass != null) findClassOfStaticField(c.superClass.t.get(), name);
+		       else null;
 	}
 	
 }
