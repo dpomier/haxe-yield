@@ -51,7 +51,7 @@ class NameController
 	/**
 	 * Unique name of the anonymous function.
 	 */
-	 public static function anonymousFunction (workEnv:WorkEnv, f:Function, pos:Position): String {
+	public static function anonymousFunction (workEnv:WorkEnv, f:Function, pos:Position): String {
 		var id:String = Md5.encode(workEnv.functionsPack.join("."));
 		if (!anonymousCounters.exists(id))
 			anonymousCounters.set(id, 0);
@@ -63,90 +63,85 @@ class NameController
 	/**
 	 * Field name of the class's instance.
 	 */
-	 public static function fieldInstance (): String {
+	public static function fieldInstance (): String {
 		return "_instance_";
 	}
 	
 	/**
 	 * Constructor arg name of the class's instance.
 	 */
-	 public static function argInstance (): String {
+	public static function argInstance (): String {
 		return "instance";
 	}
 	
 	/**
 	 * Field name of a required WorkEnv parent.
 	 */
-	 public static function fieldParent (workEnv:WorkEnv, dependence:WorkEnv): String {
+	public static function fieldParent (workEnv:WorkEnv, dependence:WorkEnv): String {
 		return "_d" + workEnv.parentDependencies.indexOf(dependence) + "_";
 	}
 	
 	/**
 	 * Constructor arg name of a required WorkEnv parent.
 	 */
-	 public static function argParent (workEnv:WorkEnv, dependence:WorkEnv): String {
+	public static function argParent (workEnv:WorkEnv, dependence:WorkEnv): String {
 		return "_d" + workEnv.parentDependencies.indexOf(dependence) + "_p";
 	}
 	
 	/**
 	 * Constructor arg name of a required parent's local.
 	 */
-	 public static function argParentAsVar (name:String): String {
+	public static function argParentAsVar (name:String): String {
 		return name + "_pav";
 	}
 	
 	/**
 	 * Constructor arg name of any user argument.
 	 */
-	 public static function argArgument (argument:FunctionArg): String {
+	public static function argArgument (argument:FunctionArg): String {
 		return argument.name + "_a";
 	}
 	
 	/**
 	 * Name of any user local vars and functions.
 	 */
-	 public static function localVar (originalName:String, scope:Scope, ic:IdentChannel, number:UInt): String {
+	public static function localVar (originalName:String, scope:Scope, ic:IdentChannel, number:UInt): String {
 		return originalName + "_" + scope.id + ID_CHANNELS[ic] + number;
 	}
 	
 	/**
 	 * Name of any user local vars and functions from a parent environment.
 	 */
-	 public static function parentVar (originalName:String, scope:Scope, ic:IdentChannel, envId:Int): String {
+	public static function parentVar (originalName:String, scope:Scope, ic:IdentChannel, envId:Int): String {
 		return originalName + "_" + ID_CHANNELS[ic] + envId + "pav";
 	}
 	
 	/**
 	 * Name of any iterative functions.
 	 */
-	 public static function iterativeFunction (iteratorPos:UInt): String {
+	public static function iterativeFunction (iteratorPos:UInt): String {
 		return "_" + iteratorPos + "_";
 	}
 	
 	/**
 	 * Name of the iteration's cursor field.
 	 */
-	 public static function fieldCursor ():String return "_cursor_";
-	
-	/**
-	 * Name of the iteration's stack field.
-	 */
-	 public static function fieldStack ():String return "_stack_";
+	public static function fieldCursor ():String return "_cursor_";
 	
 	/**
 	 * Name of the iteration's current field.
 	 */
-	 public static function fieldCurrent ():String return "_current_";
+	public static function fieldCurrent ():String return "_current_";
 	
 	/**
 	 * Name of the iteration's isConsumed field.
 	 */
-	 public static function fieldIsConsumed ():String return "_isConsumed_";
+	public static function fieldIsConsumed ():String return "_isConsumed_";
 	
 	/**
 	 * Name of the iteration's isCompleted field.
 	 */
-	 public static function fieldCompleted ():String return "_isComplete_";
+	public static function fieldCompleted ():String return "_isComplete_";
 	
 }
 #end

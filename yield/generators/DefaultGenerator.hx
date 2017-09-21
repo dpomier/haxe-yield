@@ -320,7 +320,6 @@ class DefaultGenerator
 		
 		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], workEnv.returnType);
 		
-		addProperty(bd, NameController.fieldStack(), [APrivate], macro:Array<$nextMethodType>, pos);
 		addProperty(bd, NameController.fieldCursor(), [APrivate], macro:StdTypes.Int, pos);
 		addProperty(bd, NameController.fieldCurrent(), [APrivate], workEnv.returnType, pos);
 		addProperty(bd, NameController.fieldIsConsumed(), [APrivate], macro:StdTypes.Bool, pos); 
@@ -374,7 +373,6 @@ class DefaultGenerator
 		}
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCursor()}	 = -1);
-		bd.constructorBlock.push(macro $i{NameController.fieldStack()}	  = $a{exprs});
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{workEnv.defaultReturnType});
 		bd.constructorBlock.push(macro $i{NameController.fieldIsConsumed()} = true);
@@ -383,13 +381,21 @@ class DefaultGenerator
 	
 	private static function initIteratorMethods (bd:BuildingData, workEnv:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
 		
+		var lcase:Array<Case> = [for (i in 0...bd.lastSequence + 1) {
+			values : [{ expr: EConst(CInt(Std.string(i))), pos: pos }],
+			guard : null,
+			expr: { expr: ExprDef.ECall({ expr: EConst(CIdent(NameController.iterativeFunction(i))), pos: pos}, []), pos: pos }
+		}];
+		
+		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${workEnv.defaultReturnType}), pos: pos };
+		
 		// public function hasNext():Bool
 		
 		var body:Expr = {
 			expr: EBlock([
 			  macro if (!$i{NameController.fieldIsConsumed()}) return true;
 					else if ($i{NameController.fieldCursor()} < $v{bd.lastSequence}) {
-						$i{NameController.fieldCurrent()} = $i{NameController.fieldStack()}[++$i{NameController.fieldCursor()}]();
+						$i{NameController.fieldCurrent()} = $lswitch;
 						if (!$i{NameController.fieldCompleted()}) { $i{NameController.fieldIsConsumed()} = false; return true; }
 						else return false;
 					},
