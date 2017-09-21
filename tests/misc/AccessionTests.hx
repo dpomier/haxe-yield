@@ -27,6 +27,24 @@ class AccessionTests extends TestCase implements Yield
 		}
 	};
 	
+	function testRealStaticVar () {
+		var it = realStatic();
+		realStaticVar = false;
+		assertTrue(it.hasNext());
+		assertFalse(realStaticVar);
+		assertEquals(0, it.next());
+		assertFalse(realStaticVar);
+		assertFalse(it.hasNext());
+		assertTrue(realStaticVar);
+	}
+	
+	static var realStaticVar:Bool = false;
+	
+	function realStatic () {
+		@yield return null;
+		realStaticVar = true;
+	}
+	
 	function testMember () {
 		var it = this.member();
 		assertTrue(it.hasNext());
