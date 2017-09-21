@@ -3,7 +3,7 @@
   "url" : "https://github.com/dpomier/haxe-yield/",
   "license": "MIT",
   "description": "Simplify iterator pattern implementations",
-  "version": "1.1.1",
-  "releasenote": "static accessions fixed",
+  "version": "1.1.2",
+  "releasenote": "array memory allocation removed",
   "contributors": ["dpomier"]
 }
