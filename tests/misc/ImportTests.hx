@@ -148,4 +148,60 @@ class ImportTests extends TestCase implements Yield
 		@yield return MiscYielded.inlineMethod2("toto").next();
 	}
 	
+	function testUsingTypedef () {
+		
+		var it = usingTypedef0();
+		assertEquals(0, it.next());
+		
+		it = usingTypedef1();
+		assertEquals(1, it.next());
+		
+		it = usingTypedef2();
+		assertEquals(2, it.next());
+		
+		it = usingTypedef3();
+		assertEquals(3, it.next());
+		
+		//it = usingTypedef4();
+		//assertEquals(4, it.next());
+		
+		//it = usingTypedef5();
+		//assertEquals(5, it.next());
+		
+		//it = usingTypedef6();
+		//assertEquals(6, it.next());
+	}
+	
+	function usingTypedef0 ():DynamicAlias {
+		@yield return 0;
+	}
+	
+	function usingTypedef1 ():DynamicIterator {
+		@yield return 1;
+	}
+	
+	function usingTypedef2 ():Enumerator<Int> {
+		@yield return 2;
+	}
+	
+	function usingTypedef3<T:Int> ():Iterator<T> {
+		@yield return cast 3;
+	}
+	
+	//function usingTypedef4<T:Int> ():Enumerator<T> {
+		//@yield return cast 4;
+	//}
+	
+	//function usingTypedef5<T:Enumerator<Int>> ():T {
+		//@yield return cast 5;
+	//}
+	
+	//function usingTypedef6<B:Int, T:Enumerator<B>> ():T {
+		//@yield return cast 6;
+	//}
+	
 }
+
+typedef Enumerator<T> = Iterator<T>;
+typedef DynamicAlias  = Dynamic;
+typedef DynamicIterator = Iterator<Dynamic>;
