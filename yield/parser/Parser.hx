@@ -34,11 +34,12 @@ import yield.generators.DefaultGenerator;
 import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
-#end
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
 import haxe.macro.Type.Ref;
+import haxe.macro.TypeTools;
+#end
 import yield.YieldOption;
 
 class Parser
@@ -360,8 +361,53 @@ class Parser
 						funcRetType = RetType.DYNAMIC;
 						
 					default:
-						Context.fatalError( ComplexTypeTools.toString(f.ret) + " should be Iterator or Iterable", pos );
+						
+						var resolvedType:Null<Type> = try {
+							ComplexTypeTools.toType(f.ret);
+						} catch (err:Dynamic) {
+							null;
+						};
+						
+						if (resolvedType != null) {
+							
+							var retType:Type = TypeTools.followWithAbstracts(resolvedType);
+							
+							var iteratorType:Type = ComplexTypeTools.toType(macro:Iterator<Dynamic>);
+							var iterableType:Type = ComplexTypeTools.toType(macro:Iterable<Dynamic>);
+							
+							switch (retType) {
+								
+								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],iteratortype), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iteratorType)):
+									
+									returnType = TypeTools.toComplexType(iteratortype);
+									funcRetType = RetType.ITERATOR;
+									
+								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],iterabletype), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iterableType)):
+									
+									returnType = TypeTools.toComplexType(iterabletype);
+									funcRetType = RetType.ITERABLE;
+									
+								case TDynamic(_):
+									
+									returnType  = f.ret;
+									funcRetType = RetType.DYNAMIC;
+									
+								case _:
+									
+									Context.fatalError(ComplexTypeTools.toString(f.ret) + " should be Iterator or Iterable", pos);
+									
+							}
+							
+						} else {
+							
+							returnType  = macro:Dynamic;
+							funcRetType = RetType.DYNAMIC;
+							
+							Context.fatalError(ComplexTypeTools.toString(f.ret) + "'s complexity is not supported due to the type parameter. Please use directly Iterator or Iterable to use " + WorkEnv.YIELD_KEYWORD, pos);
+							
+						}
 				}
+				
 			}
 			
 		} else {
