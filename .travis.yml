@@ -9,6 +9,7 @@ os:
   
 haxe:
   - "3.4.2"
+  - "3.4.7"
   - development
   
 matrix:
