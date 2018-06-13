@@ -40,6 +40,12 @@ class EFunctionParser extends BaseParser
 
 	public function run (e:Expr, subParsing:Bool, _name:Null<String>, _f:Function): Void {
 		
+		var isInlined = _name != null && StringTools.startsWith(_name, "inline_");
+		
+		if (isInlined) {
+			_name = _name.substr(7);
+		}
+		
 		var safeName:String = NameController.anonymousFunction(m_we, _f, e.pos);
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
@@ -58,7 +64,7 @@ class EFunctionParser extends BaseParser
 				// insert the declaration just before this expression
 				var insertedDeclaration:Expr = { expr: EFunction(_name, _f), pos: e.pos };
 				
-				m_we.addLocalDefinition([_name], [true], [ltype], IdentRef.IEFunction(insertedDeclaration), IdentChannel.Normal, IdentOption.None, insertedDeclaration.pos);
+				m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(insertedDeclaration), IdentChannel.Normal, IdentOption.None, insertedDeclaration.pos);
 				m_ys.addIntoBlock(insertedDeclaration);
 				
 				// change this expr to identify the function rather than declare it
@@ -67,7 +73,7 @@ class EFunctionParser extends BaseParser
 				
 			} else {
 				
-				m_we.addLocalDefinition([_name], [true], [ltype], IdentRef.IEFunction(e), IdentChannel.Normal, IdentOption.None, e.pos);
+				m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, IdentOption.None, e.pos);
 			}
 			
 		}

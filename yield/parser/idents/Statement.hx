@@ -25,7 +25,7 @@
 package yield.parser.idents;
 
 enum Statement {
-	Definitions(data:IdentData);
+	Definitions(data:IdentData, inlined:Bool);
 	Accession(data:IdentData, defData:IdentData);
 	Throw;
 }

@@ -683,7 +683,7 @@ class DefaultGenerator
 						default: throw "irrelevant ident reference : " + _data.ident;
 					}
 					
-				case Statement.Definitions(_data):
+				case Statement.Definitions(_data, _inlined):
 					
 					if (!newNameChannels[_data.channel].exists(_data.scope.id)) {
 						newNameChannels[_data.channel].set( _data.scope.id, new Map<String, String>() );
@@ -779,11 +779,22 @@ class DefaultGenerator
 								if (_data.option != IdentOption.KeepAsVar) {
 									
 									// add local function as field
-									var lfieldDecl:Field = FieldTools.makeField(newNames[_data.names[0]], [APublic], {expr:EConst(CIdent("null")), pos: eRef.pos}, eRef.pos);
-									bd.typeDefinition.fields.push( lfieldDecl );
+									var lfieldDecl:Field;
 									
-									// transform function declaration into field assignment
-									eRef.expr = FieldTools.makeFieldAssignation(newNames[_data.names[0]], {expr:EFunction(null, _f), pos: eRef.pos}).expr;
+									if (_inlined) {
+										
+										lfieldDecl = FieldTools.makeFunctionField(newNames[_data.names[0]], [APublic, AInline], _f, eRef.pos);
+										
+									} else {
+										
+										lfieldDecl = FieldTools.makeField(newNames[_data.names[0]], [APublic], {expr:EConst(CIdent("null")), pos: eRef.pos}, eRef.pos);
+										
+										// transform function declaration into field assignment
+										eRef.expr = FieldTools.makeFieldAssignation(newNames[_data.names[0]], {expr:EFunction(null, _f), pos: eRef.pos}).expr;
+										
+									}
+									
+									bd.typeDefinition.fields.push( lfieldDecl );
 									
 								} else {
 									

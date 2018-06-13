@@ -109,7 +109,7 @@ class InitializationChecker
 			
 			switch statement {
 				
-				case Statement.Definitions(_data):
+				case Statement.Definitions(_data, _inlined):
 					if (_data == definition) {
 						
 						info.definitionReached = true;

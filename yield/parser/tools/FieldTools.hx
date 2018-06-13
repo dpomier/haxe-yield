@@ -59,6 +59,17 @@ class FieldTools
 		};
 	}
 	
+	public static function makeFunctionField (name:String, access:Array<Access>, f:Function, pos:Position): Field {
+		return {
+			name	: name,
+			doc		: null,
+			access	: access,
+			kind	: FFun(f),
+			pos		: pos,
+			meta	: null
+		};
+	}
+	
 	public static function makeFieldAssignation (fieldName:String, value:Expr): Expr {
 		return {
 			expr: EBinop(

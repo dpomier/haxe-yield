@@ -210,7 +210,7 @@ class WorkEnv
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferArg(arg);
 			if (ltype == null) ltype = macro:StdTypes.Dynamic;
 			
-			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], IdentRef.IEVars(evars), IdentChannel.Normal, IdentOption.None, evars.pos);
+			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], false, IdentRef.IEVars(evars), IdentChannel.Normal, IdentOption.None, evars.pos);
 			
 			functionArguments.push({ definition: data, originalArg: arg });
 		}
@@ -341,7 +341,7 @@ class WorkEnv
 		}
 	}
 	
-	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, ident:IdentRef, ic:IdentChannel, option:IdentOption, pos:Position): IdentData {
+	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, inlined:Bool, ident:IdentRef, ic:IdentChannel, option:IdentOption, pos:Position): IdentData {
 		
 		var data:IdentData = {
 			names:       names, 
@@ -355,8 +355,8 @@ class WorkEnv
 			pos:         pos
 		};
 		
-		localStack.push(Statement.Definitions(data));
-		currentScope.localIdentStack.push(Statement.Definitions(data));
+		localStack.push(Statement.Definitions(data, inlined));
+		currentScope.localIdentStack.push(Statement.Definitions(data, inlined));
 		
 		return data;
 	}
@@ -471,7 +471,7 @@ class WorkEnv
 					lpos  = pos;
 			}
 			
-			addLocalDefinition([lname], [true], [ident.type], ident.ref, IdentChannel.Normal, IdentOption.KeepAsVar, lpos);
+			addLocalDefinition([lname], [true], [ident.type], false, ident.ref, IdentChannel.Normal, IdentOption.KeepAsVar, lpos);
 		}
 	}
 	
@@ -483,12 +483,12 @@ class WorkEnv
 	
 	public function getLocalDefinitionOf (name:String, ic:IdentChannel): Null<IdentData> {
 		
-		var defType:Int = Statement.Definitions(null).getIndex();
+		var defType:Int = Statement.Definitions(null, false).getIndex();
 		var i:Int = localStack.length;
 		while (--i >= 0) {
 			
 			switch (localStack[i]) {
-				case Statement.Definitions(_data) if (_data.scope.id == currentScope.id || isParentScope(_data.scope, currentScope)):
+				case Statement.Definitions(_data, _inlined) if (_data.scope.id == currentScope.id || isParentScope(_data.scope, currentScope)):
 					for (lname in _data.names) {
 						if (lname == name) {
 							return _data;
