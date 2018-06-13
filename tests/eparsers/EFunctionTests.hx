@@ -488,4 +488,27 @@ class EFunctionTests extends TestCase implements Yield
 		
 		@yield return v;
 	}
+	
+	function testInlining () {
+		var it = inlining();
+		assertEquals(0, it.next());
+		assertEquals(3, it.next());
+		try {
+			it.next();
+			assertTrue(false);
+		} catch (err:Dynamic) {
+			assertTrue(true);
+		}
+	}
+	
+	function inlining ():Iterator<Int> {
+		
+		inline function foo () return 3;
+		
+		@yield return 0;
+		
+		@yield return foo();
+		
+		@yield return untyped foo();
+	}
 }
