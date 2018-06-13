@@ -12,7 +12,7 @@ When defining an iterator with `yield` statements, an extra class is implicitly 
 Usage
 -----
 
-Any `@yield` statements are available for classes that are annotated or extend classes that are annotated with the `:yield` metadata.
+Any `@yield` statements are available for classes that are annotated with the `:yield` metadata, or available for all classes that extend classes annotated with `:yield(Extend)`.
 ```haxe
 @:yield
 class MyClass {
