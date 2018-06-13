@@ -1,15 +1,9 @@
 package misc.packs;
 import haxe.unit.TestCase;
 
-/**
- * ...
- * @author Dimitri Pomier
- */
-class Parent extends TestCase
-{
+class Parent extends TestCase {
 
-	public function new() 
-	{
+	public function new () {
 		super();
 	}
 	

@@ -103,7 +103,7 @@ class Parser
 				if (alreadyProcessed(ct))
 					return null;
 				
-				var hasYieldMeta:Bool    = false;
+				var hasYieldMeta:Bool = false;
 				var hasAutoBuild:Bool = false;
 				
 				var options:Array<Expr> = null;
