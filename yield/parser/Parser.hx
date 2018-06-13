@@ -204,12 +204,12 @@ class Parser
 			opt = options[i];
 			
 			switch (opt) {
-			case (macro YieldOption.Extend) | (macro yield.YieldOption.Extend):
+			case (macro Extend) | (macro YieldOption.Extend) | (macro yield.YieldOption.Extend):
 				if (!canExtend) throwConflict(YieldOption.Extend(true).getName(), opt.pos);
 				else if (yieldExtend == null) yieldExtend = true;
 				else throwDuplicatedOpt(YieldOption.Extend(true).getName(), opt.pos);
 				options.splice(i,1);
-			case (macro YieldOption.Extend($s)) | (macro yield.YieldOption.Extend($s)):
+			case (macro Extend($s)) | (macro YieldOption.Extend($s)) | (macro yield.YieldOption.Extend($s)):
 				var ident:String = ExpressionTools.getConstIdent(s);
 				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
 				if (value == null) throwInvalidOpt(opt.pos);
@@ -219,10 +219,10 @@ class Parser
 				else throwDuplicatedOpt(YieldOption.Extend(true).getName(), opt.pos);
 				options.splice(i,1);
 				
-			case (macro YieldOption.Explicit) | (macro yield.YieldOption.Explicit):
+			case (macro Explicit) | (macro YieldOption.Explicit) | (macro yield.YieldOption.Explicit):
 				if (yieldExplicit == null) yieldExplicit = true;
 				else throwDuplicatedOpt(YieldOption.Explicit(true).getName(), opt.pos);
-			case (macro YieldOption.Explicit($s)) | (macro yield.YieldOption.Explicit($s)):
+			case (macro Explicit($s)) | (macro YieldOption.Explicit($s)) | (macro yield.YieldOption.Explicit($s)):
 				var ident:String = ExpressionTools.getConstIdent(s);
 				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
 				if (value == null) throwInvalidOpt(opt.pos);
@@ -230,7 +230,7 @@ class Parser
 				if (yieldExplicit == null) yieldExplicit = value;
 				else throwDuplicatedOpt(YieldOption.Explicit(true).getName(), opt.pos);
 				
-			case (macro YieldOption.Keyword($s)) | (macro yield.YieldOption.Keyword($s)):
+			case (macro Keyword($s)) | (macro YieldOption.Keyword($s)) | (macro yield.YieldOption.Keyword($s)):
 				var name:String = ExpressionTools.getConstString(s);
 				if (name == null) throwInvalidOpt(opt.pos);
 				
