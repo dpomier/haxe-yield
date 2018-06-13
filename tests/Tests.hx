@@ -16,6 +16,9 @@ import eparsers.EFunctionTests;
 import eparsers.ETryTests;
 import eparsers.EWhileTests;
 import eparsers.EIfTests;
+import options.ExplicitTests;
+import options.ExtendTests;
+import options.KeywordTests;
 
 class Tests
 {
@@ -43,6 +46,11 @@ class Tests
 		r.add(new InferenceTests());
 		r.add(new InheritanceTests());
 		r.add(new PrivateTests());
+		
+		// options tests
+		r.add(new ExtendTests());
+		r.add(new KeywordTests());
+		r.add(new ExplicitTests());
 		
 		var success:Bool = r.run();
 		
