@@ -6,6 +6,7 @@ import eparsers.ESwitchTests;
 import misc.ImportTests;
 import misc.IterationTests;
 import misc.AbstractTests;
+import misc.PrivateTests;
 import misc.ScopeTests;
 import misc.UsingTests;
 import misc.YieldTests;
@@ -41,6 +42,7 @@ class Tests
 		r.add(new AccessionTests());
 		r.add(new InferenceTests());
 		r.add(new InheritanceTests());
+		r.add(new PrivateTests());
 		
 		var success:Bool = r.run();
 		

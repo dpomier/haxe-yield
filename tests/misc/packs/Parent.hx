@@ -15,7 +15,7 @@ class Parent extends TestCase
 	
 	private static var privateStatic:Bool = false;
 	public static var publicStatic:Bool = false;
-	public var privateMember:Bool = false;
+	private var privateMember:Bool = false;
 	public var publicMember:Bool = false;
 	
 }

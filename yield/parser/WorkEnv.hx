@@ -75,6 +75,7 @@ class WorkEnv
 	public var classField       (default, null):Field;
 	public var classFunction    (default, null):Function;
 	public var isAbstract       (default, null):Bool;
+	public var isPrivate        (default, null):Bool;
 	public var abstractType     (default, null):AbstractType;
 	public var classComplexType (default, null):ComplexType;
 	public var classFields      (default, null):Array<Field>;
@@ -127,6 +128,8 @@ class WorkEnv
 			default: 
 				isAbstract = false;
 		}
+		
+		isPrivate = ct.isPrivate;
 		
 		classFields    = Context.getBuildFields();
 		imports        = Context.getLocalImports();
@@ -221,6 +224,7 @@ class WorkEnv
 		we.functionsPack.push( fieldName );
 		we.parent        = this;
 		we.isAbstract    = isAbstract;
+		we.isPrivate     = isPrivate;
 		we.abstractType  = abstractType;
 		we.classField    = classField;
 		we.classFunction = classFunction;
@@ -272,11 +276,21 @@ class WorkEnv
 	
 	public function getExtraTypePath (): TypePath {
 		
-		return {
+		var moduleName:String = (isAbstract ? abstractType.module : classType.module).split(".").pop();
+		var className:String = isAbstract ? abstractType.name : classType.name;
+		var isSubType:Bool = moduleName != className;
+		
+		var p = {
 			pack : !isAbstract ? classType.pack : abstractType.pack,
-			name : generatedIteratorClass.name,
-			sub  : null
+			name : isSubType ? moduleName : generatedIteratorClass.name,
+			sub  : isSubType ? generatedIteratorClass.name : null
 		};
+		
+		if (isPrivate && p.pack[p.pack.length - 1] == "_" + moduleName) {
+			p.pack.pop();
+		}
+		
+		return p;
 	}
 	
 	public function openScope (isConditional:Bool = false, alternativeScope:Scope = null): Scope {
