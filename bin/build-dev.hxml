@@ -3,11 +3,4 @@
 -main Tests
 --times
 
---each
-
--js bin/js/Tests.js
---next
--swf bin/swf/Tests.swf
--swf-header 960:640:60:f68712
---flash-strict
--swf-version 9
+--interp

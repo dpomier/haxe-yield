@@ -24,7 +24,7 @@
     <option noInlineOnDebug="False" />
     <option mainClass="Tests" />
     <option enabledebug="False" />
-    <option additional="--times " />
+    <option additional="--times &#xA;--interp" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
