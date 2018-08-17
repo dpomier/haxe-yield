@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.generators;
+import haxe.macro.ExprTools;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -136,9 +137,54 @@ class DefaultGenerator
 			}
 		}
 		
+		if (Context.defined("yDebug")) {
+			runDebugPrint(Context.definedValue("yDebug")); 
+		}
+		
 		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.imports, usings);
 		
 		typeDefinitionStack = new Array<TypeDefinition>();
+	}
+	
+	private static function runDebugPrint (yDebug:String): Void {
+		
+		if (yDebug != null) {
+			return;
+		}
+		
+		var patterns:Array<String> = [for (s in yDebug.split(".")) s.toLowerCase()];
+		var tdName:String;
+		var match:Bool;
+		
+		for (td in typeDefinitionStack) {
+			
+			tdName = td.name.toLowerCase();
+			match = true;
+			
+			for (p in patterns) {
+				
+				if (tdName.indexOf(p) == -1) {
+					match = false;
+					break;
+				}
+			}
+			
+			if (match) {
+				printTypeDefinition(td);
+			}
+		}
+	}
+	
+	private static function printTypeDefinition (td:TypeDefinition): Void {
+		
+		var data:String = "EXTRA TYPE `" + td.name + "`\n";
+		
+		for (field in td.fields) {
+			
+			data += FieldTools.toString(field) + "\n";
+		}
+		
+		trace(data);
 	}
 	
 	private static function addProperty (bd:BuildingData, name:String, access:Array<Access>, type:ComplexType, pos:Position): Void {
