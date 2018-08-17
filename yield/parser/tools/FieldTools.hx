@@ -23,6 +23,8 @@
  */
 #if macro
 package yield.parser.tools;
+import haxe.macro.ComplexTypeTools;
+import haxe.macro.ExprTools;
 import haxe.macro.Compiler;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -133,6 +135,24 @@ class FieldTools
 		
 		var i:Int = importedFields.indexOf(name);
 		return i != -1 ? IdentCategory.ImportedField(null) : null;
+	}
+	
+	public static function toString (field:Field): String {
+		
+		return switch (field.kind) {
+			
+			case FieldType.FFun(_f):
+				
+				"function " + field.name + " (" + [ for (arg in _f.args) (arg.opt ? "?" : "") + arg.name + (arg.type == null ? "" : ":" + ComplexTypeTools.toString(arg.type)) + (arg.value == null ? "" : " = " + ExprTools.toString(arg.value)) ].join(", ") + ") " + ExprTools.toString(_f.expr);
+				
+			case FieldType.FVar(_t, _e):
+				
+				"var " + field.name + (_t == null ? "" : ":" + ComplexTypeTools.toString(_t)) + (_e == null ? "" : " = " + ExprTools.toString(_e)) + ";";
+				
+			case FieldType.FProp(_get, _set, _t, _e):
+				
+				"var " + field.name + " (" + _get + ", " + _set + ")" + (_t == null ? "" : ":" + ComplexTypeTools.toString(_t)) + (_e == null ? "" : " = " + ExprTools.toString(_e)) + ";";
+		}
 	}
 	
 }
