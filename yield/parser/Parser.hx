@@ -70,9 +70,9 @@ class Parser
 					else if (isBuildMeta(":autoBuild", md))
 						hasAutoBuild = true;
 				
-				initEnv(ct, t, options, hasAutoBuild);
+				var env = createEnv(ct, t, options, hasAutoBuild);
 				
-				return parseClass();
+				return parseClass(env);
 				
 			default: return null;
 			}
@@ -85,8 +85,6 @@ class Parser
 	}
 	
 	#if macro
-	
-	private static var workEnv:WorkEnv;
 	
 	private static function auto (): Void {
 		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
@@ -121,9 +119,9 @@ class Parser
 				if (!hasYieldMeta)
 					return null;
 				
-				initEnv(ct, t, options, hasAutoBuild);
+				var env = createEnv(ct, t, options, hasAutoBuild);
 				
-				return parseClass();
+				return parseClass(env);
 				
 			default: return null;
 		}
@@ -146,9 +144,9 @@ class Parser
 				if (md.name == ":yield" || isBuildMeta(":build", md)) 
 					return null;
 			
-			initEnv(ct, t, options, false);
+			var env = createEnv(ct, t, options, false);
 			
-			return parseClass();
+			return parseClass(env);
 			
 		default: return null;
 		}
@@ -176,14 +174,16 @@ class Parser
 		classType.meta.add(":yield_processed", [], classType.pos);
 	}
 	
-	private static function initEnv (ct:ClassType, t:Type, options:Array<Expr>, hasAutoBuild:Bool): Void {
+	private static function createEnv (ct:ClassType, t:Type, options:Array<Expr>, hasAutoBuild:Bool): WorkEnv {
 		
 		markHasProcessed(ct);
-		workEnv = new WorkEnv(ct, t);
-		initOptions(options, !hasAutoBuild);
+		var env = new WorkEnv(ct, t);
+		initOptions(options, !hasAutoBuild, env);
+
+		return env;
 	}
 	
-	private static function initOptions (options:Array<Expr>, canExtend:Bool): Void {
+	private static function initOptions (options:Array<Expr>, canExtend:Bool, env:WorkEnv): Void {
 		
 		var yieldKeyword:String = null;
 		var yieldExplicit:Bool = null;
@@ -247,21 +247,21 @@ class Parser
 		ExpressionTools.defineVarAsDirective(yieldExtend, false);
 		
 		if (yieldExtend) {
-			workEnv.classType.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , workEnv.classType.pos);
+			env.classType.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.classType.pos);
 		}
 		
 		WorkEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
 	}
 	
-	private static function parseClass (): Array<Field> {
+	private static function parseClass (env:WorkEnv): Array<Field> {
+
+		for (field in env.classFields)
+			parseField(field, env);
 		
-		for (field in workEnv.classFields)
-			parseField(field);
-		
-		return workEnv.classFields;
+		return env.classFields;
 	}
 	
-	private static function parseField (field:Field): Void {
+	private static function parseField (field:Field, env:WorkEnv): Void {
 		
 		var func:Function;
 		var alternativeRetType:ComplexType;
@@ -294,12 +294,12 @@ class Parser
 			func.ret = alternativeRetType;
 		}
 		
-		workEnv.setFieldData(field, func);
+		env.setFieldData(field, func);
 		
-		var success:Bool = parseFunction(field.name, func, field.pos, workEnv);
+		var success:Bool = parseFunction(field.name, func, field.pos, env);
 		
 		if (success) {
-			DefaultGenerator.run(workEnv);
+			DefaultGenerator.run(env);
 		}
 	}
 	
