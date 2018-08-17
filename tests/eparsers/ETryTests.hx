@@ -306,4 +306,25 @@ class ETryTests extends TestCase implements Yield
 		
 		@yield return v;
 	}
+
+	function testTryInFor () {
+
+		tryInFor(); // check compilation
+
+		assertTrue(true);
+	}
+
+	function tryInFor ():Iterator<String> {
+		
+		var num = 3;
+
+		for (i in 0...num) {
+
+			try {
+
+			}
+		}
+
+		@yield break;
+	}
 }
