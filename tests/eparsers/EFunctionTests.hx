@@ -363,7 +363,7 @@ class EFunctionTests extends TestCase implements Yield
 				val = "unchanged";
 				strengh = "!";
 			}
-			var dIt = d("");
+			var dIt:Iterator<Dynamic> = d("");
 			dIt.next();
 			dIt.next();
 			return foo + " is " + val + strengh;
