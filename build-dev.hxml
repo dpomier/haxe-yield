@@ -1,6 +1,7 @@
 -cp tests
 -lib yield
+-lib coroutine
 -main Tests
---times
 
+#-js bin/Tests.js
 --interp
