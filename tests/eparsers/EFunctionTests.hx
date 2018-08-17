@@ -343,6 +343,35 @@ class EFunctionTests extends TestCase implements Yield
 		@yield return foo;
 	}
 	
+	
+	function testNestedArgsYield () {
+
+		var it:Iterator<Dynamic> = cast nestedArgsYield();
+		assertEquals("foo is unchanged!", it.next());
+	}
+	
+	function nestedArgsYield ():Iterator<String> {
+		
+		var strengh = ".";
+
+		function c (foo) {
+			foo = "foo";
+			var val = "none";
+			function d (foo) {
+				@yield return null;
+				foo = "fail";
+				val = "unchanged";
+				strengh = "!";
+			}
+			var dIt = d("");
+			dIt.next();
+			dIt.next();
+			return foo + " is " + val + strengh;
+		}
+		
+		@yield return c("oof");
+	}
+	
 	function testAnonymous () {
 		var it:Iterator<Dynamic> = cast anonymous();
 		
