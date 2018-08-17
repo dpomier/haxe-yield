@@ -354,10 +354,10 @@ class EFunctionTests extends TestCase implements Yield
 		
 		var strengh = ".";
 
-		function c (foo) {
+		function c (foo:String) {
 			foo = "foo";
 			var val = "none";
-			function d (foo) {
+			function d (foo:String) {
 				@yield return null;
 				foo = "fail";
 				val = "unchanged";
