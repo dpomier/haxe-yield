@@ -59,22 +59,7 @@ class EFunctionParser extends BaseParser
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferFunction(_f);
 			if (ltype == null) ltype	= macro:StdTypes.Dynamic;
 			
-			if (subParsing) { // If the declaration is wrapped in another expression
-				
-				// insert the declaration just before this expression
-				var insertedDeclaration:Expr = { expr: EFunction(_name, _f), pos: e.pos };
-				
-				m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(insertedDeclaration), IdentChannel.Normal, IdentOption.None, insertedDeclaration.pos);
-				m_ys.addIntoBlock(insertedDeclaration);
-				
-				// change this expr to identify the function rather than declare it
-				e.expr = EConst(CIdent(_name));
-				m_ys.parseOut(e, true);
-				
-			} else {
-				
-				m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, IdentOption.None, e.pos);
-			}
+			m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, IdentOption.None, e.pos);
 			
 		}
 		

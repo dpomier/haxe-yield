@@ -55,7 +55,7 @@ class EBlockParser extends BaseParser
 			m_we.addLocalNativeDefinitions(predefineNativeVars);
 		
 		for (lexpr in _exprs)
-			m_ys.parse(lexpr, false);
+			m_ys.parse(lexpr, subParsing);
 		
 		m_we.closeScope();
 		
