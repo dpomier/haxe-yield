@@ -86,7 +86,7 @@ class EConstParser extends BaseParser
 									ident:       IdentRef.IEConst(e),
 									channel:     ic,
 									option:      __definition.option,
-									scope:       WorkEnv.currentScope,
+									scope:       m_we.currentScope,
 									env:         m_we,
 									pos:         e.pos
 								};

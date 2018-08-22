@@ -68,7 +68,7 @@ class WorkEnv
 	public static var YIELD_EXPLICIT (default, null):Bool;
 	public static var YIELD_EXTEND   (default, null):Bool;
 	
-	public static var currentScope (default, null):Scope;
+	public var currentScope (default, null):Scope;
 	
 	public var classType        (default, null):ClassType; // FIXME: rename to localClass
 	public var localType        (default, null):Type;
@@ -228,6 +228,7 @@ class WorkEnv
 		we.abstractType  = abstractType;
 		we.classField    = classField;
 		we.classFunction = classFunction;
+		we.currentScope  = currentScope;
 		
 		return we;
 	}
