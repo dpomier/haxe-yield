@@ -403,8 +403,6 @@ class Parser
 							returnType  = macro:Dynamic;
 							funcRetType = RetType.DYNAMIC;
 							
-							Context.fatalError(ComplexTypeTools.toString(f.ret) + "'s complexity is not supported due to the type parameter. Please use directly Iterator or Iterable to use " + WorkEnv.YIELD_KEYWORD, pos);
-							
 						}
 				}
 				
