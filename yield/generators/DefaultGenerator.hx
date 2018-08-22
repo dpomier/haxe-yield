@@ -60,8 +60,8 @@ class DefaultGenerator
 		var iteratorClassName:String = NameController.extraTypeName(workEnv, ++extraTypeCounter);
 		
 		var c  = macro class $iteratorClassName { };
-		c.pos  = workEnv.classType.pos;
-		c.meta = workEnv.classType.meta.get().copy();
+		c.pos  = workEnv.localClass.pos;
+		c.meta = workEnv.localClass.meta.get().copy();
 		
 		return c;
 	}
@@ -530,7 +530,7 @@ class DefaultGenerator
 			addTypeParameters(workEnv.abstractType.params);
 		}
 		
-		addTypeParameters(workEnv.classType.params);
+		addTypeParameters(workEnv.localClass.params);
 		
 		for (param in workEnv.classFunction.params) {
 			
@@ -956,7 +956,7 @@ class DefaultGenerator
 				if (c.superClass != null) setAccess(c.superClass.t.get());
 			}
 			
-			setAccess(workEnv.classType);
+			setAccess(workEnv.localClass);
 			
 			if (workEnv.isAbstract) {
 				

@@ -70,7 +70,7 @@ class WorkEnv
 	
 	public var currentScope (default, null):Scope;
 	
-	public var classType        (default, null):ClassType; // FIXME: rename to localClass
+	public var localClass       (default, null):ClassType;
 	public var localType        (default, null):Type;
 	public var classField       (default, null):Field;
 	public var classFunction    (default, null):Function;
@@ -117,8 +117,8 @@ class WorkEnv
 	
 	public function new (ct:ClassType, t:Type) {
 		
-		classType = ct;
-		localType = t;
+		localClass = ct;
+		localType  = t;
 		classComplexType = Context.toComplexType(t);
 		
 		switch (ct.kind) {
@@ -134,7 +134,7 @@ class WorkEnv
 		classFields    = Context.getBuildFields();
 		imports        = Context.getLocalImports();
 		importedFields = ImportTools.getFieldShorthands(imports);
-		functionsPack  = [classType.name];
+		functionsPack  = [localClass.name];
 		
 		parentDependencies      = [];
 		parentAsVarDependencies = [];
@@ -218,7 +218,7 @@ class WorkEnv
 	
 	public function getInheritedData (): WorkEnv {
 		
-		var we:WorkEnv = new WorkEnv(classType, localType);
+		var we:WorkEnv = new WorkEnv(localClass, localType);
 		
 		we.functionsPack = functionsPack.copy();
 		we.functionsPack.push( fieldName );
@@ -277,12 +277,12 @@ class WorkEnv
 	
 	public function getExtraTypePath (): TypePath {
 		
-		var moduleName:String = (isAbstract ? abstractType.module : classType.module).split(".").pop();
-		var className:String = isAbstract ? abstractType.name : classType.name;
+		var moduleName:String = (isAbstract ? abstractType.module : localClass.module).split(".").pop();
+		var className:String = isAbstract ? abstractType.name : localClass.name;
 		var isSubType:Bool = moduleName != className;
 		
 		var p = {
-			pack : !isAbstract ? classType.pack : abstractType.pack,
+			pack : !isAbstract ? localClass.pack : abstractType.pack,
 			name : isSubType ? moduleName : generatedIteratorClass.name,
 			sub  : isSubType ? generatedIteratorClass.name : null
 		};
@@ -509,7 +509,7 @@ class WorkEnv
 		if (data != null) {
 			return IdentCategory.LocalVar(data);
 		} else {
-			return FieldTools.resolveIdent(name, classType, classFields, importedFields);
+			return FieldTools.resolveIdent(name, localClass, classFields, importedFields);
 		}
 	}
 	

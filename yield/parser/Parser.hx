@@ -247,7 +247,7 @@ class Parser
 		ExpressionTools.defineVarAsDirective(yieldExtend, false);
 		
 		if (yieldExtend) {
-			env.classType.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.classType.pos);
+			env.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.localClass.pos);
 		}
 		
 		WorkEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
