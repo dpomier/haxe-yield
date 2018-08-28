@@ -59,8 +59,13 @@ class Tests
 		
 		r.onTestComplete.add(onTestComplete);
 		r.onComplete.add(onComplete);
-		
+
+		#if travix
+		r.onTestComplete.add(onTestComplete);
+		r.onComplete.add(onComplete);
+		#else
 		Report.create(r);
+		#end
 
 		r.run();
 	}
@@ -84,8 +89,6 @@ class Tests
 			
 			#if travix
 			travix.Logger.exit(0);
-			#elseif interp
-			Sys.exit(0);
 			#end
 		}
 	}
