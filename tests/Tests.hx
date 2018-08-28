@@ -60,12 +60,12 @@ class Tests
 		r.onTestComplete.add(onTestComplete);
 		r.onComplete.add(onComplete);
 
-		#if travix
+		// #if travix
 		r.onTestComplete.add(onTestComplete);
 		r.onComplete.add(onComplete);
-		#else
-		Report.create(r);
-		#end
+		// #else
+		// Report.create(r);
+		// #end
 
 		r.run();
 	}
@@ -85,12 +85,11 @@ class Tests
 
 	static function onComplete (r:Runner):Void {
 
-		if (success) {
-			
-			#if travix
-			travix.Logger.exit(0);
-			#end
-		}
+		#if travix
+		travix.Logger.exit(success ? 0 : 1);
+		#elseif interp
+		Sys.exit(success ? 0 : 1);
+		#end
 	}
 	
 }
