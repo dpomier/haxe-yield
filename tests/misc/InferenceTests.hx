@@ -1,10 +1,10 @@
 package misc;
 
 import haxe.Json;
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
-class InferenceTests extends TestCase implements Yield
+class InferenceTests implements Yield
 {
 
 	public function new() 

@@ -1,5 +1,6 @@
 package;
-import haxe.unit.TestRunner;
+import utest.Runner;
+import utest.ui.Report;
 import misc.InferenceTests;
 import misc.AccessionTests;
 import eparsers.ESwitchTests;
@@ -25,33 +26,34 @@ class Tests
 	
 	static function main () {
 		
-		var r:TestRunner = new TestRunner();
+		var r:Runner = new Runner();
 		
 		// parsers
-		r.add(new EIfTests());
-		r.add(new EWhileTests());
-		r.add(new EForTests());
-		r.add(new ETryTests());
-		r.add(new EFunctionTests());
-		r.add(new ESwitchTests());
+		r.addCase(new EIfTests());
+		r.addCase(new EWhileTests());
+		r.addCase(new EForTests());
+		r.addCase(new ETryTests());
+		r.addCase(new EFunctionTests());
+		r.addCase(new ESwitchTests());
 		
 		// general tests
-		r.add(new ScopeTests());
-		r.add(new ImportTests());
-		r.add(new UsingTests());
-		r.add(new YieldTests());
-		r.add(new IterationTests());
-		r.add(new AbstractTests());
-		r.add(new AccessionTests());
-		r.add(new InferenceTests());
-		r.add(new InheritanceTests());
-		r.add(new PrivateTests());
+		r.addCase(new ScopeTests());
+		r.addCase(new ImportTests());
+		r.addCase(new UsingTests());
+		r.addCase(new YieldTests());
+		r.addCase(new IterationTests());
+		r.addCase(new AbstractTests());
+		r.addCase(new AccessionTests());
+		r.addCase(new InferenceTests());
+		r.addCase(new InheritanceTests());
+		r.addCase(new PrivateTests());
 		
 		// options tests
-		r.add(new ExtendTests());
-		r.add(new KeywordTests());
-		r.add(new ExplicitTests());
+		r.addCase(new ExtendTests());
+		r.addCase(new KeywordTests());
+		r.addCase(new ExplicitTests());
 		
+		Report.create(r);
 		var success:Bool = r.run();
 		
 		#if travix

@@ -1,7 +1,7 @@
 package misc.packs;
-import haxe.unit.TestCase;
 
-class Parent extends TestCase {
+
+class Parent {
 
 	public function new () {
 		super();

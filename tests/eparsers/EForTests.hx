@@ -1,10 +1,12 @@
 package eparsers;
 
-import haxe.unit.TestCase;
+
+
+
 import eparsers.EForTests.FuuIterable;
 import yield.Yield;
 
-class EForTests extends TestCase implements Yield
+class EForTests implements Yield
 {
 	private static var NULL_INT:Int;
 

@@ -1,8 +1,8 @@
 package options;
 
-import haxe.unit.TestCase;
 
-class ExtendTests extends TestCase {
+
+class ExtendTests {
 	
 	function testShort () {
 		assertTrue(new ChildShort().getIt().next());

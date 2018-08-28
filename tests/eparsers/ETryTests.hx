@@ -1,9 +1,9 @@
 package eparsers;
 
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
-class ETryTests extends TestCase implements Yield
+class ETryTests implements Yield
 {
 
 	public function new() {

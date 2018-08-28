@@ -1,8 +1,8 @@
 package misc;
 
-import haxe.unit.TestCase;
 
-class PrivateTests extends TestCase {
+
+class PrivateTests {
 	
 	function testClass () {
 		assertTrue(new Class().getIt().next());

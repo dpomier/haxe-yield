@@ -1,10 +1,10 @@
 package eparsers;
 
 import haxe.macro.Expr;
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
-class ESwitchTests extends TestCase implements Yield
+class ESwitchTests implements Yield
 {
 
 	public function new() 

@@ -1,12 +1,12 @@
 package misc;
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
 using pack.pack1.MiscFunctions;
 
 using Lambda;
 
-class UsingTests extends TestCase implements Yield
+class UsingTests implements Yield
 {
 
 	public function new() 

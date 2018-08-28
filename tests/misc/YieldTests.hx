@@ -1,11 +1,11 @@
 package misc;
 
-import haxe.unit.TestCase;
+
 import pack.pack2.MiscYielded;
 import yield.Yield;
 
 @:yield
-class YieldTests extends TestCase
+class YieldTests
 {
 
 	public function new() 

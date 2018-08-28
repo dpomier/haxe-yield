@@ -1,8 +1,8 @@
 package options;
 
-import haxe.unit.TestCase;
 
-class ExplicitTests extends TestCase {
+
+class ExplicitTests {
 	
 	function testShort () {
 		var it = new Short().getIt();

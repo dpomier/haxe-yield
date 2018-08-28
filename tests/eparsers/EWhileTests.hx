@@ -1,9 +1,9 @@
 package eparsers;
 
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
-class EWhileTests extends TestCase implements Yield
+class EWhileTests implements Yield
 {
 	private static var NULL_INT:Int;
 

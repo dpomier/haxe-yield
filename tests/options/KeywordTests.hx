@@ -1,8 +1,8 @@
 package options;
 
-import haxe.unit.TestCase;
 
-class KeywordTests extends TestCase {
+
+class KeywordTests {
 	
 	function testShortOption () {
 		

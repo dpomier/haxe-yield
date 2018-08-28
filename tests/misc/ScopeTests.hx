@@ -1,9 +1,9 @@
 package misc;
 
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
-class ScopeTests extends TestCase implements Yield
+class ScopeTests implements Yield
 {
 
 	public function new() {

@@ -1,11 +1,11 @@
 package misc;
 
-import haxe.unit.TestCase;
+
 import pack.pack1.OperatorOverloading2;
 import yield.Yield;
 import yield.parser.Parser;
 
-class AbstractTests extends TestCase
+class AbstractTests
 {
 
 	public function new() 

@@ -1,6 +1,6 @@
 package misc;
 
-import haxe.unit.TestCase;
+
 import pack.pack1.MiscFunctions;
 import pack.pack1.MoreMiscFunctions;
 import pack.pack1.MoreMiscFunctions.a0 as funcA0;
@@ -11,7 +11,7 @@ import pack.pack2.*;
 import yield.Yield;
 
 @:access(pack.pack1.MoreMiscFunctions.priv)
-class ImportTests extends TestCase implements Yield
+class ImportTests implements Yield
 {
 
 	public function new() 
