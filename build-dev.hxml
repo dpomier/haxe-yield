@@ -1,6 +1,6 @@
 -cp tests
 -lib yield
--lib coroutine
+-lib utest
 -main Tests
 
 #-js bin/Tests.js
