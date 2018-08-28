@@ -1,8 +1,6 @@
 package eparsers;
 
-
-
-
+import utest.Assert;
 import eparsers.EForTests.FuuIterable;
 import yield.Yield;
 
@@ -11,7 +9,6 @@ class EForTests implements Yield
 	private static var NULL_INT:Int;
 
 	public function new() {
-		super();
 		var n:Null<Int> = null;
 		NULL_INT = n;
 	}
@@ -19,7 +16,7 @@ class EForTests implements Yield
 	function testSimpleFor () {
 		var it = simpleFor();
 		
-		assertEquals(4, it.next());
+		Assert.equals(4, it.next());
 	}
 	
 	function simpleFor ():Iterator<Int> {
@@ -36,12 +33,12 @@ class EForTests implements Yield
 	function testYieldedFor () {
 		var it = yieldedFor();
 		
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
 		
-		assertEquals(NULL_INT, it.next());
+		Assert.equals(NULL_INT, it.next());
 	}
 	
 	function yieldedFor ():Iterator<Int> {
@@ -62,20 +59,20 @@ class EForTests implements Yield
 	function testMultipleYieldedFor () {
 		var it = multipleYieldedFor();
 		
-		assertEquals(0, it.next());
-		assertEquals(10, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(1, it.next());
 		
-		assertEquals(1, it.next());
-		assertEquals(10, it.next());
-		assertEquals(2, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(2, it.next());
 		
-		assertEquals(2, it.next());
-		assertEquals(10, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(3, it.next());
 		
-		assertEquals(NULL_INT, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(NULL_INT, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function multipleYieldedFor ():Iterator<Int> {
@@ -99,11 +96,11 @@ class EForTests implements Yield
 	function testNestedFor () {
 		var it = nestedFor();
 		
-		assertEquals(6, it.next());
-		assertEquals(5, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(6, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(3, it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function nestedFor ():Iterator<Int> {
@@ -130,18 +127,18 @@ class EForTests implements Yield
 	function testNestedForYield () {
 		var it = nestedForYield();
 		
-		assertEquals(0, it.next());
-		assertEquals(10, it.next());
-		assertEquals(21, it.next());
-		assertEquals(22, it.next());
-		assertEquals(23, it.next());
-		assertEquals(11, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(21, it.next());
+		Assert.equals(22, it.next());
+		Assert.equals(23, it.next());
+		Assert.equals(11, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
 		
-		assertEquals(NULL_INT, it.next());
+		Assert.equals(NULL_INT, it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function nestedForYield ():Iterator<Int> {
@@ -179,13 +176,13 @@ class EForTests implements Yield
 	function testNestedForNestedYield () {
 		var it = nestedForNestedYield();
 		
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertEquals(4, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(4, it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function nestedForNestedYield ():Iterator<Int> {
@@ -209,15 +206,15 @@ class EForTests implements Yield
 	function testArray () {
 		var it = array();
 		
-		assertEquals(250, it.next());
+		Assert.equals(250, it.next());
 		
-		assertEquals(25, it.next());
-		assertEquals(50, it.next());
-		assertEquals(75, it.next());
-		assertEquals(100, it.next());
+		Assert.equals(25, it.next());
+		Assert.equals(50, it.next());
+		Assert.equals(75, it.next());
+		Assert.equals(100, it.next());
 		
-		assertEquals(null, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(null, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function array (): Iterator<Dynamic> {
@@ -247,20 +244,20 @@ class EForTests implements Yield
 	function testIterator () {
 		var it = iterator();
 		
-		assertEquals(25, it.next());
-		assertEquals(50, it.next());
-		assertEquals(75, it.next());
-		assertEquals(100, it.next());
+		Assert.equals(25, it.next());
+		Assert.equals(50, it.next());
+		Assert.equals(75, it.next());
+		Assert.equals(100, it.next());
 		
-		assertEquals(NULL_INT, it.next());
+		Assert.equals(NULL_INT, it.next());
 		
-		assertEquals(3, it.next());
-		assertEquals(2, it.next());
-		assertEquals(1, it.next());
-		assertEquals(0, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(0, it.next());
 		
-		assertEquals(NULL_INT, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(NULL_INT, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	function iterator () {
 		
@@ -288,12 +285,12 @@ class EForTests implements Yield
 	function testIteratble () {
 		var it = iterable();
 		
-		assertEquals(4, it.next());
-		assertEquals(8, it.next());
-		assertEquals(16, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(8, it.next());
+		Assert.equals(16, it.next());
 		
-		assertEquals(null, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(null, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	function iterable (): Iterator<Dynamic> {
 		
@@ -308,10 +305,10 @@ class EForTests implements Yield
 	
 	function testArrayComprehension () {
 		var it = arrayComprehension();
-		assertTrue(it.hasNext());
-		assertEquals(Std.string([for (i in 0...3) i]), Std.string(it.next()));
-		assertEquals(Std.string([for (i in 0...5) i]), Std.string(it.next()));
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(Std.string([for (i in 0...3) i]), Std.string(it.next()));
+		Assert.equals(Std.string([for (i in 0...5) i]), Std.string(it.next()));
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function arrayComprehension () {
@@ -322,19 +319,19 @@ class EForTests implements Yield
 	
 	function testArrayComprehensionAsVarAccession () {
 		var it = arrayComprehensionAsVarAccession();
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
 		var array:Array<Dynamic> = it.next();
 		
 		var counter:Int = 0;
 		for (getIt in array) {
-			assertTrue(Reflect.isFunction(getIt));
+			Assert.isTrue(Reflect.isFunction(getIt));
 			var arrIt = getIt();
-			assertEquals(counter, arrIt.next());
+			Assert.equals(counter, arrIt.next());
 			counter += 1;
 		}
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function arrayComprehensionAsVarAccession () {
@@ -343,23 +340,23 @@ class EForTests implements Yield
 	
 	function testArrayComprehensionAsVarNestedAccession () {
 		var it = arrayComprehensionAsVarNestedAccession();
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
 		var array:Array<Dynamic> = it.next();
 		
 		var counter:Int = 0;
 		for (getIt in array) {
-			assertTrue(Reflect.isFunction(getIt));
+			Assert.isTrue(Reflect.isFunction(getIt));
 			var arrIt = getIt();
 			var getSubIt = arrIt.next();
-			assertTrue(Reflect.isFunction(getSubIt));
+			Assert.isTrue(Reflect.isFunction(getSubIt));
 			
 			var subIt = getSubIt();
-			assertEquals(counter, subIt.next());
+			Assert.equals(counter, subIt.next());
 			counter += 1;
 		}
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function arrayComprehensionAsVarNestedAccession () {

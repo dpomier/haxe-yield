@@ -1,5 +1,6 @@
 package misc;
 
+import utest.Assert;
 import haxe.Json;
 
 import yield.Yield;
@@ -7,19 +8,18 @@ import yield.Yield;
 class InferenceTests implements Yield
 {
 
-	public function new() 
-	{
-		super();
+	public function new() {
+		
 	}
 	
 	function testFromConsts () {
 		var it:Iterator<Dynamic> = fromConsts();
-		assertTrue(it.hasNext());
-		assertEquals(3, it.next());
-		assertEquals("", it.next());
-		assertEquals(3.4, it.next());
-		assertEquals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.equals("", it.next());
+		Assert.equals(3.4, it.next());
+		Assert.equals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function fromConsts () {
@@ -39,12 +39,12 @@ class InferenceTests implements Yield
 	
 	function testFromIdents () {
 		var it:Iterator<Dynamic> = fromIdents();
-		assertTrue(it.hasNext());
-		assertEquals(3, it.next());
-		assertEquals("", it.next());
-		assertEquals(3.4, it.next());
-		assertEquals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.equals("", it.next());
+		Assert.equals(3.4, it.next());
+		Assert.equals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function fromIdents () {
@@ -73,12 +73,12 @@ class InferenceTests implements Yield
 	
 	function testFromIdentsFromConsts () {
 		var it:Iterator<Dynamic> = fromIdentsFromConsts();
-		assertTrue(it.hasNext());
-		assertEquals(3, it.next());
-		assertEquals("", it.next());
-		assertEquals(3.4, it.next());
-		assertEquals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.equals("", it.next());
+		Assert.equals(3.4, it.next());
+		Assert.equals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function fromIdentsFromConsts () {
@@ -103,12 +103,12 @@ class InferenceTests implements Yield
 	
 	function testFromArgs () {
 		var it:Iterator<Dynamic> = fromArgs(3, "", 3.4, ~/[A-Z]/);
-		assertTrue(it.hasNext());
-		assertEquals(3, it.next());
-		assertEquals("", it.next());
-		assertEquals(3.4, it.next());
-		assertEquals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.equals("", it.next());
+		Assert.equals(3.4, it.next());
+		Assert.equals(Json.stringify(~/[A-Z]/), Json.stringify(it.next()));
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function fromArgs (a:Int, b:String, c:Float, d:EReg) {
@@ -128,11 +128,11 @@ class InferenceTests implements Yield
 	
 	function testFromArgsFromConsts () {
 		var it:Iterator<Dynamic> = fromArgsFromConsts();
-		assertTrue(it.hasNext());
-		assertEquals(3, it.next());
-		assertEquals("", it.next());
-		assertEquals(3.4, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.equals("", it.next());
+		Assert.equals(3.4, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function fromArgsFromConsts (a = 3, b = "", c = 3.4) {

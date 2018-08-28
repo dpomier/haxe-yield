@@ -4,7 +4,7 @@ package misc.packs;
 class Parent {
 
 	public function new () {
-		super();
+		
 	}
 	
 	private static var privateStatic:Bool = false;

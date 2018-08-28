@@ -1,6 +1,6 @@
 package misc;
 
-
+import utest.Assert;
 import misc.packs.Parent;
 import yield.Yield;
 
@@ -15,12 +15,12 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	function testStaticVar () {
 		var it = staticVar();
 		staticVarField = false;
-		assertTrue(it.hasNext());
-		assertFalse(staticVarField);
-		assertEquals(0, it.next());
-		assertFalse(staticVarField);
-		assertFalse(it.hasNext());
-		assertTrue(staticVarField);
+		Assert.isTrue(it.hasNext());
+		Assert.isFalse(staticVarField);
+		Assert.equals(0, it.next());
+		Assert.isFalse(staticVarField);
+		Assert.isFalse(it.hasNext());
+		Assert.isTrue(staticVarField);
 	}
 	
 	static var staticVarField:Bool = false;
@@ -34,15 +34,15 @@ class AccessionTests extends misc.packs.Parent implements Yield
 		var it = parentStaticVar();
 		Parent.privateStatic = false;
 		Parent.publicStatic  = false;
-		assertTrue(it.hasNext());
-		assertFalse(Parent.privateStatic);
-		assertFalse(Parent.publicStatic);
-		assertEquals(0, it.next());
-		assertFalse(Parent.privateStatic);
-		assertFalse(Parent.publicStatic);
-		assertFalse(it.hasNext());
-		assertTrue(Parent.privateStatic);
-		assertTrue(Parent.publicStatic);
+		Assert.isTrue(it.hasNext());
+		Assert.isFalse(Parent.privateStatic);
+		Assert.isFalse(Parent.publicStatic);
+		Assert.equals(0, it.next());
+		Assert.isFalse(Parent.privateStatic);
+		Assert.isFalse(Parent.publicStatic);
+		Assert.isFalse(it.hasNext());
+		Assert.isTrue(Parent.privateStatic);
+		Assert.isTrue(Parent.publicStatic);
 	}
 	
 	function parentStaticVar () {
@@ -59,13 +59,13 @@ class AccessionTests extends misc.packs.Parent implements Yield
 		
 		var it:Iterator<Dynamic> = cast instanceAccess();
 		
-		assertEquals(-4, it.next());
-		assertEquals(-4, it.next());
-		assertEquals(-8, it.next());
-		assertEquals(member, -8);
+		Assert.equals(-4, it.next());
+		Assert.equals(-4, it.next());
+		Assert.equals(-8, it.next());
+		Assert.equals(member, -8);
 		
-		assertEquals(-8, it.next());
-		assertEquals(10, it.next());
+		Assert.equals(-8, it.next());
+		Assert.equals(10, it.next());
 	}
 	
 	function instanceAccess (): Iterator<Int> {
@@ -84,15 +84,15 @@ class AccessionTests extends misc.packs.Parent implements Yield
 		var it = parentMember();
 		privateMember = false;
 		publicMember  = false;
-		assertTrue(it.hasNext());
-		assertFalse(privateMember);
-		assertFalse(publicMember);
-		assertEquals(0, it.next());
-		assertFalse(privateMember);
-		assertFalse(publicMember);
-		assertFalse(it.hasNext());
-		assertTrue(privateMember);
-		assertTrue(publicMember);
+		Assert.isTrue(it.hasNext());
+		Assert.isFalse(privateMember);
+		Assert.isFalse(publicMember);
+		Assert.equals(0, it.next());
+		Assert.isFalse(privateMember);
+		Assert.isFalse(publicMember);
+		Assert.isFalse(it.hasNext());
+		Assert.isTrue(privateMember);
+		Assert.isTrue(publicMember);
 	}
 	
 	function parentMember () {
@@ -107,11 +107,11 @@ class AccessionTests extends misc.packs.Parent implements Yield
 		
 		var it:Iterator<Dynamic> = cast nestedAccess();
 		
-		assertEquals(3, it.next());
-		assertEquals(3, it.next());
-		assertEquals(12, it.next());
-		assertEquals(2, it.next());
-		assertEquals(member, 20);
+		Assert.equals(3, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(12, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(member, 20);
 	}
 	
 	function nestedAccess (): Iterator<Int> {
@@ -140,7 +140,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	#if (!cs && !java) // error: repeated modifier
 	function testAbstractAccessions () {
 		var a = new MyAbstract();
-		assertTrue(a.test());
+		Assert.isTrue(a.test());
 	}
 	#end
 	

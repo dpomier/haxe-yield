@@ -1,28 +1,32 @@
 package misc;
 
-
+import utest.Assert;
 
 class PrivateTests {
 	
+	public function new () {
+		
+	}
+
 	function testClass () {
-		assertTrue(new Class().getIt().next());
+		Assert.isTrue(new Class().getIt().next());
 	}
 	
 	function testNestedClass () {
 		var it = new NestedClass().getIt();
-		assertEquals("sub", it.next());
-		assertTrue(it.next());
+		Assert.equals("sub", it.next());
+		Assert.isTrue(it.next());
 	}
 	
 	#if (!cs && !java) // build failed
 	function testAbstract () {
-		assertTrue(new Abstract().getIt().next());
+		Assert.isTrue(new Abstract().getIt().next());
 	}
 	
 	function testNestedAbstract () {
 		var it = new NestedAbstract().getIt();
-		assertEquals("sub", it.next());
-		assertTrue(it.next());
+		Assert.equals("sub", it.next());
+		Assert.isTrue(it.next());
 	}
 	#end
 }

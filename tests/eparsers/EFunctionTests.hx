@@ -1,6 +1,6 @@
 package eparsers;
 
-
+import utest.Assert;
 import yield.Yield;
 
 class EFunctionTests implements Yield
@@ -8,7 +8,6 @@ class EFunctionTests implements Yield
 	private static var NULL_INT:Int;
 
 	public function new () {
-		super();
 		var n:Null<Int> = null;
 		NULL_INT = n;
 	}
@@ -16,12 +15,12 @@ class EFunctionTests implements Yield
 	function testFunDeclaration () {
 		var it:Iterator<Dynamic> = cast funDeclaration();
 		
-		assertEquals(4, it.next());
-		assertEquals(4, it.next());
-		assertEquals(5, it.next());
-		assertEquals(10, it.next());
-		assertEquals(30, it.next());
-		assertEquals(30, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(30, it.next());
+		Assert.equals(30, it.next());
 	}
 	
 	function funDeclaration ():Iterator<Int> {
@@ -41,8 +40,8 @@ class EFunctionTests implements Yield
 	function testSimpleFunc () {
 		var it:Iterator<Dynamic> = cast simpleFunc();
 		
-		assertEquals(5, it.next());
-		assertEquals(15, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(15, it.next());
 	}
 	
 	#if (neko || js || php || python || lua)
@@ -87,9 +86,9 @@ class EFunctionTests implements Yield
 	function testConditional () {
 		var it:Iterator<Dynamic> = cast conditional();
 		
-		assertEquals(2, it.next());
-		assertEquals(16, it.next());
-		assertEquals(32, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(16, it.next());
+		Assert.equals(32, it.next());
 	}
 	
 	#if (neko || js || php || python || lua)
@@ -140,10 +139,10 @@ class EFunctionTests implements Yield
 	function testNestedYield () {
 		var it:Iterator<Dynamic> = cast nestedYield();
 		
-		assertEquals(0, it.next());
-		assertEquals(5, it.next());
-		assertEquals(6, it.next());
-		assertEquals(64, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(6, it.next());
+		Assert.equals(64, it.next());
 	}
 	
 	function nestedYield ():Iterator<Int> {
@@ -170,14 +169,14 @@ class EFunctionTests implements Yield
 	function testArgs () {
 		var it = args(true);
 		
-		assertEquals(4, it.next());
-		assertEquals(0, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(4, it.next());
+		Assert.equals(0, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		it = args(false);
 		
-		assertEquals(8, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(8, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	#if (neko || js || php || python || lua)
@@ -212,13 +211,13 @@ class EFunctionTests implements Yield
 	function testNestedArgs () {
 		var it:Iterator<Dynamic> = cast nestedArgs(false);
 		
-		assertEquals(0, it.next());
-		assertEquals(5, it.next());
-		assertEquals(64, it.next());
-		assertFalse(it.next());
-		assertFalse(it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(64, it.next());
+		Assert.isFalse(it.next());
+		Assert.isFalse(it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	#if (neko || js || php || python || lua)
@@ -291,10 +290,10 @@ class EFunctionTests implements Yield
 	function testNestedArgs2 () {
 		var it:Iterator<Dynamic> = cast nestedArgs2(false);
 		
-		assertEquals("bar", it.next());
-		assertEquals("bar", it.next());
-		assertEquals("foo", it.next());
-		assertEquals("", it.next());
+		Assert.equals("bar", it.next());
+		Assert.equals("bar", it.next());
+		Assert.equals("foo", it.next());
+		Assert.equals("", it.next());
 		
 	}
 	
@@ -347,7 +346,7 @@ class EFunctionTests implements Yield
 	function testNestedArgsYield () {
 
 		var it:Iterator<Dynamic> = cast nestedArgsYield();
-		assertEquals("foo is unchanged!", it.next());
+		Assert.equals("foo is unchanged!", it.next());
 	}
 	
 	function nestedArgsYield ():Iterator<String> {
@@ -375,9 +374,9 @@ class EFunctionTests implements Yield
 	function testAnonymous () {
 		var it:Iterator<Dynamic> = cast anonymous();
 		
-		assertEquals("foo", it.next());
-		assertEquals("bar", it.next());
-		assertEquals("", it.next());
+		Assert.equals("foo", it.next());
+		Assert.equals("bar", it.next());
+		Assert.equals("", it.next());
 		
 	}
 	
@@ -409,12 +408,12 @@ class EFunctionTests implements Yield
 	function testAnonymousYield () {
 		var it:Iterator<Dynamic> = cast anonymousYield(false);
 		
-		assertEquals(5, it.next());
-		assertEquals(64, it.next());
-		assertFalse(it.next());
-		assertFalse(it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(64, it.next());
+		Assert.isFalse(it.next());
+		Assert.isFalse(it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	#if (neko || js || php || python || lua)
@@ -457,7 +456,7 @@ class EFunctionTests implements Yield
 	
 	function testNestedFunction() {
 		
-		assertEquals(15, nestedFunction());
+		Assert.equals(15, nestedFunction());
 	}
 	
 	function nestedFunction () {
@@ -502,9 +501,9 @@ class EFunctionTests implements Yield
 	
 	function testInitialization () {
 		var it = initialization();
-		assertTrue(it.hasNext());
-		assertEquals(NULL_INT, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(NULL_INT, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function initialization () {
@@ -520,14 +519,8 @@ class EFunctionTests implements Yield
 	
 	function testInlining () {
 		var it = inlining();
-		assertEquals(0, it.next());
-		assertEquals(3, it.next());
-		try {
-			it.next();
-			assertTrue(false);
-		} catch (err:Dynamic) {
-			assertTrue(true);
-		}
+		Assert.equals(0, it.next());
+		Assert.equals(3, it.next());
 	}
 	
 	function inlining ():Iterator<Int> {
@@ -537,7 +530,5 @@ class EFunctionTests implements Yield
 		@yield return 0;
 		
 		@yield return foo();
-		
-		@yield return untyped foo();
 	}
 }

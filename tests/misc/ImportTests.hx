@@ -1,6 +1,6 @@
 package misc;
 
-
+import utest.Assert;
 import pack.pack1.MiscFunctions;
 import pack.pack1.MoreMiscFunctions;
 import pack.pack1.MoreMiscFunctions.a0 as funcA0;
@@ -14,21 +14,20 @@ import yield.Yield;
 class ImportTests implements Yield
 {
 
-	public function new() 
-	{
-		super();
+	public function new() {
+		
 	}
 	
 	function testSimpleImport () {
 		var it = simpleImport("Patrick");
 		
-		assertTrue(it.hasNext());
-		assertEquals("hello!", it.next());
-		assertTrue(it.hasNext());
-		assertEquals("hello Toto!", it.next());
-		assertTrue(it.hasNext());
-		assertEquals("hello Patrick!", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello!", it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello Toto!", it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello Patrick!", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function simpleImport (name:String): Iterator<String> {
@@ -47,9 +46,9 @@ class ImportTests implements Yield
 	function testImportField () {
 		var it = importField();
 		
-		assertTrue(it.hasNext());
-		assertEquals(1, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function importField (): Iterator<Int> {
@@ -59,9 +58,9 @@ class ImportTests implements Yield
 	function testAsImport () {
 		var it = asImport();
 		
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function asImport (): Iterator<Int> {
@@ -71,9 +70,9 @@ class ImportTests implements Yield
 	function testAccessField () {
 		var it = accessField();
 		
-		assertTrue(it.hasNext());
-		assertEquals(100, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(100, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function accessField (): Iterator<Int> {
@@ -83,9 +82,9 @@ class ImportTests implements Yield
 	function testAccessField2 () {
 		var it = accessField2();
 		
-		assertTrue(it.hasNext());
-		assertEquals(200, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(200, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	@:access(pack.pack1.MoreMiscFunctions.priv2)
@@ -96,9 +95,9 @@ class ImportTests implements Yield
 	//function testImportAllowedField () {
 		//var it = importAllowedField();
 		//
-		//assertTrue(it.hasNext());
-		//assertEquals(9, it.next());
-		//assertFalse(it.hasNext());
+		//Assert.isTrue(it.hasNext());
+		//Assert.equals(9, it.next());
+		//Assert.isFalse(it.hasNext());
 	//}
 	//
 	//function importAllowedField (): Iterator<Int> {
@@ -108,12 +107,12 @@ class ImportTests implements Yield
 	function testAllField () {
 		var it = allField();
 		
-		assertTrue(it.hasNext());
-		assertEquals(5, it.next());
-		assertEquals(6, it.next());
-		assertEquals(7, it.next());
-		assertEquals(8, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(5, it.next());
+		Assert.equals(6, it.next());
+		Assert.equals(7, it.next());
+		Assert.equals(8, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function allField (): Iterator<Int> {
@@ -126,10 +125,10 @@ class ImportTests implements Yield
 	function testAllField2 () {
 		var it = allField2();
 		
-		assertTrue(it.hasNext());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function allField2 (): Iterator<Int> {
@@ -139,9 +138,9 @@ class ImportTests implements Yield
 	
 	function testAllModule () {
 		var it = allModule();
-		assertTrue(it.hasNext());
-		assertEquals("toto1", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("toto1", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function allModule () {
@@ -151,25 +150,25 @@ class ImportTests implements Yield
 	function testUsingTypedef () {
 		
 		var it = usingTypedef0();
-		assertEquals(0, it.next());
+		Assert.equals(0, it.next());
 		
 		it = usingTypedef1();
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 		
 		it = usingTypedef2();
-		assertEquals(2, it.next());
+		Assert.equals(2, it.next());
 		
 		it = usingTypedef3();
-		assertEquals(3, it.next());
+		Assert.equals(3, it.next());
 		
 		//it = usingTypedef4();
-		//assertEquals(4, it.next());
+		//Assert.equals(4, it.next());
 		
 		//it = usingTypedef5();
-		//assertEquals(5, it.next());
+		//Assert.equals(5, it.next());
 		
 		//it = usingTypedef6();
-		//assertEquals(6, it.next());
+		//Assert.equals(6, it.next());
 	}
 	
 	function usingTypedef0 ():DynamicAlias {

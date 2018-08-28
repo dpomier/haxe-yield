@@ -1,6 +1,6 @@
 package eparsers;
 
-
+import utest.Assert;
 import yield.Yield;
 
 class EWhileTests implements Yield
@@ -8,7 +8,6 @@ class EWhileTests implements Yield
 	private static var NULL_INT:Int;
 
 	public function new() {
-		super();
 		var n:Null<Int> = null;
 		NULL_INT = n;
 	}
@@ -16,7 +15,7 @@ class EWhileTests implements Yield
 	function testSimpleWhile () {
 		var it = simpleWhile();
 		
-		assertEquals(4, it.next());
+		Assert.equals(4, it.next());
 	}
 	
 	function simpleWhile ():Iterator<Int> {
@@ -33,12 +32,12 @@ class EWhileTests implements Yield
 	function testYieldedWhile () {
 		var it = yieldedWhile();
 		
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
 		
-		assertEquals(NULL_INT, it.next());
+		Assert.equals(NULL_INT, it.next());
 	}
 	
 	function yieldedWhile ():Iterator<Int> {
@@ -58,19 +57,19 @@ class EWhileTests implements Yield
 	function testMultipleYieldedWhile () {
 		var it = multipleYieldedWhile();
 		
-		assertEquals(0, it.next());
-		assertEquals(10, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(1, it.next());
 		
-		assertEquals(1, it.next());
-		assertEquals(10, it.next());
-		assertEquals(2, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(2, it.next());
 		
-		assertEquals(2, it.next());
-		assertEquals(10, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(3, it.next());
 		
-		assertEquals(NULL_INT, it.next());
+		Assert.equals(NULL_INT, it.next());
 	}
 	
 	function multipleYieldedWhile ():Iterator<Int> {
@@ -94,23 +93,23 @@ class EWhileTests implements Yield
 	function testNestedWhile () {
 		var it = nestedWhile();
 		
-		assertEquals(6, it.next());
-		assertEquals(1, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(6, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(1, it.next());
 		
-		assertEquals(0, it.next());
-		assertEquals(10, it.next());
-		assertEquals(21, it.next());
-		assertEquals(22, it.next());
-		assertEquals(23, it.next());
-		assertEquals(11, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(21, it.next());
+		Assert.equals(22, it.next());
+		Assert.equals(23, it.next());
+		Assert.equals(11, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
 		
-		assertEquals(NULL_INT, it.next());
+		Assert.equals(NULL_INT, it.next());
 		
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function nestedWhile ():Iterator<Int> {
@@ -162,14 +161,14 @@ class EWhileTests implements Yield
 	function testBreakAndContinue () {
 		var it = breakAndContinue();
 		
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
-		assertEquals(0, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertEquals(100, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(100, it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function breakAndContinue ():Iterator<Int> {
@@ -188,27 +187,27 @@ class EWhileTests implements Yield
 	function testContinueStatements () {
 		var it = continueStatement();
 		
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
-		assertEquals(0, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertEquals(4, it.next());
-		assertEquals(5, it.next());
-		assertEquals(6, it.next());
-		assertEquals(7, it.next());
-		assertEquals(8, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(6, it.next());
+		Assert.equals(7, it.next());
+		Assert.equals(8, it.next());
 		
-		assertEquals(18, it.next());
-		assertEquals(21, it.next());
-		assertEquals(24, it.next());
-		assertEquals(27, it.next());
-		assertEquals(30, it.next());
-		assertEquals(33, it.next());
+		Assert.equals(18, it.next());
+		Assert.equals(21, it.next());
+		Assert.equals(24, it.next());
+		Assert.equals(27, it.next());
+		Assert.equals(30, it.next());
+		Assert.equals(33, it.next());
 		
-		assertEquals(32, it.next());
+		Assert.equals(32, it.next());
 		for (i in 0...100) {
-			assertEquals(32, it.next());
+			Assert.equals(32, it.next());
 		}
 	}
 	
@@ -237,14 +236,14 @@ class EWhileTests implements Yield
 	function testDoWhile () {
 		var it = doWhile();
 		
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function doWhile ():Iterator<Int> {
@@ -257,16 +256,16 @@ class EWhileTests implements Yield
 	function testLastPart () {
 		var it = lastPart();
 		
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
 		
-		assertEquals(3, it.next());
-		assertEquals(5, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(5, it.next());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function lastPart ():Iterator<Int> {
@@ -285,10 +284,10 @@ class EWhileTests implements Yield
 	function testReturnedValue () {
 		
 		var it = returnedValue(4);
-		assertTrue(it.hasNext());
-		assertEquals(Std.string([0,1,2,3]), Std.string(it.next()));
-		assertEquals(Std.string([5,6,7]), Std.string(it.next()));
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(Std.string([0,1,2,3]), Std.string(it.next()));
+		Assert.equals(Std.string([5,6,7]), Std.string(it.next()));
+		Assert.isFalse(it.hasNext());
 		
 	}
 	
@@ -306,18 +305,18 @@ class EWhileTests implements Yield
 	function testIteratorReturnedValue () {
 		
 		var it = iteratorReturnedValue(4);
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
 		var array:Array<Dynamic> = it.next();
 		
-		assertEquals(4, array.length);
+		Assert.equals(4, array.length);
 		
 		for (elem in array) {
 			var subIt = elem();
-			assertTrue(subIt.hasNext());
-			assertEquals(4, subIt.next());
-			assertEquals(8, subIt.next());
-			assertFalse(subIt.hasNext());
+			Assert.isTrue(subIt.hasNext());
+			Assert.equals(4, subIt.next());
+			Assert.equals(8, subIt.next());
+			Assert.isFalse(subIt.hasNext());
 		}
 	}
 	

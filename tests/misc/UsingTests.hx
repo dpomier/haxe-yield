@@ -1,29 +1,28 @@
 package misc;
 
+import utest.Assert;
 import yield.Yield;
 
 using pack.pack1.MiscFunctions;
-
 using Lambda;
 
 class UsingTests implements Yield
 {
 
-	public function new() 
-	{
-		super();
+	public function new() {
+		
 	}
 	
 	function testSimpleUsing () {
 		var it = simpleUsing("Patrick");
 		
-		assertTrue(it.hasNext());
-		assertEquals("hello !", it.next());
-		assertTrue(it.hasNext());
-		assertEquals("hello Toto!", it.next());
-		assertTrue(it.hasNext());
-		assertEquals("hello Patrick!", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello !", it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello Toto!", it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello Patrick!", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function simpleUsing (name:String): Iterator<Dynamic> {
@@ -40,8 +39,8 @@ class UsingTests implements Yield
 	}
 	
 	function testLambda () {
-		assertEquals(3, lamba().count());
-		assertEquals([0,2,4].toString(), lamba().array().toString());
+		Assert.equals(3, lamba().count());
+		Assert.equals([0,2,4].toString(), lamba().array().toString());
 	}
 	
 	function lamba (): Iterable<Int> {
@@ -62,7 +61,7 @@ class UsingTests implements Yield
 		for (i in ["0", "01", "02", "2", "21", "22", "4", "41", "42"])
 			expected.add(i);
 		
-		assertEquals(expected.toString(), result.toString());
+		Assert.equals(expected.toString(), result.toString());
 	}
 }
 

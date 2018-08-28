@@ -1,41 +1,45 @@
 package options;
 
-
+import utest.Assert;
 
 class ExplicitTests {
+
+	public function new () {
+		
+	}
 	
 	function testShort () {
 		var it = new Short().getIt();
-		assertTrue(it.next());
+		Assert.isTrue(it.next());
 	}
 	
 	function testNormal () {
 		var it = new Normal().getIt();
-		assertTrue(it.next());
+		Assert.isTrue(it.next());
 	}
 	
 	function testFull () {
 		var it = new Full().getIt();
-		assertTrue(it.next());
+		Assert.isTrue(it.next());
 	}
 	
 	function testArgTrue () {
-		assertTrue(new ArgTrue().getExplicitIt().next());
+		Assert.isTrue(new ArgTrue().getExplicitIt().next());
 	}
 	
 	function testArgFalse () {
-		assertTrue(new ArgFalse().getExplicitIt().next());
-		assertTrue(new ArgFalse().getNoExplicitIt().next());
+		Assert.isTrue(new ArgFalse().getExplicitIt().next());
+		Assert.isTrue(new ArgFalse().getNoExplicitIt().next());
 	}
 	
 	function testParent () {
-		assertTrue(new Parent().getParentIt().next());
-		assertTrue(new Child().getChildIt().next());
+		Assert.isTrue(new Parent().getParentIt().next());
+		Assert.isTrue(new Child().getChildIt().next());
 	}
 	
 	function testIgnoredParent () {
-		assertTrue(new Parent().getParentIt().next());
-		assertTrue(new Child().getChildIt().next());
+		Assert.isTrue(new Parent().getParentIt().next());
+		Assert.isTrue(new Child().getChildIt().next());
 	}
 	
 }

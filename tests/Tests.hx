@@ -54,15 +54,8 @@ class Tests
 		r.addCase(new ExplicitTests());
 		
 		Report.create(r);
-		var success:Bool = r.run();
-		
-		#if travix
-			travix.Logger.exit(success ? 0 : 1);
-		#elseif interp
-			Sys.exit(0);
-		#elseif sys
-			Sys.getChar(false);
-		#end
+
+		r.run();	
 	}
 	
 }

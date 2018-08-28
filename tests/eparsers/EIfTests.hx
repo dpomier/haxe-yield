@@ -1,18 +1,19 @@
 package eparsers;
 
+import utest.Assert;
 import yield.Yield;
 
 class EIfTests implements Yield
 {
 
 	public function new() {
-		super();
+		
 	}
 	
 	function testSimpleIf () {
 		var it = simpleIf();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function simpleIf ():Iterator<Dynamic> {
@@ -32,10 +33,10 @@ class EIfTests implements Yield
 	function testYieldIf () {
 		var it = yieldIf();
 		
-		assertEquals(1, it.next());
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function yieldIf ():Iterator<Dynamic> {
@@ -57,10 +58,10 @@ class EIfTests implements Yield
 	function testYieldIf2 () {
 		var it = yieldIf2();
 		
-		assertEquals(1, it.next());
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function yieldIf2 ():Iterator<Dynamic> {
@@ -82,20 +83,20 @@ class EIfTests implements Yield
 	function testYieldIfElseTrue () {
 		var it = yieldIfElseTrue();
 		
-		assertEquals(1, it.next());
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		// Part 2
 		it = yieldIfElseFalse();
 		
-		assertEquals(3, it.next());
-		assertTrue(it.hasNext());
-		assertEquals(4, it.next());
-		assertTrue(it.hasNext());
-		assertEquals(5, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(4, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(5, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function yieldIfElseTrue ():Iterator<Dynamic> {
@@ -138,10 +139,10 @@ class EIfTests implements Yield
 	function testYieldElse () {
 		var it = yieldElse();
 		
-		assertEquals(4, it.next());
-		assertTrue(it.hasNext());
-		assertEquals(3, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(4, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function yieldElse ():Iterator<Dynamic> {
@@ -162,8 +163,8 @@ class EIfTests implements Yield
 	function testYieldElse2 () {
 		var it = yieldElse2();
 		
-		assertEquals(0, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function yieldElse2 ():Iterator<Dynamic> {
@@ -183,16 +184,16 @@ class EIfTests implements Yield
 	function testReturnedValue () {
 		
 		var it = returnedValue(true);
-		assertTrue(it.hasNext());
-		assertEquals(1, it.next());
-		assertEquals(3, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(3, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		var it = returnedValue(false);
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertEquals(4, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.equals(4, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function returnedValue (condition:Bool) {
@@ -205,30 +206,30 @@ class EIfTests implements Yield
 	function testIteratorReturnedValue () {
 		
 		var it = iteratorReturnedValue(true);
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
 		var it1 = it.next()();
-		assertEquals(1, it1.next());
-		assertEquals(3, it1.next());
+		Assert.equals(1, it1.next());
+		Assert.equals(3, it1.next());
 		
 		var it2 = it.next()();
-		assertEquals(6, it2.next());
-		assertEquals(12, it2.next());
-		assertFalse(it.hasNext());
+		Assert.equals(6, it2.next());
+		Assert.equals(12, it2.next());
+		Assert.isFalse(it.hasNext());
 		
 		
 		
 		var it = iteratorReturnedValue(false);
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
 		var it1 = it.next()();
-		assertEquals(2, it1.next());
-		assertEquals(4, it1.next());
+		Assert.equals(2, it1.next());
+		Assert.equals(4, it1.next());
 		
 		var it2 = it.next()();
-		assertEquals(8, it2.next());
-		assertEquals(16, it2.next());
-		assertFalse(it.hasNext());
+		Assert.equals(8, it2.next());
+		Assert.equals(16, it2.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function iteratorReturnedValue (condition:Bool) {
@@ -262,9 +263,9 @@ class EIfTests implements Yield
 	
 	function testInitialization () {
 		var it = initialization(2);
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function initialization (a:Int) {
