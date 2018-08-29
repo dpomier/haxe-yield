@@ -53,7 +53,7 @@ class Tests
 		r.addCase(new KeywordTests());
 		r.addCase(new ExplicitTests());
 		
-		Report.create(r, SuccessResultsDisplayMode.AlwaysShowSuccessResults, HeaderDisplayMode.AlwaysShowHeader);
+		Report.create(r);
 
 		r.run();
 	}
