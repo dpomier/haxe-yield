@@ -1,4 +1,4 @@
 -cp tests
 -lib utest
 -main Tests
--dce full
+-dce no
