@@ -25,7 +25,7 @@ script:
   - haxelib run travix neko
   - haxelib run travix python
   - haxelib run travix node
-  - haxelib run travix js
+#  - haxelib run travix js # Fails to exit
   - haxelib run travix java
   - haxelib run travix cpp
   - haxelib run travix cs
