@@ -2,3 +2,4 @@
 -lib utest
 -main Tests
 -dce no
+-D travis
