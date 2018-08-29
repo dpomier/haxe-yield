@@ -1,9 +1,7 @@
 package;
 import utest.Runner;
 import utest.ui.Report;
-import utest.Assertation;
-import utest.TestHandler;
-import utest.TestFixture;
+import utest.ui.common.HeaderDisplayMode;
 import misc.InferenceTests;
 import misc.AccessionTests;
 import eparsers.ESwitchTests;
@@ -26,8 +24,6 @@ import options.KeywordTests;
 
 class Tests
 {
-	static var success:Bool = true;
-
 	static function main () {
 		
 		var r:Runner = new Runner();
@@ -57,39 +53,9 @@ class Tests
 		r.addCase(new KeywordTests());
 		r.addCase(new ExplicitTests());
 		
-		r.onTestComplete.add(onTestComplete);
-		r.onComplete.add(onComplete);
-
-		// #if travix
-		r.onTestComplete.add(onTestComplete);
-		r.onComplete.add(onComplete);
-		// #else
-		// Report.create(r);
-		// #end
+		Report.create(r, SuccessResultsDisplayMode.AlwaysShowSuccessResults, HeaderDisplayMode.AlwaysShowHeader);
 
 		r.run();
-	}
-
-	static function onTestComplete (test:TestHandler<TestFixture>) {
-
-		for (assertation in test.results) {
-		
-			switch (assertation) {
-				case Success(_) | Ignore(_):
-				case _: 
-					success = false;
-					break;
-			}
-		}
-	}
-
-	static function onComplete (r:Runner):Void {
-
-		#if travix
-		travix.Logger.exit(success ? 0 : 1);
-		#elseif interp
-		Sys.exit(success ? 0 : 1);
-		#end
 	}
 	
 }

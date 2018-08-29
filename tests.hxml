@@ -1,3 +1,4 @@
 -cp tests
 -main Tests
 -dce full
+-D travis
