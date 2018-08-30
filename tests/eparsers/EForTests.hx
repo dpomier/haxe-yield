@@ -267,7 +267,7 @@ class EForTests implements Yield
 			@yield return i;
 		}
 		
-		@yield return null;
+		@yield return NULL_INT;
 		
 		#if (neko || js || php || python || lua)
 		var n = new FuuIterator();
@@ -279,7 +279,7 @@ class EForTests implements Yield
 			@yield return i;
 		}
 		
-		@yield return null;
+		@yield return NULL_INT;
 	}
 	
 	function testIteratble () {
