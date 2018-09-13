@@ -112,6 +112,7 @@ class WorkEnv
 	public var requiresInstance (default, null):Bool;
 
 	public var yieldMode:Bool;
+	public var untypedMode:Bool;
 	
 	private static var scopeCounter:UInt;
 	
@@ -139,6 +140,8 @@ class WorkEnv
 		parentDependencies      = [];
 		parentAsVarDependencies = [];
 		parent = null;
+
+		untypedMode = false;
 	}
 	
 	public static function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
@@ -229,6 +232,7 @@ class WorkEnv
 		we.classField    = classField;
 		we.classFunction = classFunction;
 		we.currentScope  = currentScope;
+		we.untypedMode   = untypedMode;
 		
 		return we;
 	}

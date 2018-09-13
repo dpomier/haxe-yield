@@ -93,6 +93,9 @@ class YieldSplitter
 		switch (f.expr.expr) {
 			case EBlock(_exprs):
 				for (lexpr in _exprs) parse(lexpr, false);
+			case EUntyped(_e):
+				workEnv.untypedMode = true;
+				parse(_e, false);
 			case _:
 				parse(f.expr, false);
 		}
@@ -118,6 +121,9 @@ class YieldSplitter
 	}
 	
 	public function addIntoBlock (e:Expr, ?pos:Int): Void {
+		if (workEnv.untypedMode) {
+			e = { expr: EUntyped(e), pos: e.pos };
+		}
 		iteratorBlocks[pos == null ? cursor : pos].push(e);
 	}
 	
@@ -294,7 +300,13 @@ class YieldSplitter
 				if (!subParsing) addIntoBlock(e);
 				
 			case EUntyped(_e):
+			
+				var wasUntyped = workEnv.untypedMode;
+				
+				workEnv.untypedMode = true;
 				parse(_e, true, ic);
+				workEnv.untypedMode = wasUntyped;
+
 				if (!subParsing) addIntoBlock(e);
 				
 			case ECheckType(_e, _t):
