@@ -144,6 +144,36 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	}
 	#end
 	
+	function testUntyped () {
+		var it = untypedFunc();
+		assertFalse(it.hasNext());
+		
+		var it = untypedNestedFunc();
+		assertFalse(it.next());
+	}
+
+	function untypedFunc () untyped {
+
+		try {
+			unknown(); // should compile
+		} catch (e:Dynamic) { }
+
+		@yield break;
+	}
+
+	function untypedNestedFunc () {
+
+		untyped function subEnv () {
+
+			try {
+				unknown(); // should compile
+			} catch (e:Dynamic) { }
+
+			@yield break;
+		}
+
+		@yield return subEnv().hasNext();
+	}
 }
 
 #if (!cs && !java) // error: repeated modifier
