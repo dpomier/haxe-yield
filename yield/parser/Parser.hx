@@ -425,8 +425,9 @@ class Parser
 		
 		// Generate type
 		
-		if (env.yieldMode || env.requiredBySubEnv)
+		if (env.yieldMode || env.requiredBySubEnv) {
 			f.expr = DefaultGenerator.add(ibd, pos, env);
+		}
 		
 		return true;
 	}
