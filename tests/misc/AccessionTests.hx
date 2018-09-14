@@ -174,6 +174,28 @@ class AccessionTests extends misc.packs.Parent implements Yield
 
 		@yield return subEnv().hasNext();
 	}
+
+	function testUnknownIdent () {
+		var it = unknownIdent();
+		assertFalse(it.next());
+	}
+
+	function unknownIdent () {
+
+		trace("should compile");
+		
+		try {
+			untyped unknown(); // should compile
+		} catch (e:Dynamic) { }
+
+		untyped try {
+			unknown(); // should compile
+		} catch (e:Dynamic) { }
+
+		// unknown(); // TODO: test compilation error
+
+		@yield break;
+	}
 }
 
 #if (!cs && !java) // error: repeated modifier
