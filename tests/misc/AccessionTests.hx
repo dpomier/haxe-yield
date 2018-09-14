@@ -144,6 +144,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	}
 	#end
 	
+	#if interp
 	function testUntyped () {
 		var it = untypedFunc();
 		assertFalse(it.hasNext());
@@ -194,6 +195,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 
 		@yield break;
 	}
+	#end
 }
 
 #if (!cs && !java) // error: repeated modifier
