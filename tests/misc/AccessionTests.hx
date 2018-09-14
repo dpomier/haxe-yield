@@ -177,13 +177,11 @@ class AccessionTests extends misc.packs.Parent implements Yield
 
 	function testUnknownIdent () {
 		var it = unknownIdent();
-		assertFalse(it.next());
+		assertFalse(it.hasNext());
 	}
 
 	function unknownIdent () {
 
-		trace("should compile");
-		
 		try {
 			untyped unknown(); // should compile
 		} catch (e:Dynamic) { }

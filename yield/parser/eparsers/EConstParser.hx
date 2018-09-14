@@ -108,15 +108,6 @@ class EConstParser extends BaseParser
 							
 						case IdentCategory.ImportedField(_t):
 						case IdentCategory.Unknown:
-
-							if (!m_we.untypedMode && _s != "trace") {
-
-								try {
-									Context.typeof(e);
-								} catch (error:Dynamic) {
-									Context.fatalError(Std.string(error), e.pos);
-								}
-							}
 					}
 				}
 				
