@@ -94,8 +94,10 @@ class YieldSplitter
 			case EBlock(_exprs):
 				for (lexpr in _exprs) parse(lexpr, false);
 			case EUntyped(_e):
+				var wasUntyped:Bool = workEnv.untypedMode;
 				workEnv.untypedMode = true;
 				parse(_e, false);
+				workEnv.untypedMode = wasUntyped;
 			case _:
 				parse(f.expr, false);
 		}
