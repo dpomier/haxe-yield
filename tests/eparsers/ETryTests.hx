@@ -327,4 +327,41 @@ class ETryTests extends TestCase implements Yield
 
 		@yield break;
 	}
+
+	function testNestedFunctionShouldBeOutOfTry () {
+		var it = nestedFunctionShouldBeOutOfTry();
+		assertTrue(it.next());
+		assertTrue(it.next());
+	}
+
+	function nestedFunctionShouldBeOutOfTry () {
+
+		var throwErrors:Iterator<Dynamic> = null;
+		var errorThrowed = false;
+		
+		try {
+			
+			throwErrors = (function () {
+				@yield return throw "error1";
+				@yield return throw "error2";
+			})();
+			
+			throwErrors.next();
+			
+		} catch (error:Dynamic) {
+			errorThrowed = Std.string(error) == "error1";
+		}
+		
+		@yield return errorThrowed;
+		
+		errorThrowed = false;
+		
+		try {
+			throwErrors.next();
+		} catch (error:Dynamic) {
+			errorThrowed = Std.string(error) == "error2";
+		}
+		
+		@yield return errorThrowed;
+	}
 }
