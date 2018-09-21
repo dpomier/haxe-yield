@@ -113,6 +113,10 @@ class WorkEnv
 
 	public var yieldMode:Bool;
 	public var untypedMode:Bool;
+
+	#if debug
+	public var debug (default, null):Bool = false;
+	#end
 	
 	private var scopeCounter:UInt;
 	
@@ -172,6 +176,13 @@ class WorkEnv
 	}
 	
 	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, pos:Position): Void {
+		
+		#if debug
+		if (Context.defined("yDebug")) {
+			var match:String = Context.definedValue("yDebug");
+			debug = match != null && name == StringTools.trim(match);
+		}
+		#end
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -235,6 +246,10 @@ class WorkEnv
 		we.untypedMode   = untypedMode;
 		we.scopeCounter  = scopeCounter + 1;
 		
+		#if debug
+		we.debug = debug;
+		#end
+
 		return we;
 	}
 	

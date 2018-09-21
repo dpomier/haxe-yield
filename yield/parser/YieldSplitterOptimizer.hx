@@ -47,6 +47,9 @@ class YieldSplitterOptimizer
 			while (removeSuperfluousGotoActionCalls(ys, pm, workEnv, pos) && ++subpass < 30)
 				needRepass = true;
 		}
+
+		if (workEnv.debug)
+			trace('"${workEnv.fieldName}" optimazed in $pass pass');
 	}
 
 	public static function removeUselessSetActions (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Bool {
