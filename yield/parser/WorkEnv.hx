@@ -69,6 +69,7 @@ class WorkEnv
 	public static var YIELD_EXTEND   (default, null):Bool;
 	
 	public var currentScope (default, null):Scope;
+	public var scopeCounter (default, null):UInt;
 	
 	public var localClass       (default, null):ClassType;
 	public var localType        (default, null):Type;
@@ -117,8 +118,6 @@ class WorkEnv
 	#if debug
 	public var debug (default, null):Bool = false;
 	#end
-	
-	private var scopeCounter:UInt;
 	
 	public function new (ct:ClassType, t:Type) {
 		
@@ -244,7 +243,7 @@ class WorkEnv
 		we.classFunction = classFunction;
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
-		we.scopeCounter  = scopeCounter + 1;
+		we.scopeCounter  = 0;
 		
 		#if debug
 		we.debug = debug;
