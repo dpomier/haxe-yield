@@ -29,7 +29,7 @@ import yield.parser.PositionManager.LinkedPosition;
 class YieldSplitterOptimizer
 {
 	
-	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Void {
+	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Void {
 		
 		var pass:Int = 0;
 		var subpass:Int = 0;
@@ -40,21 +40,21 @@ class YieldSplitterOptimizer
 			needRepass = false;
 			subpass = 0;
 
-			while (removeUselessSetActions(ys, pm, workEnv, pos) && ++subpass < 10)
+			while (removeUselessSetActions(ys, pm, env, pos) && ++subpass < 10)
 				needRepass = true;
-			while (removeSuperfluousSetActionCalls(ys, pm, workEnv, pos) && ++subpass < 20)
+			while (removeSuperfluousSetActionCalls(ys, pm, env, pos) && ++subpass < 20)
 				needRepass = true;
-			while (removeSuperfluousGotoActionCalls(ys, pm, workEnv, pos) && ++subpass < 30)
+			while (removeSuperfluousGotoActionCalls(ys, pm, env, pos) && ++subpass < 30)
 				needRepass = true;
 		}
 
 		#if debug
-		if (workEnv.debug)
-			trace('"${workEnv.fieldName}" optimazed in $pass pass');
+		if (env.debug)
+			trace('"${env.fieldName}" optimazed in $pass pass');
 		#end
 	}
 
-	public static function removeUselessSetActions (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Bool {
+	public static function removeUselessSetActions (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Bool {
 		
 		var optimized:Bool = false;
 		
@@ -68,7 +68,7 @@ class YieldSplitterOptimizer
 				
 				var isActionExpr:Bool = false;
 				
-				for (lset in workEnv.setActions) {
+				for (lset in env.setActions) {
 					if (lexpr == lset.e) {
 						
 						if (lastSetAction != null)
@@ -82,7 +82,7 @@ class YieldSplitterOptimizer
 				
 				if (isActionExpr) continue;
 				
-				for (lgoto in workEnv.gotoActions) {
+				for (lgoto in env.gotoActions) {
 					if (lexpr == lgoto.e) {
 						if (lastSetAction != null) 
 							setsToRemove.push( lastSetAction );
@@ -97,7 +97,7 @@ class YieldSplitterOptimizer
 			while (--i != -1) {
 				
 				iteratorBlock.remove(setsToRemove[i].e);
-				workEnv.setActions.remove(setsToRemove[i]);
+				env.setActions.remove(setsToRemove[i]);
 				
 				setsToRemove.splice(i, 1);
 				optimized = true;
@@ -107,11 +107,11 @@ class YieldSplitterOptimizer
 		return optimized;
 	}
 	
-	public static function removeSuperfluousSetActionCalls (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Bool {
+	public static function removeSuperfluousSetActionCalls (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Bool {
 		
 		var optimized:Bool = false;
 		
-		for (aSet in workEnv.setActions) {
+		for (aSet in env.setActions) {
 			
 			if (aSet.pos >= ys.iteratorBlocks.length) continue;
 			
@@ -119,7 +119,7 @@ class YieldSplitterOptimizer
 				
 				var isAnotherExpr:Bool = true;
 				
-				for (lset in workEnv.setActions) {
+				for (lset in env.setActions) {
 					if (lexpr == lset.e) {
 						isAnotherExpr = false;
 						break;
@@ -127,7 +127,7 @@ class YieldSplitterOptimizer
 				}
 				if (!isAnotherExpr) continue;
 				
-				for (lgoto in workEnv.gotoActions) {
+				for (lgoto in env.gotoActions) {
 					if (lexpr == lgoto.e) {
 						
 						pm.moveLinkedPosition(aSet, lgoto.pos);
@@ -145,13 +145,13 @@ class YieldSplitterOptimizer
 		return optimized;
 	}
 	
-	public static function removeSuperfluousGotoActionCalls (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Bool {
+	public static function removeSuperfluousGotoActionCalls (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Bool {
 		
 		var optimized:Bool = false;
 		
 		var uncrossedPositions:Array<Int> = [];
 		
-		for (aGoto in workEnv.gotoActions) {
+		for (aGoto in env.gotoActions) {
 			
 			if (aGoto.pos >= ys.iteratorBlocks.length) continue;
 			
@@ -159,7 +159,7 @@ class YieldSplitterOptimizer
 				
 				var isAnotherExpr:Bool = true;
 				
-				for (lgoto in workEnv.gotoActions) {
+				for (lgoto in env.gotoActions) {
 					if (lexpr == lgoto.e && aGoto.pos != lgoto.pos) {
 						
 						if (uncrossedPositions.indexOf(aGoto.pos) == -1)

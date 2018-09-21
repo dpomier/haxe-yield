@@ -34,27 +34,27 @@ typedef LinkedPosition = {
 class PositionManager
 {
 	
-	private var ibd:IteratorBlockData;
-	private var posPointers:Array<Array<LinkedPosition>>;
+	private var m_ibd:IteratorBlockData;
+	private var m_posPointers:Array<Array<LinkedPosition>>;
 
 	public function new (iteratorBlocks:IteratorBlockData) {
 		
-		ibd = iteratorBlocks;
-		posPointers	= new Array<Array<LinkedPosition>>();
+		m_ibd = iteratorBlocks;
+		m_posPointers = new Array<Array<LinkedPosition>>();
 	}
 	
 	public function addPosPointer (lp:LinkedPosition): Void {
 		
-		if (posPointers.length <= lp.pos || posPointers[lp.pos] == null) {
-			posPointers[lp.pos] = new Array<LinkedPosition>();
+		if (m_posPointers.length <= lp.pos || m_posPointers[lp.pos] == null) {
+			m_posPointers[lp.pos] = new Array<LinkedPosition>();
 		}
 		
-		posPointers[lp.pos].push(lp);
+		m_posPointers[lp.pos].push(lp);
 	}
 	
 	public function moveLinkedPosition (lp:LinkedPosition, newPos:Int): Void {
 		
-		posPointers[lp.pos].remove(lp);
+		m_posPointers[lp.pos].remove(lp);
 		
 		if (newPos >= 0) {
 			lp.pos = newPos;
@@ -64,14 +64,14 @@ class PositionManager
 	
 	public function adjustIteratorPos (offset:Int, since:Int): Void {
 		
-		var ibdLength:Int = ibd.length;
-		var posCount:Int  = posPointers.length;
+		var ibdLength:Int = m_ibd.length;
+		var posCount:Int  = m_posPointers.length;
 		
 		for (i in since...ibdLength + 1) {
 			
-			if (i < posCount && posPointers[i] != null) {
+			if (i < posCount && m_posPointers[i] != null) {
 				
-				for (posPtr in posPointers[i]) {
+				for (posPtr in m_posPointers[i]) {
 					
 					posPtr.pos += offset;
 				}
@@ -80,17 +80,17 @@ class PositionManager
 		
 		for (i in since...ibdLength + 1) {
 			
-			if (i < posCount && posPointers[i] != null) {
+			if (i < posCount && m_posPointers[i] != null) {
 				
-				var j:Int = posPointers[i].length;
+				var j:Int = m_posPointers[i].length;
 				
 				while (--j != -1) {
 					
-					if (posPointers[i][j].pos >= 0) {
-						addPosPointer(posPointers[i][j]);
+					if (m_posPointers[i][j].pos >= 0) {
+						addPosPointer(m_posPointers[i][j]);
 					}
 					
-					posPointers[i].splice(j, 1);
+					m_posPointers[i].splice(j, 1);
 				}
 			}
 		}

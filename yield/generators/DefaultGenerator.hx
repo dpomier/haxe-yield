@@ -55,13 +55,13 @@ class DefaultGenerator
 	
 	private static var typeDefinitionStack:Array<TypeDefinition> = [];
 	
-	public static function makeTypeDefinition (workEnv:WorkEnv): TypeDefinition {
+	public static function makeTypeDefinition (env:WorkEnv): TypeDefinition {
 		
-		var iteratorClassName:String = NameController.extraTypeName(workEnv, ++extraTypeCounter);
+		var iteratorClassName:String = NameController.extraTypeName(env, ++extraTypeCounter);
 		
 		var c  = macro class $iteratorClassName { };
-		c.pos  = workEnv.localClass.pos;
-		c.meta = workEnv.localClass.meta.get().copy();
+		c.pos  = env.localClass.pos;
+		c.meta = env.localClass.meta.get().copy();
 		
 		return c;
 	}
@@ -70,28 +70,28 @@ class DefaultGenerator
 	 * Generate the extra-type representing the iterator blocks, then add it into the queue of type definition.
 	 * @return Returns the expression which instantiates the generated extra-type.
 	 */
-	public static function add (ibd:IteratorBlockData, pos:Position, workEnv:WorkEnv): Expr {
+	public static function add (ibd:IteratorBlockData, pos:Position, env:WorkEnv): Expr {
 		
-		var bd:BuildingData = new BuildingData(workEnv.generatedIteratorClass, workEnv.getExtraTypePath(), ibd);
+		var bd:BuildingData = new BuildingData(env.generatedIteratorClass, env.getExtraTypePath(), ibd);
 		
 		initTypeMetas(bd, pos);
-		initTypeParams(bd, workEnv, pos);
+		initTypeParams(bd, env, pos);
 		
-		initIteratorActions(bd, workEnv, pos);
+		initIteratorActions(bd, env, pos);
 		
-		initParentDependencies(bd, workEnv, pos);
-		initParentAsVarDependencies(bd, workEnv, pos);
-		initInstanceDependency(bd, workEnv, pos);
-		initIteratorInitialisations(bd, workEnv, ibd, pos);
-		initIteratorMethods(bd, workEnv, ibd, pos);
+		initParentDependencies(bd, env, pos);
+		initParentAsVarDependencies(bd, env, pos);
+		initInstanceDependency(bd, env, pos);
+		initIteratorInitialisations(bd, env, ibd, pos);
+		initIteratorMethods(bd, env, ibd, pos);
 		initConstructor(bd, pos);
 		
-		allowAccessToPrivateFields(workEnv, pos);
-		initInstanceAccessions(workEnv);
-		initParentAccessions(workEnv);
+		allowAccessToPrivateFields(env, pos);
+		initInstanceAccessions(env);
+		initParentAccessions(env);
 		
-		initVariableFields(bd, workEnv);
-		initIterativeFunctions(bd, workEnv, ibd);
+		initVariableFields(bd, env);
+		initIterativeFunctions(bd, env, ibd);
 		
 		typeDefinitionStack.push( bd.typeDefinition );
 		
@@ -227,17 +227,17 @@ class DefaultGenerator
 		});
 	}
 	
-	private static function initParentDependencies (bd:BuildingData, workEnv:WorkEnv, pos:Position): Void {
+	private static function initParentDependencies (bd:BuildingData, env:WorkEnv, pos:Position): Void {
 		
-		for (dependence in workEnv.parentDependencies) {
+		for (dependence in env.parentDependencies) {
 			
 			// Add the argument of the parent as a field
 			
-			var dependenceName:String = NameController.fieldParent(workEnv, dependence);
+			var dependenceName:String = NameController.fieldParent(env, dependence);
 			
 			addProperty(bd, dependenceName, [APrivate], dependence.getGeneratedComplexType(), pos);
 			
-			var constructorArgName:String = NameController.argParent(workEnv, dependence);
+			var constructorArgName:String = NameController.argParent(env, dependence);
 			
 			bd.constructorArgs.push({
 				name:  constructorArgName, 
@@ -251,7 +251,7 @@ class DefaultGenerator
 			
 			// Pass the parent through arguments
 			
-			if (dependence == workEnv.parent) {
+			if (dependence == env.parent) {
 				bd.givenArguments.push({
 					expr: EConst(CIdent("this")),
 					pos:  pos
@@ -266,9 +266,9 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initParentAsVarDependencies (bd:BuildingData, workEnv:WorkEnv, pos:Position): Void {
+	private static function initParentAsVarDependencies (bd:BuildingData, env:WorkEnv, pos:Position): Void {
 		
-		for (dependence in workEnv.parentAsVarDependencies) {
+		for (dependence in env.parentAsVarDependencies) {
 			
 			// Add the local variable as a field
 			
@@ -290,7 +290,7 @@ class DefaultGenerator
 			
 			// Pass the local variable through arguments
 			
-			if (dependence.env == workEnv.parent) {
+			if (dependence.env == env.parent) {
 				
 				var econst:Expr = switch (dependence.identData.ident) {
 					case IdentRef.IEConst(eRef): { expr: eRef.expr, pos: eRef.pos };
@@ -310,15 +310,15 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initInstanceDependency (bd:BuildingData, workEnv:WorkEnv, pos:Position): Void {
+	private static function initInstanceDependency (bd:BuildingData, env:WorkEnv, pos:Position): Void {
 		
 		// instance of the class
 		
-		if (workEnv.requiresInstance) {
+		if (env.requiresInstance) {
 			
 			// Add the argument of the instance as a field
 			
-			var lInstanceCT:ComplexType = !workEnv.isAbstract ? workEnv.classComplexType : TypeTools.toComplexType(workEnv.abstractType.type);
+			var lInstanceCT:ComplexType = !env.isAbstract ? env.classComplexType : TypeTools.toComplexType(env.abstractType.type);
 			
 			addProperty(bd, NameController.fieldInstance(), [APrivate], lInstanceCT, pos);
 			
@@ -334,17 +334,17 @@ class DefaultGenerator
 			
 			// Pass the instance through arguments
 			
-			if (workEnv.parent != null) {
+			if (env.parent != null) {
 				
 				var lexpr:Expr = { expr: EConst(CIdent("this")), pos: pos };
 				
-				workEnv.parent.addInstanceAccession(null, workEnv.parent.getGeneratedComplexType(), IdentRef.IEConst(lexpr), IdentChannel.Normal, lexpr.pos);
+				env.parent.addInstanceAccession(null, env.parent.getGeneratedComplexType(), IdentRef.IEConst(lexpr), IdentChannel.Normal, lexpr.pos);
 				
 				bd.givenArguments.push(lexpr);
 				
 			} else {
 				
-				if (workEnv.parent == null) {
+				if (env.parent == null) {
 					
 					bd.givenArguments.push({
 						expr: EConst(CIdent("this")),
@@ -362,18 +362,18 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initIteratorInitialisations (bd:BuildingData, workEnv:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
+	private static function initIteratorInitialisations (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
 		
-		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], workEnv.returnType);
+		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], env.returnType);
 		
 		addProperty(bd, NameController.fieldCursor(), [APrivate], macro:StdTypes.Int, pos);
-		addProperty(bd, NameController.fieldCurrent(), [APrivate], workEnv.returnType, pos);
+		addProperty(bd, NameController.fieldCurrent(), [APrivate], env.returnType, pos);
 		addProperty(bd, NameController.fieldIsConsumed(), [APrivate], macro:StdTypes.Bool, pos); 
 		addProperty(bd, NameController.fieldCompleted(), [APrivate], macro:StdTypes.Bool, pos); 
 		
 		// Initialize arguments
 		
-		for (argData in workEnv.functionArguments) {
+		for (argData in env.functionArguments) {
 			
 			var newArgName:String = NameController.argArgument(argData.originalArg);
 			var constructorArg:FunctionArg;
@@ -403,7 +403,7 @@ class DefaultGenerator
 			
 			// in new call
 			
-			if (workEnv.parent != null) {
+			if (env.parent != null) {
 				argData.originalArg.name = newArgName; // modify the name of the original argument as arg-name to avoid collisions with potential operative variables
 			}
 			
@@ -420,12 +420,12 @@ class DefaultGenerator
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCursor()}	 = -1);
 		
-		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{workEnv.defaultReturnType});
+		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultReturnType});
 		bd.constructorBlock.push(macro $i{NameController.fieldIsConsumed()} = true);
 		bd.constructorBlock.push(macro $i{NameController.fieldCompleted()}  = false);
 	}
 	
-	private static function initIteratorMethods (bd:BuildingData, workEnv:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
+	private static function initIteratorMethods (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
 		
 		var lcase:Array<Case> = [for (i in 0...bd.lastSequence + 1) {
 			values : [{ expr: EConst(CInt(Std.string(i))), pos: pos }],
@@ -433,7 +433,7 @@ class DefaultGenerator
 			expr: { expr: ExprDef.ECall({ expr: EConst(CIdent(NameController.iterativeFunction(i))), pos: pos}, []), pos: pos }
 		}];
 		
-		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${workEnv.defaultReturnType}), pos: pos };
+		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultReturnType}), pos: pos };
 		
 		// public function hasNext():Bool
 		
@@ -456,18 +456,18 @@ class DefaultGenerator
 		
 		var body:Expr = {
 			expr: EBlock([
-				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{workEnv.defaultReturnType}; },
+				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultReturnType}; },
 				macro $i{NameController.fieldIsConsumed()} = true,
 				macro return $i{NameController.fieldCurrent()}
 			]), 
 			pos: pos
 		};
 		
-		addMethod(bd, "next", [APublic], [], workEnv.returnType, body, pos);
+		addMethod(bd, "next", [APublic], [], env.returnType, body, pos);
 		
 		// public inline function iterator():Iterator<???>
 		
-		switch (workEnv.functionRetType) {
+		switch (env.functionRetType) {
 			case ITERABLE | DYNAMIC:
 				
 				var body:Expr = {
@@ -477,10 +477,10 @@ class DefaultGenerator
 					pos: pos
 				};
 				
-				var rtype:ComplexType = workEnv.returnType;
+				var rtype:ComplexType = env.returnType;
 				var metadata:Metadata = null;
 				
-				if (workEnv.functionRetType == RetType.DYNAMIC) {
+				if (env.functionRetType == RetType.DYNAMIC) {
 					metadata = [{
 						name: ":keep",
 						params: null,
@@ -506,7 +506,7 @@ class DefaultGenerator
 		addMeta(bd, ":final", null, pos);
 	}
 	
-	private static function initTypeParams (bd:BuildingData, workEnv:WorkEnv, pos:Position): Void {
+	private static function initTypeParams (bd:BuildingData, env:WorkEnv, pos:Position): Void {
 		
 		bd.typeDefinition.params = [];
 		var ids:Array<String>    = [];
@@ -526,13 +526,13 @@ class DefaultGenerator
 		
 		// Add params from the Class and Function
 		
-		if (workEnv.isAbstract) {
-			addTypeParameters(workEnv.abstractType.params);
+		if (env.isAbstract) {
+			addTypeParameters(env.abstractType.params);
 		}
 		
-		addTypeParameters(workEnv.localClass.params);
+		addTypeParameters(env.localClass.params);
 		
-		for (param in workEnv.classFunction.params) {
+		for (param in env.classFunction.params) {
 			
 			if (ids.indexOf(param.name) != -1) continue;
 			
@@ -548,13 +548,13 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initIteratorActions (bd:BuildingData, workEnv:WorkEnv, pos:Position): Void {
+	private static function initIteratorActions (bd:BuildingData, env:WorkEnv, pos:Position): Void {
 		
-		for (aGoto in workEnv.gotoActions) {
+		for (aGoto in env.gotoActions) {
 			
 			var lset:Expr = { expr: null, pos: aGoto.e.pos};
 			
-			workEnv.setActions.push({ e: lset, pos: aGoto.pos + 1 });
+			env.setActions.push({ e: lset, pos: aGoto.pos + 1 });
 			
 			var call:Expr = ExpressionTools.makeCall("_" + (aGoto.pos) + "_", [], aGoto.e.pos);
 			
@@ -564,7 +564,7 @@ class DefaultGenerator
 			]);
 		}
 		
-		for (aSetNext in workEnv.setActions) {
+		for (aSetNext in env.setActions) {
 			
 			aSetNext.e.expr = EBinop(
 				Binop.OpAssign, 
@@ -573,20 +573,20 @@ class DefaultGenerator
 			);
 		}
 		
-		for (aBreak in workEnv.breakActions) {
+		for (aBreak in env.breakActions) {
 			
 			aBreak.e.expr = EBlock([
 				macro $i{NameController.fieldCompleted()} = true,
-				macro return ${workEnv.defaultReturnType}
+				macro return ${env.defaultReturnType}
 			]);
 		}
 	}
 	
-	private static function initInstanceAccessions (workEnv:WorkEnv): Void {
+	private static function initInstanceAccessions (env:WorkEnv): Void {
 		
 		// Transform instance accessions
 		
-		for (statement in workEnv.instanceStack) {
+		for (statement in env.instanceStack) {
 			
 			switch (statement) {
 			case Statement.Accession(_data, _defData):
@@ -611,18 +611,18 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initParentAccessions (workEnv:WorkEnv): Void {
+	private static function initParentAccessions (env:WorkEnv): Void {
 		
 		// Transform parent accessions
 		
-		for (statement in workEnv.parentStack) {
+		for (statement in env.parentStack) {
 			
 			switch (statement) {
 			case Statement.Accession(_data, _defData):
 				
 				if (_data.option != IdentOption.KeepAsVar) {
 					
-					var parentFieldName:String = NameController.fieldParent(workEnv, _defData.env);
+					var parentFieldName:String = NameController.fieldParent(env, _defData.env);
 					
 					switch (_data.ident) {
 						case IdentRef.IEConst(eRef):
@@ -665,7 +665,7 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initVariableFields (bd:BuildingData, workEnv:WorkEnv): Void {
+	private static function initVariableFields (bd:BuildingData, env:WorkEnv): Void {
 		
 		// Prepare ident channels
 		
@@ -682,7 +682,7 @@ class DefaultGenerator
 		var newNames:Map<String, String>;
 		var nameCounter:Map<String, UInt>;
 		
-		for (statement in workEnv.localStack) {
+		for (statement in env.localStack) {
 			
 			switch (statement) {
 				
@@ -752,7 +752,7 @@ class DefaultGenerator
 						var newNameRc:String;
 						do {
 							newNameRc = NameController.localVar(_data.names[i], _data.scope, _data.channel, ++counter);
-						} while (workEnv.getIdentCategoryOf(newNameRc, _data.channel) != IdentCategory.Unknown);
+						} while (env.getIdentCategoryOf(newNameRc, _data.channel) != IdentCategory.Unknown);
 						
 						nameCounter.set( _data.names[i], counter );
 						newNames.set( _data.names[i], newNameRc );
@@ -871,7 +871,7 @@ class DefaultGenerator
 		}
 	}
 	
-	private static function initIterativeFunctions (bd:BuildingData, workEnv:WorkEnv, ibd:IteratorBlockData): Void {
+	private static function initIterativeFunctions (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData): Void {
 		
 		for (i in 0...ibd.length) {
 			
@@ -879,7 +879,7 @@ class DefaultGenerator
 			
 			var body:Expr = { expr: EBlock(lExpressions), pos: lExpressions[0].pos };
 			
-			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], workEnv.returnType, body, lExpressions[0].pos, workEnv.classField.meta.copy());
+			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.returnType, body, lExpressions[0].pos, env.classField.meta.copy());
 		}
 	}
 	
@@ -942,27 +942,27 @@ class DefaultGenerator
 		return classPackage;
 	}
 	
-	private static function allowAccessToPrivateFields (workEnv:WorkEnv, pos:Position): Void {
+	private static function allowAccessToPrivateFields (env:WorkEnv, pos:Position): Void {
 		
-		if (workEnv.classComplexType != null) {
+		if (env.classComplexType != null) {
 			
 			function setAccess (c:ClassType) {
 				
-				workEnv.generatedIteratorClass.meta.push({
+				env.generatedIteratorClass.meta.push({
 					name : ":access",
-					params : [Context.parse(getTypePath(c, workEnv.isAbstract, workEnv.abstractType), pos)],
+					params : [Context.parse(getTypePath(c, env.isAbstract, env.abstractType), pos)],
 					pos : pos
 				});
 				if (c.superClass != null) setAccess(c.superClass.t.get());
 			}
 			
-			setAccess(workEnv.localClass);
+			setAccess(env.localClass);
 			
-			if (workEnv.isAbstract) {
+			if (env.isAbstract) {
 				
-				workEnv.generatedIteratorClass.meta.push({
+				env.generatedIteratorClass.meta.push({
 					name : ":access",
-					params : [Context.parse(getTypePath(workEnv.abstractType.type), pos)],
+					params : [Context.parse(getTypePath(env.abstractType.type), pos)],
 					pos : pos
 				});
 			}
