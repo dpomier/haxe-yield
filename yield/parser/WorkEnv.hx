@@ -114,7 +114,7 @@ class WorkEnv
 	public var yieldMode:Bool;
 	public var untypedMode:Bool;
 	
-	private static var scopeCounter:UInt;
+	private var scopeCounter:UInt;
 	
 	public function new (ct:ClassType, t:Type) {
 		
@@ -233,6 +233,7 @@ class WorkEnv
 		we.classFunction = classFunction;
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
+		we.scopeCounter  = scopeCounter + 1;
 		
 		return we;
 	}
@@ -300,8 +301,10 @@ class WorkEnv
 	
 	public function openScope (isConditional:Bool = false, alternativeScope:Scope = null): Scope {
 		
+		scopeCounter += 1;
+
 		var s:Scope = {
-			id    : ++scopeCounter,
+			id    : scopeCounter,
 			level : currentScope.level + 1,
 			parent: currentScope,
 			children: [],
