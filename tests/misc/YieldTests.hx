@@ -287,5 +287,21 @@ class YieldTests extends TestCase
 			
 		assertTrue(res);
 	}
+
+	function testCompilationOptimization () {
+		var it = compilationOptimization();
+		assertTrue(true);
+	}
+
+	function compilationOptimization ():Iterator<Any> {
+		
+		for (rule in 0...3) {
+			if (rule < 3) {
+				if (true) {
+					@yield return null;
+				}
+			}
+		}
+	}
 	
 }
