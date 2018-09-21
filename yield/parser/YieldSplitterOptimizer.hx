@@ -31,16 +31,22 @@ class YieldSplitterOptimizer
 	
 	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Void {
 		
-		var optimized:Bool = false;
+		var pass:Int = 0;
+		var subpass:Int = 0;
+		var needRepass:Bool = true;
 		
-		while (removeUselessSetActions(ys, pm, workEnv, pos)) 
-			optimized = true;
-		while (removeSuperfluousSetActionCalls(ys, pm, workEnv, pos)) 
-			optimized = true;
-		while (removeSuperfluousGotoActionCalls(ys, pm, workEnv, pos)) 
-			optimized = true;
-		
-		if (optimized) optimizeAll(ys, pm, workEnv, pos);
+		while (needRepass && ++pass < 10) {
+			
+			needRepass = false;
+			subpass = 0;
+
+			while (removeUselessSetActions(ys, pm, workEnv, pos) && ++subpass < 10)
+				needRepass = true;
+			while (removeSuperfluousSetActionCalls(ys, pm, workEnv, pos) && ++subpass < 20)
+				needRepass = true;
+			while (removeSuperfluousGotoActionCalls(ys, pm, workEnv, pos) && ++subpass < 30)
+				needRepass = true;
+		}
 	}
 
 	public static function removeUselessSetActions (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Bool {
