@@ -48,8 +48,10 @@ class YieldSplitterOptimizer
 				needRepass = true;
 		}
 
+		#if debug
 		if (workEnv.debug)
 			trace('"${workEnv.fieldName}" optimazed in $pass pass');
+		#end
 	}
 
 	public static function removeUselessSetActions (ys:YieldSplitter, pm:PositionManager, workEnv:WorkEnv, pos:Position): Bool {
