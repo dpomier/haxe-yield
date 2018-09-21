@@ -33,11 +33,11 @@ class YieldSplitterOptimizer
 		
 		var optimized:Bool = false;
 		
-		if (removeUselessSetActions(ys, pm, workEnv, pos)) 
+		while (removeUselessSetActions(ys, pm, workEnv, pos)) 
 			optimized = true;
-		if (removeSuperfluousSetActionCalls(ys, pm, workEnv, pos)) 
+		while (removeSuperfluousSetActionCalls(ys, pm, workEnv, pos)) 
 			optimized = true;
-		if (removeSuperfluousGotoActionCalls(ys, pm, workEnv, pos)) 
+		while (removeSuperfluousGotoActionCalls(ys, pm, workEnv, pos)) 
 			optimized = true;
 		
 		if (optimized) optimizeAll(ys, pm, workEnv, pos);
