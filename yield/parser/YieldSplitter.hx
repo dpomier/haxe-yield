@@ -384,6 +384,13 @@ class YieldSplitter
 			
 		case TOptional(_t):
 			parseComplexType(_t, subParsing);
+			
+		case TNamed(_n, _t):
+			parseComplexType(_t, subParsing);
+			
+		case TIntersection(_tl):
+			for (lct in _tl)
+				parseComplexType(lct, subParsing);
 		}
 	}
 	
