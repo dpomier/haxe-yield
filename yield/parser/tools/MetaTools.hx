@@ -301,10 +301,10 @@ class MetaTools
 				
 				return hasMetaCT(name, _t);
 				
-			case TIntersection(_tl:Array<ComplexType>):
+			case TIntersection(_tl):
 				
 				for (lct in _tl) {
-					if (hasMetaCT(name, _t)) {
+					if (hasMetaCT(name, lct)) {
 						return true;
 					}
 				}
