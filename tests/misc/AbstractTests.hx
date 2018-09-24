@@ -192,7 +192,11 @@ class Statics {
 		while (true) @yield return i;
 	}
 	
+	#if (haxe_ver < 4.000)
 	public static function testConstraints<T:(Iterable<String>, Measurable)>(a:T) {
+	#else
+	public static function testConstraints<T:Iterable<String> & Measurable>(a:T) {
+	#end
 		if (a.length == 0) @yield break;
 		@yield return a.iterator();
 	}
@@ -204,7 +208,11 @@ typedef Measurable = {
 
 #if (!cs && !java) // build failed
 @:build(yield.parser.Parser.run())
+#if (haxe_ver < 4.000)
 abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
+#else
+abstract AbstractWithConstraints<T:Iterable<String> & Measurable>(T) from T {
+#end
 	public function new(t:T) this = t;
 
 	function get() return this;
