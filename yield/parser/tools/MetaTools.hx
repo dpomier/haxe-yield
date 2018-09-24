@@ -297,6 +297,7 @@ class MetaTools
 				
 				return hasMetaCT(name, _t);
 				
+			#if (haxe_ver >= 4.000)
 			case TNamed(_n, _t):
 				
 				return hasMetaCT(name, _t);
@@ -308,6 +309,7 @@ class MetaTools
 						return true;
 					}
 				}
+			#end
 		}
 		
 		return false;
