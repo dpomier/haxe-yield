@@ -30,9 +30,9 @@ class BaseParser
 	private var m_ys:YieldSplitter;
 	private var m_we:WorkEnv;
 
-	public function new (yieldSplitter:YieldSplitter, workEnv:WorkEnv) {
+	public function new (yieldSplitter:YieldSplitter, env:WorkEnv) {
 		m_ys = yieldSplitter;
-		m_we = workEnv;
+		m_we = env;
 	}
 	
 }

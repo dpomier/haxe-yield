@@ -56,27 +56,27 @@ class YieldSplitter
 	public var iteratorBlocks (default, null):IteratorBlockData = [];
 	public var yieldedScope:Bool;
 	
-	private var workEnv:WorkEnv;
-	private var positionManager:PositionManager;
-	private var yieldMetaCounter:Int = 0;
+	private var m_env:WorkEnv;
+	private var m_positionManager:PositionManager;
+	private var m_yieldMetaCounter:Int = 0;
 	
 	//{ INIT
 	
 	public function new (env:WorkEnv) {
-		workEnv = env;
+		m_env = env;
 		yieldedScope = true;
-		actionParser    = new ActionParser(this, workEnv);
-		eblockParser    = new EBlockParser(this, workEnv);
-		ewhileParser    = new EWhileParser(this, workEnv);
-		eforParser      = new EForParser(this, workEnv);
-		eifParser       = new EIfParser(this, workEnv);
-		eswitchParser   = new ESwitchParser(this, workEnv);
-		eternaryParser  = new ETernaryParser(this, workEnv);
-		econstParser    = new EConstParser(this, workEnv);
-		emetaParser     = new EMetaParser(this, workEnv);
-		efunctionParser = new EFunctionParser(this, workEnv);
-		evarsParser     = new EVarsParser(this, workEnv);
-		etryParser      = new ETryParser(this, workEnv);
+		actionParser    = new ActionParser(this, env);
+		eblockParser    = new EBlockParser(this, env);
+		ewhileParser    = new EWhileParser(this, env);
+		eforParser      = new EForParser(this, env);
+		eifParser       = new EIfParser(this, env);
+		eswitchParser   = new ESwitchParser(this, env);
+		eternaryParser  = new ETernaryParser(this, env);
+		econstParser    = new EConstParser(this, env);
+		emetaParser     = new EMetaParser(this, env);
+		efunctionParser = new EFunctionParser(this, env);
+		evarsParser     = new EVarsParser(this, env);
+		etryParser      = new ETryParser(this, env);
 	}
 	
 	public function split (f:Function, pos:Position): IteratorBlockData {
@@ -85,25 +85,30 @@ class YieldSplitter
 		
 		cursor = -1;
 		iteratorBlocks  = new IteratorBlockData();
-		positionManager = new PositionManager(iteratorBlocks);
+		m_positionManager = new PositionManager(iteratorBlocks);
 		moveCursor();
 		
-		workEnv.openScope();
+		m_env.openScope();
 		
 		switch (f.expr.expr) {
 			case EBlock(_exprs):
 				for (lexpr in _exprs) parse(lexpr, false);
+			case EUntyped(_e):
+				var wasUntyped:Bool = m_env.untypedMode;
+				m_env.untypedMode = true;
+				parse(_e, false);
+				m_env.untypedMode = wasUntyped;
 			case _:
 				parse(f.expr, false);
 		}
 		
-		workEnv.closeScope();
+		m_env.closeScope();
 		
 		var yieldBreak:Expr = { expr: null, pos: f.expr.pos };
 		iteratorBlocks[cursor].push(yieldBreak);
 		addBreakAction(yieldBreak);
 		
-		YieldSplitterOptimizer.optimizeAll(this, positionManager, workEnv, f.expr.pos);
+		YieldSplitterOptimizer.optimizeAll(this, m_positionManager, m_env, f.expr.pos);
 		
 		return iteratorBlocks;
 	}
@@ -118,6 +123,9 @@ class YieldSplitter
 	}
 	
 	public function addIntoBlock (e:Expr, ?pos:Int): Void {
+		if (m_env.untypedMode) {
+			e = { expr: EUntyped(e), pos: e.pos };
+		}
 		iteratorBlocks[pos == null ? cursor : pos].push(e);
 	}
 	
@@ -129,28 +137,28 @@ class YieldSplitter
 		}
 		
 		iteratorBlocks.splice(pos, len);
-		positionManager.adjustIteratorPos(len *-1, pos);
+		m_positionManager.adjustIteratorPos(len *-1, pos);
 		cursor -= len;
 	}
 	
 	public function addGotoAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
-		workEnv.gotoActions.push(lp);
-		positionManager.addPosPointer(lp);
+		m_env.gotoActions.push(lp);
+		m_positionManager.addPosPointer(lp);
 	}
 	
 	public function addSetAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
-		workEnv.setActions.push(lp);
-		positionManager.addPosPointer(lp);
+		m_env.setActions.push(lp);
+		m_positionManager.addPosPointer(lp);
 	}
 	
 	public function addBreakAction (emptyExpr:Expr): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: null };
-		workEnv.breakActions.push(lp);
+		m_env.breakActions.push(lp);
 	}
 	
 	//}
@@ -183,7 +191,7 @@ class YieldSplitter
 	 */
 	public function parse (e:Expr, subParsing:Bool, ?ic:IdentChannel): Int {
 		
-		var yieldCount:Int = yieldMetaCounter;
+		var yieldCount:Int = m_yieldMetaCounter;
 		
 		switch (e.expr) {
 			
@@ -192,11 +200,11 @@ class YieldSplitter
 				
 			case EMeta(_s, _e):
 				if (_s.name == WorkEnv.YIELD_KEYWORD && (_s.params == null || _s.params.length == 0))
-					yieldMetaCounter += 1;
+					m_yieldMetaCounter += 1;
 				emetaParser.run(e, subParsing, _s, _e);
 				
 			case EReturn(_e):
-				if (yieldedScope && workEnv.yieldMode)
+				if (yieldedScope && m_env.yieldMode)
 					Context.fatalError( "Cannot return a value from an iterator. Use the " + WorkEnv.YIELD_KEYWORD + " return expression to return a value, or " + WorkEnv.YIELD_KEYWORD + " break to end the iteration", e.pos );
 				else if (_e != null)
 					parse(_e, true, ic);
@@ -280,7 +288,7 @@ class YieldSplitter
 			case EThrow(_e):
 				parse(_e, true, ic);
 				if (!subParsing) addIntoBlock(e);
-				workEnv.addLocalThrow();
+				m_env.addLocalThrow();
 				
 			case EConst(_c): 
 				econstParser.run(e, subParsing, _c, IdentChannel.Normal);
@@ -294,7 +302,13 @@ class YieldSplitter
 				if (!subParsing) addIntoBlock(e);
 				
 			case EUntyped(_e):
+			
+				var wasUntyped = m_env.untypedMode;
+				
+				m_env.untypedMode = true;
 				parse(_e, true, ic);
+				m_env.untypedMode = wasUntyped;
+
 				if (!subParsing) addIntoBlock(e);
 				
 			case ECheckType(_e, _t):
@@ -317,7 +331,7 @@ class YieldSplitter
 				Context.fatalError("EDisplayNew not implemented", e.pos);
 		}
 		
-		return yieldMetaCounter - yieldCount;
+		return m_yieldMetaCounter - yieldCount;
 	}
 	
 	public function parseMetadata (m:Metadata, subParsing:Bool): Void {

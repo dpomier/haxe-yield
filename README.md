@@ -3,6 +3,8 @@ yield
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.md)
 [![TravisCI Build Status](https://travis-ci.org/dpomier/haxe-yield.svg?branch=master)](https://travis-ci.org/dpomier/haxe-yield)
 
+*Supports Haxe `3.4.2` and higher (Haxe 4 is not supported for now though, but it is coming soon)*
+
 This library adds the `yield` metadata, which is similar to the `yield` keyword in C#.
 
 The `yield` metadata defines iterator blocks and indicates that the function, operator (see [operator overloading](https://haxe.org/manual/types-abstract-operator-overloading.html)), or accessor in which it appears is an iterator.

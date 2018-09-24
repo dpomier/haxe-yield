@@ -255,6 +255,10 @@ class Parser
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
 
+		#if (haxe_ver >= 4.000)
+		#error "Haxe 4 is not supported by the library yield (coming soon)"
+		#end
+
 		for (field in env.classFields)
 			parseField(field, env);
 		
@@ -425,8 +429,9 @@ class Parser
 		
 		// Generate type
 		
-		if (env.yieldMode || env.requiredBySubEnv)
+		if (env.yieldMode || env.requiredBySubEnv) {
 			f.expr = DefaultGenerator.add(ibd, pos, env);
+		}
 		
 		return true;
 	}

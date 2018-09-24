@@ -280,11 +280,27 @@ class YieldTests
 		while (!res && (function(){
 				@yield return 3;
 			})().next() == 3) {
-				
-				res = true;
-			}
 			
+			res = true;
+		}
+		
 		Assert.isTrue(res);
+	}
+
+	function testCompilationOptimization () {
+		var it = compilationOptimization();
+		Assert.isTrue(true);
+	}
+
+	function compilationOptimization ():Iterator<Any> {
+		
+		for (rule in 0...3) {
+			if (rule < 3) {
+				if (true) {
+					@yield return null;
+				}
+			}
+		}
 	}
 	
 }

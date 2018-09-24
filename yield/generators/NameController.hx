@@ -44,15 +44,15 @@ class NameController
 	/**
 	 * Name of the extra-type generated when using yield statements.
 	 */
-	public static function extraTypeName (workEnv:WorkEnv, number:UInt): String {
-		return workEnv.functionsPack.join("_") + "_" + workEnv.fieldName + "__I" + number;
+	public static function extraTypeName (env:WorkEnv, number:UInt): String {
+		return env.functionsPack.join("_") + "_" + env.fieldName + "__I" + number;
 	}
 	
 	/**
 	 * Unique name of the anonymous function.
 	 */
-	public static function anonymousFunction (workEnv:WorkEnv, f:Function, pos:Position): String {
-		var id:String = Md5.encode(workEnv.functionsPack.join("."));
+	public static function anonymousFunction (env:WorkEnv, f:Function, pos:Position): String {
+		var id:String = Md5.encode(env.functionsPack.join("."));
 		if (!anonymousCounters.exists(id))
 			anonymousCounters.set(id, 0);
 		else
@@ -77,15 +77,15 @@ class NameController
 	/**
 	 * Field name of a required WorkEnv parent.
 	 */
-	public static function fieldParent (workEnv:WorkEnv, dependence:WorkEnv): String {
-		return "_d" + workEnv.parentDependencies.indexOf(dependence) + "_";
+	public static function fieldParent (env:WorkEnv, dependence:WorkEnv): String {
+		return "_d" + env.parentDependencies.indexOf(dependence) + "_";
 	}
 	
 	/**
 	 * Constructor arg name of a required WorkEnv parent.
 	 */
-	public static function argParent (workEnv:WorkEnv, dependence:WorkEnv): String {
-		return "_d" + workEnv.parentDependencies.indexOf(dependence) + "_p";
+	public static function argParent (env:WorkEnv, dependence:WorkEnv): String {
+		return "_d" + env.parentDependencies.indexOf(dependence) + "_p";
 	}
 	
 	/**

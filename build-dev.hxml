@@ -5,3 +5,6 @@
 
 #-js bin/Tests.js
 --interp
+
+# -debug
+# -D yDebug=functionName

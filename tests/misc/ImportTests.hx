@@ -71,11 +71,13 @@ class ImportTests implements Yield
 		var it = accessField();
 		
 		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
 		Assert.equals(100, it.next());
 		Assert.isFalse(it.hasNext());
 	}
 	
 	function accessField (): Iterator<Int> {
+		@yield return misc.packs.Parent.publicStatic ? 1 : 0;
 		@yield return pack.pack1.MoreMiscFunctions.priv("");
 	}
 	

@@ -69,6 +69,7 @@ class WorkEnv
 	public static var YIELD_EXTEND   (default, null):Bool;
 	
 	public var currentScope (default, null):Scope;
+	public var scopeCounter (default, null):UInt;
 	
 	public var localClass       (default, null):ClassType;
 	public var localType        (default, null):Type;
@@ -112,8 +113,11 @@ class WorkEnv
 	public var requiresInstance (default, null):Bool;
 
 	public var yieldMode:Bool;
-	
-	private static var scopeCounter:UInt;
+	public var untypedMode:Bool;
+
+	#if debug
+	public var debug (default, null):Bool = false;
+	#end
 	
 	public function new (ct:ClassType, t:Type) {
 		
@@ -139,6 +143,8 @@ class WorkEnv
 		parentDependencies      = [];
 		parentAsVarDependencies = [];
 		parent = null;
+
+		untypedMode = false;
 	}
 	
 	public static function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
@@ -169,6 +175,13 @@ class WorkEnv
 	}
 	
 	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, pos:Position): Void {
+		
+		#if debug
+		if (Context.defined("yDebug")) {
+			var match:String = Context.definedValue("yDebug");
+			debug = match != null && name == StringTools.trim(match);
+		}
+		#end
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -229,7 +242,13 @@ class WorkEnv
 		we.classField    = classField;
 		we.classFunction = classFunction;
 		we.currentScope  = currentScope;
+		we.untypedMode   = untypedMode;
+		we.scopeCounter  = 0;
 		
+		#if debug
+		we.debug = debug;
+		#end
+
 		return we;
 	}
 	
@@ -296,8 +315,10 @@ class WorkEnv
 	
 	public function openScope (isConditional:Bool = false, alternativeScope:Scope = null): Scope {
 		
+		scopeCounter += 1;
+
 		var s:Scope = {
-			id    : ++scopeCounter,
+			id    : scopeCounter,
 			level : currentScope.level + 1,
 			parent: currentScope,
 			children: [],
