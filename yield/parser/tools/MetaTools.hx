@@ -248,7 +248,7 @@ class MetaTools
 	private static function hasMetaCT (name:String, t:ComplexType): Bool {
 		
 		switch (t) {
-						
+			
 			case TPath(_p):
 				
 				if (hasMetaTP(name, _p)) {
@@ -296,6 +296,11 @@ class MetaTools
 			case TOptional(_t):
 				
 				return hasMetaCT(name, _t);
+				
+			case TNamed(_n, _t):
+				
+				return hasMetaCT(name, _t);
+				
 		}
 		
 		return false;
