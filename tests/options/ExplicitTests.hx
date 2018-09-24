@@ -2,11 +2,7 @@ package options;
 
 import utest.Assert;
 
-class ExplicitTests {
-
-	public function new () {
-		
-	}
+class ExplicitTests extends utest.Test {
 	
 	function testShort () {
 		var it = new Short().getIt();

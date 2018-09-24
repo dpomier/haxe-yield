@@ -3,12 +3,7 @@ package eparsers;
 import utest.Assert;
 import yield.Yield;
 
-class EIfTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class EIfTests extends utest.Test implements Yield {
 	
 	function testSimpleIf () {
 		var it = simpleIf();

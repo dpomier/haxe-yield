@@ -3,11 +3,12 @@ package eparsers;
 import utest.Assert;
 import yield.Yield;
 
-class EFunctionTests implements Yield
-{
+class EFunctionTests extends utest.Test implements Yield {
+	
 	private static var NULL_INT:Int;
 
 	public function new () {
+		super();
 		var n:Null<Int> = null;
 		NULL_INT = n;
 	}

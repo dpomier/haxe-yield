@@ -11,12 +11,7 @@ import pack.pack2.*;
 import yield.Yield;
 
 @:access(pack.pack1.MoreMiscFunctions.priv)
-class ImportTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class ImportTests extends utest.Test implements Yield {
 	
 	function testSimpleImport () {
 		var it = simpleImport("Patrick");
@@ -69,6 +64,8 @@ class ImportTests implements Yield
 	
 	function testAccessField () {
 		var it = accessField();
+		
+		misc.packs.Parent.Parent.reset();
 		
 		Assert.isTrue(it.hasNext());
 		Assert.equals(0, it.next());

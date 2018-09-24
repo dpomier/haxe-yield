@@ -2,11 +2,7 @@ package misc;
 
 import utest.Assert;
 
-class PrivateTests {
-	
-	public function new () {
-		
-	}
+class PrivateTests extends utest.Test {
 
 	function testClass () {
 		Assert.isTrue(new Class().getIt().next());

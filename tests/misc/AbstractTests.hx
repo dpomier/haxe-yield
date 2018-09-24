@@ -5,13 +5,7 @@ import pack.pack1.OperatorOverloading2;
 import yield.Yield;
 import yield.parser.Parser;
 
-class AbstractTests
-{
-
-	public function new() 
-	{
-		
-	}
+class AbstractTests extends utest.Test {
 	
 	#if (!cs && !java)
 	function testOperatorOverloading () {

@@ -5,12 +5,7 @@ import pack.pack2.MiscYielded;
 import yield.Yield;
 
 @:yield
-class YieldTests
-{
-
-	public function new() {
-		
-	}
+class YieldTests extends utest.Test {
 	
 	function testSimpleSplit () {
 		var it:Iterator<Dynamic> = cast simpleSplit();

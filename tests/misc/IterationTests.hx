@@ -3,12 +3,7 @@ package misc;
 import utest.Assert;
 import yield.Yield;
 
-class IterationTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class IterationTests extends utest.Test implements Yield {
 	
 	function testReturnedType () {
 		

@@ -2,11 +2,7 @@ package options;
 
 import utest.Assert;
 
-class ExtendTests {
-
-	public function new () {
-		
-	}
+class ExtendTests extends utest.Test {
 	
 	function testShort () {
 		Assert.isTrue(new ChildShort().getIt().next());

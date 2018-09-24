@@ -6,12 +6,7 @@ import yield.Yield;
 using pack.pack1.MiscFunctions;
 using Lambda;
 
-class UsingTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class UsingTests extends utest.Test implements Yield {
 	
 	function testSimpleUsing () {
 		var it = simpleUsing("Patrick");

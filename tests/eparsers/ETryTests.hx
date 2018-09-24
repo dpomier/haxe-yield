@@ -3,12 +3,7 @@ package eparsers;
 import utest.Assert;
 import yield.Yield;
 
-class ETryTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class ETryTests extends utest.Test implements Yield {
 	
 	function testSimpleTry () {
 		var it = simpleTry();

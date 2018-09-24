@@ -5,12 +5,7 @@ import haxe.Json;
 
 import yield.Yield;
 
-class InferenceTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class InferenceTests extends utest.Test implements Yield {
 	
 	function testFromConsts () {
 		var it:Iterator<Dynamic> = fromConsts();

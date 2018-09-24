@@ -2,11 +2,7 @@ package options;
 
 import utest.Assert;
 
-class KeywordTests {
-
-	public function new () {
-		
-	}
+class KeywordTests extends utest.Test {
 	
 	function testShortOption () {
 		

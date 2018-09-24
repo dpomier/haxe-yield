@@ -5,11 +5,12 @@ import yield.YieldOption;
 
 @:build(yield.parser.Parser.run())
 @:yield(YieldOption.Extend)
-class Parent
-{
+class Parent extends utest.Test {
+	
 	private var parentMemeber:Int;
 
 	public function new() {
+		super();
 		parentMemeber = 14;
 	}
 	

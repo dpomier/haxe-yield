@@ -4,11 +4,12 @@ import utest.Assert;
 import eparsers.EForTests.FuuIterable;
 import yield.Yield;
 
-class EForTests implements Yield
-{
+class EForTests extends utest.Test implements Yield {
+	
 	private static var NULL_INT:Int;
 
 	public function new() {
+		super();
 		var n:Null<Int> = null;
 		NULL_INT = n;
 	}

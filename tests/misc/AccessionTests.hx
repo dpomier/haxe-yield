@@ -43,6 +43,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 		Assert.isFalse(it.hasNext());
 		Assert.isTrue(Parent.privateStatic);
 		Assert.isTrue(Parent.publicStatic);
+		Parent.reset();
 	}
 	
 	function parentStaticVar () {

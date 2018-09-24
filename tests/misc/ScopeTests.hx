@@ -3,12 +3,7 @@ package misc;
 import utest.Assert;
 import yield.Yield;
 
-class ScopeTests implements Yield
-{
-
-	public function new() {
-		
-	}
+class ScopeTests extends utest.Test implements Yield {
 	
 	function testEBlock () {
 		var it = eblock();

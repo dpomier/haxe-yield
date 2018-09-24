@@ -5,12 +5,7 @@ import haxe.macro.Expr;
 
 import yield.Yield;
 
-class ESwitchTests implements Yield
-{
-
-	public function new() {
-
-	}
+class ESwitchTests extends utest.Test implements Yield {
 	
 	function testBase () {
 		
