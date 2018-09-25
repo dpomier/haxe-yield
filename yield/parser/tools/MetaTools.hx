@@ -89,7 +89,7 @@ class MetaTools
 			case EArray(_e1, _e2):
 				return hasMetaExpr(name, _e1) || hasMetaExpr(name, _e2); 
 				
-			case EBinop(_op, _e1, _e2) #if (haxe_ver < 4.000), EIn(_e1, _e2) #end:
+			case EBinop(_, _e1, _e2) #if (haxe_ver < 4.000), EIn(_e1, _e2) #end:
 				return hasMetaExpr(name, _e1) || hasMetaExpr(name, _e2);
 				
 			case EField(_e, _field):
