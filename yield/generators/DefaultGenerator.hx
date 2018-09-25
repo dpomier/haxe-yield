@@ -148,7 +148,7 @@ class DefaultGenerator
 	
 	private static function runDebugPrint (yDebug:String): Void {
 		
-		if (yDebug != null) {
+		if (yDebug == null) {
 			return;
 		}
 		
