@@ -46,7 +46,7 @@ class UsingTests extends utest.Test implements Yield {
 	
 	function testLambaAnonymous () {
 		
-		var result:List<String> = lamba().flatMap(function (a:Int) {
+		var result:List<String> = lamba().flatMap(function (a:Int):Iterable<String> {
 			@yield return ""+a;
 			@yield return ""+a+1;
 			@yield return ""+a+2;
