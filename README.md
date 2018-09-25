@@ -3,7 +3,7 @@ yield
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.md)
 [![TravisCI Build Status](https://travis-ci.org/dpomier/haxe-yield.svg?branch=master)](https://travis-ci.org/dpomier/haxe-yield)
 
-*Supports Haxe `3.4.2` and higher (Haxe 4 is not supported for now though, but it is coming soon)*
+*Supports Haxe `3.4.2` and higher*
 
 This library adds the `yield` metadata, which is similar to the `yield` keyword in C#.
 
@@ -103,4 +103,21 @@ Install
 -----
 
 To install the library, use `haxelib install yield` and compile your program with `-lib yield`.
+
+Development Builds
+-----
+
+1. To clone the github repository, use `git clone https://github.com/dpomier/haxe-yield`
+
+2. To tell haxelib where your development copy is installed, use `haxelib dev yield my/repositories/haxe-yield`
+
+To return to release builds use `haxelib dev yield`
+
+Alternatives
+-----
+
+Other libraries addressing generators:
+
+* https://github.com/RealyUniqueName/Coro - Haxe compiler plugin which adds generic coroutines implementation (including async/await and generators)
+* https://lib.haxe.org/p/moon-core/ - Utility library which includes generator functions, fibers, yield and await
 
