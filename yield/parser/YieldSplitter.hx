@@ -242,15 +242,23 @@ class YieldSplitter
 				case EConst(__c):
 					switch (_op) {
 					case Binop.OpAssign:
-						econstParser.run(_e1, true, __c, true);
+						econstParser.run(_e1, true, __c, ic, true);
 					default:
-						econstParser.run(_e1, true, __c, false);
+						econstParser.run(_e1, true, __c, ic, false);
 					}
 				default:
-					parse(_e1, true);
+					parse(_e1, true, ic);
 				}
-				parse(_e2, true);
+				parse(_e2, true, ic);
 				if (!subParsing) addIntoBlock(e);
+				
+			#if (haxe_ver < 4.000)
+			case EIn(_e1, _e2):
+				
+				parse(_e1, true, ic);
+				parse(_e2, true, ic);
+				if (!subParsing) addIntoBlock(e);
+			#end
 				
 			case EIf(_econd, _eif, _eelse): 
 				eifParser.run(e, subParsing, _econd, _eif, _eelse);
@@ -314,11 +322,6 @@ class YieldSplitter
 			case ECheckType(_e, _t):
 				parse(_e, true, ic);
 				parseComplexType(_t, true);
-				if (!subParsing) addIntoBlock(e);
-			
-			case EIn(_e1, _e2):
-				parse(_e1, true, ic);
-				parse(_e2, true, ic);
 				if (!subParsing) addIntoBlock(e);
 				
 			case ESwitch(_e, _cases, _edef): 

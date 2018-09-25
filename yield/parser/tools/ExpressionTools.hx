@@ -123,7 +123,9 @@ class ExpressionTools
 				Context.fatalError("The value must be a constant", defaultValue.pos);
 		}
 		
-		return macro {if ($ident == null) {
+		var a = macro if ($ident == null) {
+			
+			$ident = $defaultValue;
 			
 			if (Context.defined($v{argName})) {
 				
@@ -132,10 +134,12 @@ class ExpressionTools
 					v = StringTools.trim(v);
 					$assign;
 				}
-			} else {
-				untyped $ident = $defaultValue;
 			}
-		}};
+		};
+		
+		trace(a);
+		trace(ExprTools.toString(a));
+		return a;
 	}
 	
 	/**

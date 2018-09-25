@@ -145,7 +145,7 @@ class AccessionTests extends misc.packs.Parent implements Yield
 	}
 	#end
 	
-	#if interp
+	#if (interp && haxe_ver < 4.000)
 	function testUntyped () {
 		var it = untypedFunc();
 		Assert.isFalse(it.hasNext());

@@ -57,7 +57,11 @@ class EForParser extends BaseParser
 		var updateExprs:Array<Expr> = new Array<Expr>();
 		
 		switch (_it.expr) {
+			#if (haxe_ver < 4.000)
 			case EIn(__e1, __e2):
+			#else
+			case EBinop(_, __e1, __e2):
+			#end
 				
 				var opIdentName:String = ExpressionTools.getConstIdent(__e1);
 				var localVar:Expr = __e1;
@@ -149,7 +153,11 @@ class EForParser extends BaseParser
 	private function runPreserveMode (e:Expr, subParsing:Bool, _it:Expr, _expr:Expr, loopExprs:Array<Expr>): Void {
 		
 		switch (_it.expr) {
+			#if (haxe_ver < 4.000)
 			case EIn(__e1, __e2):
+			#else
+			case EBinop(_, __e1, __e2):
+			#end
 				
 				m_ys.parseOut(__e2, true);
 				
@@ -169,7 +177,7 @@ class EForParser extends BaseParser
 				
 				if (!subParsing) m_ys.addIntoBlock(e);
 				
-			default:
+			default: 
 		}
 	}
 	
