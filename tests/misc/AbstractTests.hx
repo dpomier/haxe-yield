@@ -1,28 +1,22 @@
 package misc;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 import pack.pack1.OperatorOverloading2;
 import yield.Yield;
 import yield.parser.Parser;
 
-class AbstractTests extends TestCase
-{
-
-	public function new() 
-	{
-		super();
-	}
+class AbstractTests extends utest.Test {
 	
 	#if (!cs && !java)
 	function testOperatorOverloading () {
 		var a = new OperatorOverloading("foo");
 		var it = a * 3;
 		
-		assertTrue(it.hasNext());
-		assertEquals(new OperatorOverloading("foo"), it.next());
-		assertEquals(new OperatorOverloading("foofoo"), it.next());
-		assertEquals(new OperatorOverloading("foofoofoo"), it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(new OperatorOverloading("foo"), it.next());
+		Assert.equals(new OperatorOverloading("foofoo"), it.next());
+		Assert.equals(new OperatorOverloading("foofoofoo"), it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	#end
 	
@@ -31,14 +25,14 @@ class AbstractTests extends TestCase
 		var a = new Wrapper(new OperatorOverloading("foo"));
 		var it = a.getSource();
 		
-		assertTrue(it.hasNext());
-		for (i in 0...10) assertEquals(new Wrapper(new OperatorOverloading("foo")), it.next());
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		for (i in 0...10) Assert.equals(new Wrapper(new OperatorOverloading("foo")), it.next());
+		Assert.isTrue(it.hasNext());
 		
 		var duplicator = a * 4;
-		assertTrue(duplicator.hasNext());
-		for (j in 0...4) assertEquals(new OperatorOverloading("foo"), duplicator.next());
-		assertFalse(duplicator.hasNext());
+		Assert.isTrue(duplicator.hasNext());
+		for (j in 0...4) Assert.equals(new OperatorOverloading("foo"), duplicator.next());
+		Assert.isFalse(duplicator.hasNext());
 	}
 	#end
 	
@@ -47,11 +41,11 @@ class AbstractTests extends TestCase
 		var a = new OperatorOverloading2("bar");
 		var it = a / 3;
 		
-		assertTrue(it.hasNext());
-		assertEquals(new OperatorOverloading2("b"), it.next());
-		assertEquals(new OperatorOverloading2("a"), it.next());
-		assertEquals(new OperatorOverloading2("r"), it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(new OperatorOverloading2("b"), it.next());
+		Assert.equals(new OperatorOverloading2("a"), it.next());
+		Assert.equals(new OperatorOverloading2("r"), it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	#end
 	
@@ -61,9 +55,9 @@ class AbstractTests extends TestCase
 		var b = new SelectiveFunctions(1);
 		
 		var it = a.getString();
-		assertTrue(it.hasNext());
-		for (j in 0...10) assertEquals("foo", it.next());
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		for (j in 0...10) Assert.equals("foo", it.next());
+		Assert.isTrue(it.hasNext());
 	}
 	#end
 	
@@ -74,20 +68,20 @@ class AbstractTests extends TestCase
 		var b = new SFWrapper(1);
 		
 		var it = a.getSource();
-		assertTrue(it.hasNext());
-		assertEquals(new SelectiveFunctions("bar"), it.next());
-		assertEquals("bar", it.next().getString().next());
-		assertEquals(new SelectiveFunctions("bar"), it.next());
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(new SelectiveFunctions("bar"), it.next());
+		Assert.equals("bar", it.next().getString().next());
+		Assert.equals(new SelectiveFunctions("bar"), it.next());
+		Assert.isTrue(it.hasNext());
 	}
 	#end
 	
 	function testFunctionStaticTypeParams () {
 		
 		var it = Statics.makeSource("foobar");
-		assertTrue(it.hasNext());
-		for (j in 0...10) assertEquals("foobar", it.next());
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		for (j in 0...10) Assert.equals("foobar", it.next());
+		Assert.isTrue(it.hasNext());
 		
 		var it = Statics.testConstraints(["3"]);
 		//Statics.testConstraints([3]); // Constraint check failure
@@ -99,7 +93,7 @@ class AbstractTests extends TestCase
 		var a = new AbstractWithConstraints(["5"]);
 		//new AbstractWithConstraints([5]); // Constraint check failure
 		
-		assertTrue(true);
+		Assert.isTrue(true);
 	}
 	#end	
 	
@@ -107,11 +101,11 @@ class AbstractTests extends TestCase
 		var myForward = new MyForward();
 		var it = myForward.numbers();
 		
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		// MyForward has no field strNumbers
 		//myForward.strNumbers();
@@ -198,7 +192,11 @@ class Statics {
 		while (true) @yield return i;
 	}
 	
+	#if (haxe_ver < 4.000)
 	public static function testConstraints<T:(Iterable<String>, Measurable)>(a:T) {
+	#else
+	public static function testConstraints<T:Iterable<String> & Measurable>(a:T) {
+	#end
 		if (a.length == 0) @yield break;
 		@yield return a.iterator();
 	}
@@ -210,7 +208,11 @@ typedef Measurable = {
 
 #if (!cs && !java) // build failed
 @:build(yield.parser.Parser.run())
+#if (haxe_ver < 4.000)
 abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
+#else
+abstract AbstractWithConstraints<T:Iterable<String> & Measurable>(T) from T {
+#end
 	public function new(t:T) this = t;
 
 	function get() return this;

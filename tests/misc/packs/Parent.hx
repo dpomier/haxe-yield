@@ -1,7 +1,7 @@
 package misc.packs;
-import haxe.unit.TestCase;
 
-class Parent extends TestCase {
+
+class Parent extends utest.Test {
 
 	public function new () {
 		super();
@@ -11,5 +11,17 @@ class Parent extends TestCase {
 	public static var publicStatic:Bool = false;
 	private var privateMember:Bool = false;
 	public var publicMember:Bool = false;
+	
+	public static function reset ()
+	{
+		privateStatic = false;
+		publicStatic  = false;
+	}
+	
+	public function resetMembers ()
+	{
+		privateMember = false;
+		publicMember  = false;
+	}
 	
 }

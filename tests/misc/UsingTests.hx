@@ -1,29 +1,23 @@
 package misc;
-import haxe.unit.TestCase;
+
+import utest.Assert;
 import yield.Yield;
 
 using pack.pack1.MiscFunctions;
-
 using Lambda;
 
-class UsingTests extends TestCase implements Yield
-{
-
-	public function new() 
-	{
-		super();
-	}
+class UsingTests extends utest.Test implements Yield {
 	
 	function testSimpleUsing () {
 		var it = simpleUsing("Patrick");
 		
-		assertTrue(it.hasNext());
-		assertEquals("hello !", it.next());
-		assertTrue(it.hasNext());
-		assertEquals("hello Toto!", it.next());
-		assertTrue(it.hasNext());
-		assertEquals("hello Patrick!", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello !", it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello Toto!", it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello Patrick!", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function simpleUsing (name:String): Iterator<Dynamic> {
@@ -40,8 +34,8 @@ class UsingTests extends TestCase implements Yield
 	}
 	
 	function testLambda () {
-		assertEquals(3, lamba().count());
-		assertEquals([0,2,4].toString(), lamba().array().toString());
+		Assert.equals(3, lamba().count());
+		Assert.equals([0,2,4].toString(), lamba().array().toString());
 	}
 	
 	function lamba (): Iterable<Int> {
@@ -52,7 +46,7 @@ class UsingTests extends TestCase implements Yield
 	
 	function testLambaAnonymous () {
 		
-		var result:List<String> = lamba().flatMap(function (a:Int) {
+		var result:List<String> = lamba().flatMap(function (a:Int):Iterable<String> {
 			@yield return ""+a;
 			@yield return ""+a+1;
 			@yield return ""+a+2;
@@ -62,7 +56,7 @@ class UsingTests extends TestCase implements Yield
 		for (i in ["0", "01", "02", "2", "21", "22", "4", "41", "42"])
 			expected.add(i);
 		
-		assertEquals(expected.toString(), result.toString());
+		Assert.equals(expected.toString(), result.toString());
 	}
 }
 

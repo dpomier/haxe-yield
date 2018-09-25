@@ -185,9 +185,19 @@ class Parser
 	
 	private static function initOptions (options:Array<Expr>, canExtend:Bool, env:WorkEnv): Void {
 		
-		var yieldKeyword:String = null;
-		var yieldExplicit:Bool = null;
-		var yieldExtend:Bool = null;
+		inline function parseDirectiveStr (define:String):String
+			return StringTools.trim(define);
+			
+		inline function parseDirectiveBool (define:String):Bool
+			return if ((define = StringTools.trim(define)) == "true" || define == "1") true;
+			  else if (define == "false" || define == "0") false;
+			  else if (define == "null") null;
+			  else false;
+		
+		var yieldKeyword:String = Context.defined("yieldKeyword") ? parseDirectiveStr(Context.definedValue("yieldKeyword")) : "yield";
+		var yieldExplicit:Bool = Context.defined("yieldExplicit") ? parseDirectiveBool(Context.definedValue("yieldExplicit")) : false;
+		var yieldExtend:Bool = Context.defined("yieldExtend") ? parseDirectiveBool(Context.definedValue("yieldExtend")) : false;
+		
 		
 		function throwInvalidOpt (pos:Position)
 			Context.fatalError("Invalid option", pos);
@@ -198,6 +208,7 @@ class Parser
 		function throwConflict (opt:String, pos:Position)
 			Context.fatalError(opt + " and :autoBuild(" + ExprTools.toString(macro yield.parser.Parser.run()) + ") metadata are conflicted", pos);
 		
+		
 		var i:Int = options.length;
 		var opt:Expr;
 		while (--i != -1) {
@@ -206,8 +217,7 @@ class Parser
 			switch (opt) {
 			case (macro Extend) | (macro YieldOption.Extend) | (macro yield.YieldOption.Extend):
 				if (!canExtend) throwConflict(YieldOption.Extend(true).getName(), opt.pos);
-				else if (yieldExtend == null) yieldExtend = true;
-				else throwDuplicatedOpt(YieldOption.Extend(true).getName(), opt.pos);
+				else yieldExtend = true;
 				options.splice(i,1);
 			case (macro Extend($s)) | (macro YieldOption.Extend($s)) | (macro yield.YieldOption.Extend($s)):
 				var ident:String = ExpressionTools.getConstIdent(s);
@@ -215,36 +225,28 @@ class Parser
 				if (value == null) throwInvalidOpt(opt.pos);
 				
 				if (!canExtend) throwConflict(YieldOption.Extend(true).getName(), opt.pos);
-				else if (yieldExtend == null) yieldExtend = value;
-				else throwDuplicatedOpt(YieldOption.Extend(true).getName(), opt.pos);
+				else yieldExtend = value;
 				options.splice(i,1);
 				
 			case (macro Explicit) | (macro YieldOption.Explicit) | (macro yield.YieldOption.Explicit):
-				if (yieldExplicit == null) yieldExplicit = true;
-				else throwDuplicatedOpt(YieldOption.Explicit(true).getName(), opt.pos);
+				yieldExplicit = true;
 			case (macro Explicit($s)) | (macro YieldOption.Explicit($s)) | (macro yield.YieldOption.Explicit($s)):
 				var ident:String = ExpressionTools.getConstIdent(s);
 				var value:Bool   = if (ident == "false") false else if (ident == "true") true else null; 
 				if (value == null) throwInvalidOpt(opt.pos);
 				
-				if (yieldExplicit == null) yieldExplicit = value;
-				else throwDuplicatedOpt(YieldOption.Explicit(true).getName(), opt.pos);
+				yieldExplicit = value;
 				
 			case (macro Keyword($s)) | (macro YieldOption.Keyword($s)) | (macro yield.YieldOption.Keyword($s)):
 				var name:String = ExpressionTools.getConstString(s);
 				if (name == null) throwInvalidOpt(opt.pos);
 				
-				if (yieldKeyword == null) yieldKeyword = name;
-				else throwDuplicatedOpt(YieldOption.Keyword("").getName(), opt.pos);
+				yieldKeyword = name;
 				
 			default:
 				throwInvalidOpt(opt.pos);
 			}
 		}
-		
-		ExpressionTools.defineVarAsDirective(yieldKeyword, "yield");
-		ExpressionTools.defineVarAsDirective(yieldExplicit, false);
-		ExpressionTools.defineVarAsDirective(yieldExtend, false);
 		
 		if (yieldExtend) {
 			env.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.localClass.pos);
@@ -254,10 +256,6 @@ class Parser
 	}
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
-
-		#if (haxe_ver >= 4.000)
-		#error "Haxe 4 is not supported by the library yield (coming soon)"
-		#end
 
 		for (field in env.classFields)
 			parseField(field, env);

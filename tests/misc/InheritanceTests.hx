@@ -1,16 +1,15 @@
 package misc;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 import yield.YieldOption;
 
 @:build(yield.parser.Parser.run())
 @:yield(YieldOption.Extend)
-class Parent extends TestCase
-{
+class Parent extends utest.Test {
+	
 	private var parentMemeber:Int;
 
-	public function new() 
-	{
+	public function new() {
 		super();
 		parentMemeber = 14;
 	}
@@ -26,10 +25,10 @@ class InheritanceTests extends Parent {
 	
 	function testBasic () {
 		var it = basic();
-		assertTrue(it.hasNext());
-		assertEquals("foo", it.next());
-		assertEquals("bar", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("foo", it.next());
+		Assert.equals("bar", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function basic ():Iterator<String> {
@@ -39,9 +38,9 @@ class InheritanceTests extends Parent {
 	
 	function testAccess () {
 		var it = access();
-		assertTrue(it.hasNext());
-		assertEquals(14, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(14, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function access ():Iterator<Int> {

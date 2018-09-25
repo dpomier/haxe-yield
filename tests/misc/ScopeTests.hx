@@ -1,19 +1,14 @@
 package misc;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 import yield.Yield;
 
-class ScopeTests extends TestCase implements Yield
-{
-
-	public function new() {
-		super();
-	}
+class ScopeTests extends utest.Test implements Yield {
 	
 	function testEBlock () {
 		var it = eblock();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eblock ():Iterator<Dynamic> {
@@ -32,9 +27,9 @@ class ScopeTests extends TestCase implements Yield
 	function testEBlockY () {
 		var it = eblockY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eblockY ():Iterator<Dynamic> {
@@ -54,11 +49,11 @@ class ScopeTests extends TestCase implements Yield
 	function testEBlockNestedY () {
 		var it = eblockNestedY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(11, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(11, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function eblockNestedY ():Iterator<Dynamic> {
@@ -88,7 +83,7 @@ class ScopeTests extends TestCase implements Yield
 	function testEif () {
 		var it = eif();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eif ():Iterator<Dynamic> {
@@ -107,9 +102,9 @@ class ScopeTests extends TestCase implements Yield
 	function testEifY () {
 		var it = eifY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eifY ():Iterator<Dynamic> {
@@ -130,9 +125,9 @@ class ScopeTests extends TestCase implements Yield
 	function testEifNestedY () {
 		var it = eifNestedY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eifNestedY ():Iterator<Dynamic> {
@@ -157,7 +152,7 @@ class ScopeTests extends TestCase implements Yield
 	function testEelse () {
 		var it = eelse();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eelse ():Iterator<Dynamic> {
@@ -179,9 +174,9 @@ class ScopeTests extends TestCase implements Yield
 	function testEelseY () {
 		var it = eelseY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eelseY ():Iterator<Dynamic> {
@@ -207,10 +202,10 @@ class ScopeTests extends TestCase implements Yield
 	function testEelseNestedY () {
 		var it = eelseNestedY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eelseNestedY ():Iterator<Dynamic> {
@@ -242,7 +237,7 @@ class ScopeTests extends TestCase implements Yield
 	function testEWhile () {
 		var it = ewhile();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function ewhile ():Iterator<Dynamic> {
@@ -261,9 +256,9 @@ class ScopeTests extends TestCase implements Yield
 	function testEWhileNestedY () {
 		var it = ewhileNestedY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function ewhileNestedY ():Iterator<Dynamic> {
@@ -292,7 +287,7 @@ class ScopeTests extends TestCase implements Yield
 	function testEFor () {
 		var it = efor();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function efor ():Iterator<Dynamic> {
@@ -310,9 +305,9 @@ class ScopeTests extends TestCase implements Yield
 	function testEForNestedY () {
 		var it = eforNestedY();
 		
-		assertEquals(null, it.next());
-		assertEquals(null, it.next());
-		assertEquals(1, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(null, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function eforNestedY ():Iterator<Dynamic> {
@@ -341,7 +336,7 @@ class ScopeTests extends TestCase implements Yield
 	function testETry () {
 		var it = etry();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function etry ():Iterator<Dynamic> {
@@ -359,7 +354,7 @@ class ScopeTests extends TestCase implements Yield
 	function testECatch () {
 		var it = ecatch();
 		
-		assertEquals(1, it.next());
+		Assert.equals(1, it.next());
 	}
 	
 	function ecatch ():Iterator<Dynamic> {
@@ -381,9 +376,9 @@ class ScopeTests extends TestCase implements Yield
 	
 	function testEfunction () {
 		var it = efunction();
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function efunction () {
@@ -398,12 +393,12 @@ class ScopeTests extends TestCase implements Yield
 	function testSelf () {
 		var it = self();
 		
-		assertEquals(5, it.next());
-		assertEquals(true, it.next());
-		assertEquals(5, it.next());
-		assertEquals(true, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(true, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(true, it.next());
 		
-		assertEquals(false, it.hasNext());
+		Assert.equals(false, it.hasNext());
 	}
 	
 	function self ():Iterator<Dynamic> {
@@ -432,7 +427,7 @@ class ScopeTests extends TestCase implements Yield
 			result += i + " ";
 		}
 		
-		assertEquals("2 4 8 16 32 64 128 256 ", result);
+		Assert.equals("2 4 8 16 32 64 128 256 ", result);
 	}
 
 	function noFinalReturn (number:Int, exponent:Int):Iterator<Int> {

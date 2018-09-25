@@ -1,22 +1,22 @@
 package options;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 
-class ExtendTests extends TestCase {
+class ExtendTests extends utest.Test {
 	
 	function testShort () {
-		assertTrue(new ChildShort().getIt().next());
-		assertTrue(new ChildShort().getChildIt().next());
+		Assert.isTrue(new ChildShort().getIt().next());
+		Assert.isTrue(new ChildShort().getChildIt().next());
 	}
 	
 	function testNormal () {
-		assertTrue(new ChildNormal().getIt().next());
-		assertTrue(new ChildNormal().getChildIt().next());
+		Assert.isTrue(new ChildNormal().getIt().next());
+		Assert.isTrue(new ChildNormal().getChildIt().next());
 	}
 	
 	function testFull () {
-		assertTrue(new ChildFull().getIt().next());
-		assertTrue(new ChildFull().getChildIt().next());
+		Assert.isTrue(new ChildFull().getIt().next());
+		Assert.isTrue(new ChildFull().getChildIt().next());
 	}
 	
 }

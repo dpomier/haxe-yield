@@ -1,54 +1,54 @@
 package options;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 
-class KeywordTests extends TestCase {
+class KeywordTests extends utest.Test {
 	
 	function testShortOption () {
 		
 		var it = new Short().getIt();
-		assertTrue(it.next());
-		assertTrue(new Short().getBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new Short().getBool());
 		
 	}
 	
 	function testNormalOption () {
 		
 		var it = new Normal().getIt();
-		assertTrue(it.next());
-		assertTrue(new Normal().getBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new Normal().getBool());
 		
 	}
 	
 	function testFullOption () {
 		
 		var it = new Full().getIt();
-		assertTrue(it.next());
-		assertTrue(new Full().getBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new Full().getBool());
 		
 	}
 	
 	function testParentOption () {
 		
 		var it = new Parent().getParentIt();
-		assertTrue(it.next());
-		assertTrue(new Parent().getParentBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new Parent().getParentBool());
 		
 		var it = new Child().getChildIt();
-		assertTrue(it.next());
-		assertTrue(new Child().getChildBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new Child().getChildBool());
 		
 	}
 	
 	function testIgnoredParentOption () {
 		
 		var it = new IgnoredParent().getParentIt();
-		assertTrue(it.next());
-		assertTrue(new IgnoredParent().getParentBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new IgnoredParent().getParentBool());
 		
 		var it = new IgnoredChild().getChildIt();
-		assertTrue(it.next());
-		assertTrue(new IgnoredChild().getChildBool());
+		Assert.isTrue(it.next());
+		Assert.isTrue(new IgnoredChild().getChildBool());
 		
 	}
 	

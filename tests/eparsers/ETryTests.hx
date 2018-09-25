@@ -1,14 +1,9 @@
 package eparsers;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 import yield.Yield;
 
-class ETryTests extends TestCase implements Yield
-{
-
-	public function new() {
-		super();
-	}
+class ETryTests extends utest.Test implements Yield {
 	
 	function testSimpleTry () {
 		var it = simpleTry();
@@ -21,7 +16,7 @@ class ETryTests extends TestCase implements Yield
 			error = err;
 		}
 		
-		assertEquals(1, error);
+		Assert.equals(1, error);
 	}
 	
 	function simpleTry ():Iterator<Int> {
@@ -34,10 +29,10 @@ class ETryTests extends TestCase implements Yield
 	function testTryY () {
 		var it = tryY();
 		
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(25, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(25, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function tryY ():Iterator<Int> {
@@ -60,11 +55,11 @@ class ETryTests extends TestCase implements Yield
 	function testTryYThrow () {
 		var it = tryYThrow();
 		
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(10, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(10, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function tryYThrow ():Iterator<Int> {
@@ -87,8 +82,8 @@ class ETryTests extends TestCase implements Yield
 	function testCatchY () {
 		var it = catchY();
 		
-		assertEquals(42, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(42, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	function catchY ():Iterator<Int> {
 		
@@ -113,10 +108,10 @@ class ETryTests extends TestCase implements Yield
 	function testCatchY2 () {
 		var it = catchY2();
 		
-		assertEquals(80, it.next());
-		assertEquals(60, it.next());
-		assertEquals(42, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(80, it.next());
+		Assert.equals(60, it.next());
+		Assert.equals(42, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	function catchY2 ():Iterator<Int> {
 		
@@ -144,10 +139,10 @@ class ETryTests extends TestCase implements Yield
 	function testCatchYThrow () {
 		var it = catchYThrow();
 		
-		assertEquals(2, it.next());
-		assertEquals(4, it.next());
-		assertEquals(8, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(8, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	function catchYThrow ():Iterator<Int> {
 		
@@ -181,10 +176,10 @@ class ETryTests extends TestCase implements Yield
 	function testGettingError () {
 		var it = gettingError();
 		
-		assertEquals("foobar", it.next());
-		assertEquals(5, it.next());
-		assertEquals(null, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals("foobar", it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(null, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	function gettingError ():Iterator<Dynamic> {
 		
@@ -220,22 +215,22 @@ class ETryTests extends TestCase implements Yield
 	function testReturnedValue () {
 		
 		var it = returnedValue("string");
-		assertTrue(it.hasNext());
-		assertEquals("1", it.next());
-		assertEquals("2", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("1", it.next());
+		Assert.equals("2", it.next());
+		Assert.isFalse(it.hasNext());
 		
 		it = returnedValue(10);
-		assertTrue(it.hasNext());
-		assertEquals("2", it.next());
-		assertEquals("4", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("2", it.next());
+		Assert.equals("4", it.next());
+		Assert.isFalse(it.hasNext());
 		
 		it = returnedValue(false);
-		assertTrue(it.hasNext());
-		assertEquals("3", it.next());
-		assertEquals("6", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("3", it.next());
+		Assert.equals("6", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function returnedValue (err:Dynamic) {
@@ -269,15 +264,15 @@ class ETryTests extends TestCase implements Yield
 	
 	function testInitialization () {
 		var it = initialization();
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
 		try {
 			it.next();
-			assertTrue(false);
+			Assert.isTrue(false);
 		} catch (err:Dynamic) {
-			assertTrue(true);
+			Assert.isTrue(true);
 		}
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function initialization () {
@@ -311,7 +306,7 @@ class ETryTests extends TestCase implements Yield
 
 		tryInFor(); // check compilation
 
-		assertTrue(true);
+		Assert.isTrue(true);
 	}
 
 	function tryInFor ():Iterator<String> {
@@ -330,8 +325,8 @@ class ETryTests extends TestCase implements Yield
 
 	function testNestedFunctionShouldBeOutOfTry () {
 		var it = nestedFunctionShouldBeOutOfTry();
-		assertTrue(it.next());
-		assertTrue(it.next());
+		Assert.isTrue(it.next());
+		Assert.isTrue(it.next());
 	}
 
 	function nestedFunctionShouldBeOutOfTry () {

@@ -1,25 +1,19 @@
 package misc;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 import pack.pack2.MiscYielded;
 import yield.Yield;
 
 @:yield
-class YieldTests extends TestCase
-{
-
-	public function new() 
-	{
-		super();
-	}
+class YieldTests extends utest.Test {
 	
 	function testSimpleSplit () {
 		var it:Iterator<Dynamic> = cast simpleSplit();
 		
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(4, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(4, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function simpleSplit (): Iterator<Int> {
@@ -30,11 +24,11 @@ class YieldTests extends TestCase
 	
 	function testStaticVar () {
 		var it = staticVar();
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	static var staticVar:Void->Iterator<Int> = function ():Iterator<Int> {
@@ -46,11 +40,11 @@ class YieldTests extends TestCase
 	
 	function testMember () {
 		var it = this.member();
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	var member:Void->Iterator<Int> = function ():Iterator<Int> {
@@ -62,11 +56,11 @@ class YieldTests extends TestCase
 	
 	function testStaticProperty () {
 		var it = staticProperty();
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	static var staticProperty(default, null) = function () {
@@ -78,11 +72,11 @@ class YieldTests extends TestCase
 	
 	function testProperty () {
 		var it = this.propertyMember();
-		assertTrue(it.hasNext());
-		assertEquals(0, it.next());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(0, it.next());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	var propertyMember(default, null) = function () {
@@ -95,10 +89,10 @@ class YieldTests extends TestCase
 	function testVarDeclaration () {
 		var it:Iterator<Dynamic> = cast varDeclaration();
 		
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(4, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(4, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function varDeclaration (): Iterator<Int> {
@@ -113,8 +107,8 @@ class YieldTests extends TestCase
 	function testOneLine () {
 		var it:Iterator<Dynamic> = cast oneLine();
 		
-		assertEquals(72, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(72, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function oneLine (): Iterator<Int> @yield return 72;
@@ -122,13 +116,13 @@ class YieldTests extends TestCase
 	function testSimpleBreak () {
 		var it = simpleBreak(5);
 		
-		assertTrue(it.hasNext());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertEquals(4, it.next());
-		assertEquals(5, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(5, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function simpleBreak (value:Int) {
@@ -147,11 +141,11 @@ class YieldTests extends TestCase
 	function testInlineMethods () {
 		var it = inlineMethod1();
 		
-		assertTrue(it.hasNext());
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	static inline function inlineMethod1 () {
@@ -163,11 +157,11 @@ class YieldTests extends TestCase
 	function testInlineCrossModuleAccess () {
 		var it = MiscYielded.inlineMethod2("hello");
 		
-		assertTrue(it.hasNext());
-		assertEquals("hello1", it.next());
-		assertEquals("hello2", it.next());
-		assertEquals("hello3", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("hello1", it.next());
+		Assert.equals("hello2", it.next());
+		Assert.equals("hello3", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function testCheckType () {
@@ -176,7 +170,7 @@ class YieldTests extends TestCase
 		
 		var d = (a:Int);
 		
-		assertTrue(true);
+		Assert.isTrue(true);
 	}
 	
 	function checkType () {
@@ -238,7 +232,7 @@ class YieldTests extends TestCase
 			res = i;
 		}
 		
-		assertTrue(res);
+		Assert.isTrue(res);
 	}
 	
 	function testAnonymSwitch () {
@@ -257,7 +251,7 @@ class YieldTests extends TestCase
 			default:
 		}
 		
-		assertTrue(res);
+		Assert.isTrue(res);
 	}
 	
 	function testAnonymIf () {
@@ -271,7 +265,7 @@ class YieldTests extends TestCase
 				res = true;
 			}
 			
-		assertTrue(res);
+		Assert.isTrue(res);
 	}
 	
 	function testAnonymWhile () {
@@ -281,16 +275,16 @@ class YieldTests extends TestCase
 		while (!res && (function(){
 				@yield return 3;
 			})().next() == 3) {
-				
-				res = true;
-			}
 			
-		assertTrue(res);
+			res = true;
+		}
+		
+		Assert.isTrue(res);
 	}
 
 	function testCompilationOptimization () {
 		var it = compilationOptimization();
-		assertTrue(true);
+		Assert.isTrue(true);
 	}
 
 	function compilationOptimization ():Iterator<Any> {

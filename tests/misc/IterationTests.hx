@@ -1,15 +1,9 @@
 package misc;
 
-import haxe.unit.TestCase;
+import utest.Assert;
 import yield.Yield;
 
-class IterationTests extends TestCase implements Yield
-{
-
-	public function new() 
-	{
-		super();
-	}
+class IterationTests extends utest.Test implements Yield {
 	
 	function testReturnedType () {
 		
@@ -24,10 +18,10 @@ class IterationTests extends TestCase implements Yield
 			var d = getIterable();
 			d.iterator();
 		} catch (err:Dynamic) {
-			assertTrue(false);
+			Assert.isTrue(false);
 		}
 		
-		assertTrue(true);
+		Assert.isTrue(true);
 	}
 	
 	function getDynamic ():Dynamic {
@@ -47,12 +41,12 @@ class IterationTests extends TestCase implements Yield
 		var iterable:Iterable<Int> = iterableAPI();
 		var it = iterable.iterator();
 		
-		assertEquals(1, it.next());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertEquals(4, it.next());
-		assertEquals(5, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(5, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function iterableAPI (): Iterable<Int> {
@@ -73,7 +67,7 @@ class IterationTests extends TestCase implements Yield
 			}
 		};
 		
-		assertTrue(structure.getIterator().hasNext());
+		Assert.isTrue(structure.getIterator().hasNext());
 		
 		#if (neko || js || php || python || lua)
 		var it = structure.getIterator();
@@ -83,7 +77,7 @@ class IterationTests extends TestCase implements Yield
 		
 		var expected:Int = 2;
 		for (i in structure.getIterator()) {
-			assertEquals(expected, i);
+			Assert.equals(expected, i);
 			expected *= 2;
 		}
 	}

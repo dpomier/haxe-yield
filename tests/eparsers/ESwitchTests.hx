@@ -1,23 +1,18 @@
 package eparsers;
 
+import utest.Assert;
 import haxe.macro.Expr;
-import haxe.unit.TestCase;
+
 import yield.Yield;
 
-class ESwitchTests extends TestCase implements Yield
-{
-
-	public function new() 
-	{
-		super();
-	}
+class ESwitchTests extends utest.Test implements Yield {
 	
 	function testBase () {
 		
 		var it = base(Data.None);
-		assertEquals("none", it.next());
+		Assert.equals("none", it.next());
 		var it = base(Data.WrappedMessages({ get: function () return "foo" }, null));
-		assertEquals("foo", it.next());
+		Assert.equals("foo", it.next());
 	}
 	
 	function base (data:Data) {
@@ -54,15 +49,15 @@ class ESwitchTests extends TestCase implements Yield
 	function testYielded () {
 		
 		var it = yielded(Data.WrappedMessages({ get: function () return "foo" }, { get: function () return 3 }));
-		assertEquals("foo", it.next());
-		assertEquals("foo", it.next());
-		assertEquals("foo", it.next());
-		assertEquals(5, it.next());
+		Assert.equals("foo", it.next());
+		Assert.equals("foo", it.next());
+		Assert.equals("foo", it.next());
+		Assert.equals(5, it.next());
 		
 		var it = yielded(Data.None);
-		assertEquals(1, it.next());
-		assertEquals(1, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(1, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function yielded (data:Data):Iterator<Dynamic> {
@@ -109,19 +104,19 @@ class ESwitchTests extends TestCase implements Yield
 	function testGuard () {
 		
 		var it = guard(Data.None, 5);
-		assertEquals(1, it.next());
-		assertEquals(10, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(10, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		var it = guard(Data.None, 3);
-		assertEquals(2, it.next());
-		assertEquals(20, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.equals(20, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		var it = guard(Data.None, 4);
-		assertEquals(3, it.next());
-		assertEquals(30, it.next());
-		assertFalse(it.hasNext());
+		Assert.equals(3, it.next());
+		Assert.equals(30, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function guard (data:Data, count:Int):Iterator<Dynamic> {
@@ -158,16 +153,16 @@ class ESwitchTests extends TestCase implements Yield
 	function testReturnedValue () {
 		
 		var it = returnedValue(true);
-		assertTrue(it.hasNext());
-		assertEquals(1, it.next());
-		assertEquals(3, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(1, it.next());
+		Assert.equals(3, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		var it = returnedValue(false);
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertEquals(4, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.equals(4, it.next());
+		Assert.isFalse(it.hasNext());
 		
 	}
 	
@@ -193,16 +188,16 @@ class ESwitchTests extends TestCase implements Yield
 	function testComplexReturnedValue () {
 		
 		var it = complexReturnedValue(Data.None, 3);
-		assertTrue(it.hasNext());
-		assertEquals(20, it.next());
-		assertEquals(10, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(20, it.next());
+		Assert.equals(10, it.next());
+		Assert.isFalse(it.hasNext());
 		
 		var it = complexReturnedValue(Data.WrappedMessages(null, {get: function () return 50}), 5);
-		assertTrue(it.hasNext());
-		assertEquals(100, it.next());
-		assertEquals(50, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(100, it.next());
+		Assert.equals(50, it.next());
+		Assert.isFalse(it.hasNext());
 		
 	}
 	
@@ -228,18 +223,18 @@ class ESwitchTests extends TestCase implements Yield
 	function testNestedReturnedValue () {
 		
 		var it = nestedReturnedValue(Data.WrappedMessages(null, { get:function () return 3 }));
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		
 		var func = it.next();
 		var subIt = func();
 		
-		assertTrue(subIt.hasNext());
-		assertEquals(3, subIt.next());
-		assertEquals(3, subIt.next());
-		assertEquals(3, subIt.next());
-		assertFalse(subIt.hasNext());
+		Assert.isTrue(subIt.hasNext());
+		Assert.equals(3, subIt.next());
+		Assert.equals(3, subIt.next());
+		Assert.equals(3, subIt.next());
+		Assert.isFalse(subIt.hasNext());
 		
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 		
 	}
 	
@@ -265,23 +260,23 @@ class ESwitchTests extends TestCase implements Yield
 			Data.Messages("two", 4)
 		);
 		
-		assertTrue(it.hasNext());
+		Assert.isTrue(it.hasNext());
 		var funcGetFirst = it.next();
-		assertTrue(Reflect.isFunction(funcGetFirst));
+		Assert.isTrue(Reflect.isFunction(funcGetFirst));
 		var firstSubIt = funcGetFirst();
-		assertFalse(it.hasNext());
+		Assert.isFalse(it.hasNext());
 		
-		assertTrue(firstSubIt.hasNext());
+		Assert.isTrue(firstSubIt.hasNext());
 		var funcGetSecond = firstSubIt.next();
-		assertTrue(Reflect.isFunction(funcGetSecond));
+		Assert.isTrue(Reflect.isFunction(funcGetSecond));
 		var secondSubIt:Iterator<Dynamic> = funcGetSecond();
-		assertFalse(firstSubIt.hasNext());
+		Assert.isFalse(firstSubIt.hasNext());
 		
-		assertTrue(secondSubIt.hasNext());
-		assertEquals(3, secondSubIt.next());
-		assertEquals(4, secondSubIt.next());
-		assertEquals("two", secondSubIt.next());
-		assertFalse(secondSubIt.hasNext());
+		Assert.isTrue(secondSubIt.hasNext());
+		Assert.equals(3, secondSubIt.next());
+		Assert.equals(4, secondSubIt.next());
+		Assert.equals("two", secondSubIt.next());
+		Assert.isFalse(secondSubIt.hasNext());
 		
 	}
 	
@@ -317,11 +312,11 @@ class ESwitchTests extends TestCase implements Yield
 	function testReferenceAsVar () {
 		var it = referenceAsVar(Data.Message("foo"));
 		
-		assertTrue(it.hasNext());
-		assertEquals("foo", it.next());
-		assertEquals("foo", it.next());
-		assertEquals("foofoo", it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals("foo", it.next());
+		Assert.equals("foo", it.next());
+		Assert.equals("foofoo", it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function referenceAsVar (data:Data) {
@@ -364,10 +359,10 @@ class ESwitchTests extends TestCase implements Yield
 	
 	function testInitialization () {
 		var it = initialization();
-		assertTrue(it.hasNext());
-		assertEquals(2, it.next());
-		assertEquals(3, it.next());
-		assertFalse(it.hasNext());
+		Assert.isTrue(it.hasNext());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.isFalse(it.hasNext());
 	}
 	
 	function initialization () {
