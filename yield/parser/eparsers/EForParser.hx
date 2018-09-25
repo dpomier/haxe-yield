@@ -60,7 +60,7 @@ class EForParser extends BaseParser
 			#if (haxe_ver < 4.000)
 			case EIn(__e1, __e2):
 			#else
-			case EBinop(_, __e1, __e2):
+			case EBinop(OpIn, __e1, __e2):
 			#end
 				
 				var opIdentName:String = ExpressionTools.getConstIdent(__e1);
@@ -156,7 +156,7 @@ class EForParser extends BaseParser
 			#if (haxe_ver < 4.000)
 			case EIn(__e1, __e2):
 			#else
-			case EBinop(_, __e1, __e2):
+			case EBinop(OpIn, __e1, __e2):
 			#end
 				
 				m_ys.parseOut(__e2, true);
