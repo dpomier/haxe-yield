@@ -342,7 +342,13 @@ class Parser
 				if (WorkEnv.YIELD_EXPLICIT) {
 					Context.fatalError( "Method must have a return type when using " + WorkEnv.YIELD_KEYWORD + " expressions", pos );
 				} else {
-					f.ret		= macro:StdTypes.Dynamic;
+					
+					#if (haxe_ver < 4.000)
+					f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->Dynamic; var iterator(default, never):Void->Iterator<Dynamic>; };
+					#else
+					f.ret = ComplexType.TIntersection([macro:Iterator<Dynamic>, macro:Iterable<Dynamic>]);
+					#end
+					
 					returnType	= macro:StdTypes.Dynamic;
 					funcRetType	= RetType.DYNAMIC;
 				}
