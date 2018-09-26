@@ -116,6 +116,7 @@ class WorkEnv
 	public var untypedMode:Bool;
 
 	#if debug
+	@:allow(yield.parser.Parser)
 	public var debug (default, null):Bool = false;
 	#end
 	
@@ -175,13 +176,6 @@ class WorkEnv
 	}
 	
 	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, pos:Position): Void {
-		
-		#if debug
-		if (Context.defined("yDebug")) {
-			var match:String = Context.definedValue("yDebug");
-			debug = match != null && name == StringTools.trim(match);
-		}
-		#end
 		
 		// reset
 		localStack    = new Array<Statement>();

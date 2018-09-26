@@ -311,6 +311,13 @@ class Parser
 	@:noCompletion
 	public static function parseFunction (name:String, f:Function, pos:Position, env:WorkEnv): Bool {
 		
+		#if debug
+		if (Context.defined("yDebug")) {
+			var match:String = Context.definedValue("yDebug");
+			env.debug = match != null && name == StringTools.trim(match);
+		}
+		#end
+		
 		MetaTools.option = MetaToolsOption.None;
 		
 		if (!MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, f, true)) {
