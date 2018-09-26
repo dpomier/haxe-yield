@@ -386,14 +386,14 @@ class Parser
 							
 							switch (retType) {
 								
-								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],iteratortype), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iteratorType)):
+								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],rt), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iteratorType)):
 									
-									returnType = TypeTools.toComplexType(iteratortype);
+									returnType = TypeTools.toComplexType(rt);
 									funcRetType = RetType.ITERATOR;
 									
-								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],iterabletype), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iterableType)):
+								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],rt), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iterableType)):
 									
-									returnType = TypeTools.toComplexType(iterabletype);
+									returnType = TypeTools.toComplexType(rt);
 									funcRetType = RetType.ITERABLE;
 									
 								case TDynamic(_):
