@@ -50,7 +50,7 @@ class EFunctionParser extends BaseParser
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 		
-		if (!MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, _f) || !Parser.parseFunction(safeName, _f, e.pos, m_we.getInheritedData())) {
+		if (!MetaTools.hasMeta(m_we.yieldKeywork, _f) || !Parser.parseFunction(safeName, _f, e.pos, m_we.getInheritedData())) {
 			parseFun(_f, e.pos, true, false);
 		}
 		

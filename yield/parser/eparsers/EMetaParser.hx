@@ -33,7 +33,7 @@ class EMetaParser extends BaseParser
 	
 	public function run (e:Expr, subParsing:Bool, _s:MetadataEntry, _e:Expr): Void {
 		
-		if (_s.name == WorkEnv.YIELD_KEYWORD) {
+		if (_s.name == m_we.yieldKeywork) {
 			
 			if (_s.params == null || _s.params.length == 0) {
 				parseYieldMeta(e, subParsing, _s, _e);
@@ -79,7 +79,7 @@ class EMetaParser extends BaseParser
 				m_ys.addBreakAction(e);
 				
 			default:
-				Context.fatalError( "Unexpected " + WorkEnv.YIELD_KEYWORD, e.pos );
+				Context.fatalError( "Unexpected " + m_we.yieldKeywork, e.pos );
 		}
 		
 		m_ys.addIntoBlock(e);

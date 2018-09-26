@@ -252,7 +252,7 @@ class Parser
 			env.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.localClass.pos);
 		}
 		
-		WorkEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
+		env.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
 	}
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
@@ -279,7 +279,7 @@ class Parser
 				
 				MetaTools.option = MetaToolsOption.None;
 				
-				if (MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, _e)) {
+				if (MetaTools.hasMeta(env.yieldKeywork, _e)) {
 					
 					func               = MetaTools.selectedFunc;
 					alternativeRetType = switch (_t) {
@@ -320,7 +320,7 @@ class Parser
 		
 		MetaTools.option = MetaToolsOption.None;
 		
-		if (!MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, f, true)) {
+		if (!MetaTools.hasMeta(env.yieldKeywork, f, true)) {
 			return false;
 		}
 		
@@ -339,8 +339,8 @@ class Parser
 			
 			if (f.ret == null) {
 				
-				if (WorkEnv.YIELD_EXPLICIT) {
-					Context.fatalError( "Method must have a return type when using " + WorkEnv.YIELD_KEYWORD + " expressions", pos );
+				if (env.yieldExplicit) {
+					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
 					
 					#if (haxe_ver < 4.000)

@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser.eactions;
+import yield.parser.WorkEnv;
 import haxe.Serializer;
 import haxe.Unserializer;
 import haxe.macro.Context;
@@ -32,7 +33,7 @@ import yield.parser.eparsers.BaseParser;
 class ActionParser extends BaseParser
 {
 	
-	public static function addActionToExpr (action:Action, e:Expr): Void {
+	public static function addActionToExpr (action:Action, e:Expr, env:WorkEnv): Void {
 		
 		var ls:Serializer = new Serializer();
 		ls.serialize(action);
@@ -40,7 +41,7 @@ class ActionParser extends BaseParser
 		var lexpr = e.expr;
 		
 		e.expr = EMeta({
-			name: WorkEnv.YIELD_KEYWORD, 
+			name: env.yieldKeywork, 
 			params: [{ expr:EConst(CString( ls.toString() )), pos:e.pos }], 
 			pos:e.pos
 		},{

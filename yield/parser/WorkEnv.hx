@@ -64,9 +64,9 @@ enum RetType {
 class WorkEnv
 {
 	
-	public static var YIELD_KEYWORD  (default, null):String;
-	public static var YIELD_EXPLICIT (default, null):Bool;
-	public static var YIELD_EXTEND   (default, null):Bool;
+	public var yieldKeywork  (default, null):String;
+	public var yieldExplicit (default, null):Bool;
+	public var yieldExtend   (default, null):Bool;
 	
 	public var currentScope (default, null):Scope;
 	public var scopeCounter (default, null):UInt;
@@ -148,11 +148,11 @@ class WorkEnv
 		untypedMode = false;
 	}
 	
-	public static function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
+	public function setOptions (keywork:String, explicit:Bool, extend:Bool): Void {
 		
-		YIELD_KEYWORD  = yieldKeywork;
-		YIELD_EXPLICIT = yieldExplicit;
-		YIELD_EXTEND   = yieldExtend;
+		yieldKeywork  = keywork;
+		yieldExplicit = explicit;
+		yieldExtend   = extend;
 	}
 	
 	public function setFieldData (f:Field, fun:Function): Void {
@@ -238,11 +238,12 @@ class WorkEnv
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
 		we.scopeCounter  = 0;
+		we.setOptions(yieldKeywork, yieldExplicit, yieldExtend);
 		
 		#if debug
 		we.debug = debug;
 		#end
-
+		
 		return we;
 	}
 	

@@ -41,7 +41,7 @@ class EForParser extends BaseParser
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 		
-		if (MetaTools.hasMetaExpr(WorkEnv.YIELD_KEYWORD, _expr, true)) {
+		if (MetaTools.hasMetaExpr(m_we.yieldKeywork, _expr, true)) {
 			runSplitMode(e, subParsing, _it, _expr, loopExprs);
 		} else {
 			runPreserveMode(e, subParsing, _it, _expr, loopExprs);
@@ -71,7 +71,7 @@ class EForParser extends BaseParser
 					pos: e.pos
 				};
 				
-				ActionParser.addActionToExpr(Action.DefineChannel(IdentChannel.IterationOp), opIdent);
+				ActionParser.addActionToExpr(Action.DefineChannel(IdentChannel.IterationOp), opIdent, m_we);
 				
 				switch (__e2.expr) {
 					case EBinop(___op, ___e1, ___e2): 
