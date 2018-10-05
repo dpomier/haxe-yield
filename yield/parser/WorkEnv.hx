@@ -405,7 +405,7 @@ class WorkEnv
 			types:       [type],
 			ident:       ident,
 			channel:     ic,
-			options:     [],
+			options:     defIdent.options,
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
