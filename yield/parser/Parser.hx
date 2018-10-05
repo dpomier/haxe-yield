@@ -330,6 +330,7 @@ class Parser
 		
 		var returnType:ComplexType;
 		var funcRetType:RetType;
+		var funcReturnType:ComplexType;
 		
 		// Typing
 		
@@ -343,17 +344,20 @@ class Parser
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
 					
+					returnType     = macro:StdTypes.Dynamic;
+					
 					#if (haxe_ver < 4.000)
-					f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->Dynamic; var iterator(default, never):Void->Iterator<Dynamic>; };
+					funcReturnType = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$returnType; var iterator(default, never):Void->Iterator<$returnType>; };
 					#else
-					f.ret = ComplexType.TIntersection([macro:Iterator<Dynamic>, macro:Iterable<Dynamic>]);
+					funcReturnType = ComplexType.TIntersection([macro:Iterator<$returnType>, macro:Iterable<$returnType>]);
 					#end
 					
-					returnType	= macro:StdTypes.Dynamic;
-					funcRetType	= RetType.DYNAMIC;
+					funcRetType	= RetType.BOTH;
 				}
 				
 			} else {
+				
+				funcReturnType = f.ret;
 				
 				switch (f.ret) {
 					
@@ -373,7 +377,7 @@ class Parser
 					   | (macro:StdTypes.Dynamic):
 					   
 						returnType  = macro:StdTypes.Dynamic;
-						funcRetType = RetType.DYNAMIC;
+						funcRetType = RetType.BOTH;
 						
 					default:
 						
@@ -405,7 +409,7 @@ class Parser
 								case TDynamic(_):
 									
 									returnType  = f.ret;
-									funcRetType = RetType.DYNAMIC;
+									funcRetType = RetType.BOTH;
 									
 								case _:
 									
@@ -416,7 +420,8 @@ class Parser
 						} else {
 							
 							returnType  = macro:Dynamic;
-							funcRetType = RetType.DYNAMIC;
+							f.ret       = macro:Dynamic;
+							funcRetType = RetType.BOTH;
 							
 						}
 				}
@@ -428,7 +433,9 @@ class Parser
 			env.yieldMode = false;
 			
 			returnType  = macro:StdTypes.Dynamic;
-			funcRetType = RetType.DYNAMIC;
+			funcRetType = RetType.BOTH;
+			
+			funcReturnType = f.ret != null ? f.ret : (macro:Dynamic);
 		}
 		
 		#if (display || yield_debug_display)
@@ -437,7 +444,7 @@ class Parser
 		
 		// Parse
 		
-		env.setFunctionData(name, f, funcRetType, returnType, pos);
+		env.setFunctionData(name, f, funcRetType, returnType, funcReturnType, f.expr.pos);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
 		var ibd:IteratorBlockData = yieldSplitter.split(f, pos);

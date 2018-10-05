@@ -53,9 +53,9 @@ typedef Scope = {
 }
 
 enum RetType {
-	DYNAMIC;
 	ITERABLE;
 	ITERATOR;
+	BOTH;
 }
 
 /**
@@ -85,6 +85,7 @@ class WorkEnv
 	
 	public var fieldName        (default, null):String;
 	public var functionRetType  (default, null):RetType;
+	public var functionReturnType (default, null):ComplexType;
 	public var returnType       (default, null):ComplexType;
 	public var defaultReturnType (default, null):Expr;
 	
@@ -175,7 +176,7 @@ class WorkEnv
 		requiresInstance = false;
 	}
 	
-	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, pos:Position): Void {
+	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, funcReturnType:ComplexType, pos:Position): Void {
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -191,6 +192,7 @@ class WorkEnv
 		fieldName = name;
 		this.returnType = returnType;
 		this.functionRetType = functionRetType;
+		this.functionReturnType = funcReturnType;
 		
 		defaultReturnType = WorkEnv.getDefaultValue(returnType);
 		

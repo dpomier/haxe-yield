@@ -468,7 +468,7 @@ class DefaultGenerator
 		// public inline function iterator():Iterator<???>
 		
 		switch (env.functionRetType) {
-			case ITERABLE | DYNAMIC:
+			case ITERABLE | BOTH:
 				
 				var body:Expr = {
 					expr: EBlock([
@@ -480,7 +480,7 @@ class DefaultGenerator
 				var rtype:ComplexType = env.returnType;
 				var metadata:Metadata = null;
 				
-				if (env.functionRetType == RetType.DYNAMIC) {
+				if (env.functionRetType == BOTH) {
 					metadata = [{
 						name: ":keep",
 						params: null,
