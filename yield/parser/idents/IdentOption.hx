@@ -27,5 +27,6 @@ package yield.parser.idents;
 enum IdentOption {
 	ReadOnly;
 	KeepAsVar;
+	IsVarLoop;
 }
 #end

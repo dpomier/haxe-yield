@@ -275,11 +275,10 @@ class YieldSplitter
 			case EBinop(_op, _e1, _e2):
 				switch (_e1.expr) {
 				case EConst(__c):
+					var beingModified:Bool = switch (_op) { case OpAssign, OpAssignOp(_): true; case _: false; }
 					switch (_op) {
-					case Binop.OpAssign:
-						econstParser.run(_e1, true, __c, ic, true);
-					default:
-						econstParser.run(_e1, true, __c, ic, false);
+					case Binop.OpAssign: econstParser.run(_e1, true, __c, ic, true, beingModified);
+					case _:              econstParser.run(_e1, true, __c, ic, false, beingModified);
 					}
 				default:
 					parse(_e1, true, ic);
@@ -302,7 +301,11 @@ class YieldSplitter
 				eternaryParser.run(e, subParsing, _econd, _eif, _eelse);
 				
 			case EUnop(_op, _postFix, _e):
-				parse(_e, true);
+				var beingModified:Bool = switch (_op) { case OpIncrement, OpDecrement: true; case _: false; }
+				switch (_e.expr) {
+					case EConst(_c): econstParser.run(_e, true, _c, ic, false, beingModified);
+					case _:           parse(_e, true);
+				}
 				if (!subParsing) addIntoBlock(e);
 				
 			case ECast(_e, _t):

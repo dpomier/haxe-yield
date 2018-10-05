@@ -374,6 +374,12 @@ class WorkEnv
 			pos:         pos
 		};
 		
+		if (options.indexOf(ReadOnly) != -1) {
+			for (i in 0...initialized.length) {
+				if (!initialized[i]) Context.fatalError(names[i] + ' must be initialized to be readonly', pos);
+			}
+		}
+		
 		localStack.push(Statement.Definitions(data, inlined));
 		currentScope.localIdentStack.push(Statement.Definitions(data, inlined));
 		

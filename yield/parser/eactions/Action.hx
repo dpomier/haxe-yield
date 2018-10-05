@@ -23,9 +23,11 @@
  */
 #if macro
 package yield.parser.eactions;
+import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentChannel;
 
 enum Action {
 	DefineChannel(ic:IdentChannel);
+	DefineOptions(options:Array<IdentOption>, ?ic:IdentChannel);
 }
 #end

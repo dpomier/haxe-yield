@@ -23,6 +23,8 @@
  */
 #if macro
 package yield.parser.eparsers;
+import yield.parser.idents.IdentOption;
+import yield.parser.eactions.Action;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -71,7 +73,7 @@ class EForParser extends BaseParser
 					pos: e.pos
 				};
 				
-				ActionParser.addActionToExpr(Action.DefineChannel(IdentChannel.IterationOp), opIdent, m_we);
+				ActionParser.addActionToExpr([Action.DefineChannel(IdentChannel.IterationOp), Action.DefineOptions([IdentOption.ReadOnly], IdentChannel.IterationOp)], opIdent, m_we);
 				
 				switch (__e2.expr) {
 					case EBinop(___op, ___e1, ___e2): 
@@ -144,7 +146,10 @@ class EForParser extends BaseParser
 			default:
 		}
 		
-		for (v in updateExprs) loopExprs.unshift(v);
+		for (v in updateExprs) {
+			ActionParser.addActionToExpr([Action.DefineOptions([IsVarLoop, ReadOnly])], v, m_we);
+			loopExprs.unshift(v);
+		}
 		
 		e.expr = ewhile.expr;
 		m_ys.ewhileParser.run(ewhile, subParsing, ewhileEcond, ewhileE, true, true);

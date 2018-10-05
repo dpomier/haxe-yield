@@ -36,7 +36,7 @@ import yield.parser.tools.IdentCategory;
 class EConstParser extends BaseParser
 {
 	
-	public function run (e:Expr, subParsing:Bool, _c:Constant, ?ic:IdentChannel, initialized:Bool = false): Void {
+	public function run (e:Expr, subParsing:Bool, _c:Constant, ?ic:IdentChannel, initialized = false, beingModified = false): Void {
 		
 		if (ic == null) ic = IdentChannel.Normal;
 		
@@ -72,6 +72,19 @@ class EConstParser extends BaseParser
 							
 							var type:ComplexType = __definition.types[defIndex];
 							var initialized:Bool = initialized ? true : __definition.initialized[defIndex];
+							
+							
+							if (beingModified && __definition.options.indexOf(ReadOnly) != -1) {
+								
+								if (__definition.options.indexOf(IsVarLoop) != -1) {
+									
+									Context.fatalError('Loop variable cannot be modified', e.pos);
+									
+								} else {
+									
+									Context.fatalError('This variable cannot be modified (reference is readonly)'+beingModified+__definition.options.toString(), e.pos);
+								}
+							}
 							
 							if (__definition.env == m_we) {
 								

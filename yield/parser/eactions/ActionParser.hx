@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser.eactions;
+import yield.parser.idents.IdentData;
 import yield.parser.WorkEnv;
 import haxe.Serializer;
 import haxe.Unserializer;
@@ -33,10 +34,10 @@ import yield.parser.eparsers.BaseParser;
 class ActionParser extends BaseParser
 {
 	
-	public static function addActionToExpr (action:Action, e:Expr, env:WorkEnv): Void {
+	public static function addActionToExpr (actions:Array<Action>, e:Expr, env:WorkEnv): Void {
 		
 		var ls:Serializer = new Serializer();
-		ls.serialize(action);
+		ls.serialize(actions);
 		
 		var lexpr = e.expr;
 		
@@ -50,7 +51,7 @@ class ActionParser extends BaseParser
 		});
 	}
 	
-	public static function getAction (e:Expr): Null<Action> {
+	public static function getAction (e:Expr): Null<Array<Action>> {
 		
 		switch (e.expr) {
 			case EConst(__c):
@@ -67,7 +68,7 @@ class ActionParser extends BaseParser
 							return null;
 						}
 						
-						if (Std.is(o, Action)) {
+						if (Std.is(o, Array)) {
 							return o;
 						}
 						
@@ -79,19 +80,40 @@ class ActionParser extends BaseParser
 		return null;
 	}
 	
-	public function executeAction (action:Action, e:Expr): Void {
+	public function executeAction (actions:Array<Action>, e:Expr): Void {
 		
-		switch (action) {
-			case DefineChannel(ic):
-				
-				switch (e.expr) {
-					case EConst(_c):
-						m_ys.econstParser.run(e, true, _c, ic);
-					default:
-						Context.fatalError("Action " + action.getName() + " only works for constants", e.pos);
-				}
+		for (action in actions) {
+			
+			switch (action) {
+				case DefineChannel(ic):
+					
+					switch (e.expr) {
+						case EConst(_c):
+							m_ys.econstParser.run(e, true, _c, ic);
+						default:
+							Context.fatalError("Action " + action.getName() + " only works for econst and doesn't accept " + e.expr.getName(), e.pos);
+					}
+					
+				case DefineOptions(options, ic):
+					
+					switch (e.expr) {
+						case EVars(_vars):
+							
+							m_ys.evarsParser.run(e, true, _vars, ic, options);
+							
+						case EConst(CIdent(_s)):
+							var identData:Null<IdentData> = m_we.getLocalDefinitionOf(_s, ic);
+							
+							if (identData == null) {
+								Context.fatalError("Action " + action.getName() + " cannot be applied on an unkwown local identifier", e.pos);
+							}
+							identData.options = options;
+							
+						default:
+							Context.fatalError("Action " + action.getName() + " only works for econst(cident) and doesn't accept " + e.expr.getName(), e.pos);
+					}
+			}
 		}
-		return;
 	}
 	
 }

@@ -44,11 +44,11 @@ class EMetaParser extends BaseParser
 				
 				for (lparamExpr in _s.params) {
 					
-					var action:Action = ActionParser.getAction(lparamExpr);
+					var actions:Array<Action> = ActionParser.getAction(lparamExpr);
 					
-					if (action != null) {
+					if (actions != null) {
 						
-						m_ys.actionParser.executeAction(action, _e);
+						m_ys.actionParser.executeAction(actions, _e);
 						m_ys.addIntoBlock(e);
 						return;
 						

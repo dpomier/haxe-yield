@@ -79,10 +79,11 @@ class EForTests extends utest.Test {
 	function multipleYieldedFor ():Iterator<Int> {
 		
 		var b = 0;
-		
-		for (a in 0...3) {
-			@yield return a;
-			a += 1;
+		var y = -1;
+		for (i in 0...3) {
+			if ((y += 1) >= 3) break;
+			@yield return y;
+			// i += 1; // Should fail, loop variable cannot be modified
 			@yield return 10;
 			b += 1;
 			@yield return b;
@@ -297,7 +298,8 @@ class EForTests extends utest.Test {
 		
 		var a:Dynamic = { iterator:function () return [4, 8, 16].iterator() };
 		
-		for (i in a) {
+		// for (i in (a) { // FIXME: Can't iterate on a Dynamic value
+		for (i in (a:Iterable<Int>)) {
 			@yield return i;
 		}
 		
@@ -368,6 +370,42 @@ class EForTests extends utest.Test {
 			};
 			
 		}];
+	}
+	
+	function testLoopVariableCompilation () {
+		var it = loopVariableCompilation();
+		Assert.isTrue(it.hasNext());
+	}
+	
+	function loopVariableCompilation () {
+		
+		for (i in 0...20) {
+			@yield return i;
+            if (i < 1) @yield return i;
+			if (i <= 1) @yield return i;
+			if (i == 1) @yield return i;
+			if (i != 1) @yield return i;
+			if (i >= 1) @yield return i;
+			if (i > 1) @yield return i;
+			if (i + 1 == 1) @yield return i;
+			if (i - 1 == 1) @yield return i;
+			if (i * 1 == 1) @yield return i;
+			if (i / 1 == 1) @yield return i;
+			if (i % 1 == 1) @yield return i;
+			if ((i & 1) == 1) @yield return i;
+			if ((i | 1) == 1) @yield return i;
+			if ((i ^ 1) == 1) @yield return i;
+			if ((i == 1) && true) @yield return i;
+			if ((i == 1) || true) @yield return i;
+			if ((i << 1) == 1) @yield return i;
+			if ((i >> 1) == 1) @yield return i;
+			if ((i >>> 1) == 1) @yield return i;
+			if ((i...1) != null) @yield return i;
+			if ((0...i) != null) @yield return i;
+			if ([i => 0] != null) @yield return i;
+            if (-i < 1) @yield return i;
+            if (~i < 1) @yield return i;
+		}
 	}
 
 }

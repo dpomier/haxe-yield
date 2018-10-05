@@ -15,7 +15,7 @@ abstract OperatorOverloading2(String) {
 		
 		var i:Int = 0;
 		
-		for (i in 0...rhs) {
+		for (y in 0...rhs) {
 			@yield return new OperatorOverloading2(this.substr(i, len));
 			i += len;
 		}
