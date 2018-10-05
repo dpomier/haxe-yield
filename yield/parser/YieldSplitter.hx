@@ -105,8 +105,13 @@ class YieldSplitter
 		m_env.closeScope();
 		
 		var yieldBreak:Expr = { expr: null, pos: f.expr.pos };
-		iteratorBlocks[cursor].push(yieldBreak);
 		addBreakAction(yieldBreak);
+		
+		#if (!display && !yield_debug_display)
+		addIntoBlock(yieldBreak);
+		#else
+		ExpressionTools.checkIsInEBlock(f.expr).push(yieldBreak);
+		#end
 		
 		YieldSplitterOptimizer.optimizeAll(this, m_positionManager, m_env, f.expr.pos);
 		
@@ -118,19 +123,23 @@ class YieldSplitter
 	//{ ITERATOR OPERATIONS
 	
 	public function moveCursor (): Void {
+		#if (!display && !yield_debug_display)
 		if (iteratorBlocks[++cursor] == null)
 			iteratorBlocks[cursor] = new IteratorBlock();
+		#end
 	}
 	
 	public function addIntoBlock (e:Expr, ?pos:Int): Void {
+		#if (!display && !yield_debug_display)
 		if (m_env.untypedMode) {
 			e = { expr: EUntyped(e), pos: e.pos };
 		}
 		iteratorBlocks[pos == null ? cursor : pos].push(e);
+		#end
 	}
 	
 	public function spliceIteratorBlocks (pos:Int, len:Int): Void {
-		
+		#if (!display && !yield_debug_display)
 		if (pos < 0) {
 			len += pos;
 			pos = 0;
@@ -139,8 +148,10 @@ class YieldSplitter
 		iteratorBlocks.splice(pos, len);
 		m_positionManager.adjustIteratorPos(len *-1, pos);
 		cursor -= len;
+		#end
 	}
 	
+	#if (!display && !yield_debug_display)
 	public function addGotoAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
@@ -154,11 +165,29 @@ class YieldSplitter
 		m_env.setActions.push(lp);
 		m_positionManager.addPosPointer(lp);
 	}
+	#end
 	
 	public function addBreakAction (emptyExpr:Expr): Void {
 		
+		#if (display || yield_debug_display)
+		addDisplayDummy(emptyExpr);
+		#else
 		var lp:LinkedPosition = { e: emptyExpr, pos: null };
 		m_env.breakActions.push(lp);
+		#end
+	}
+	
+	public function addDisplayDummy (emptyDummy:Expr): Void {
+		
+		if (m_env.returnType != null) {
+			processDisplayDummy(emptyDummy);
+		}
+	}
+	
+	private function processDisplayDummy (emptyDummy:Expr): Void {
+		
+		var ft = m_env.functionReturnType;
+		emptyDummy.expr = EReturn(macro (null:$ft));
 	}
 	
 	//}
@@ -180,7 +209,9 @@ class YieldSplitter
 		spliceIteratorBlocks(initialPos + 1, cursor - initialPos);
 		
 		if (returnValue && yieldCount != 0) {
+			#if (!display && !yield_debug_display)
 			Context.fatalError("Missing return " + returnedType, e.pos);
+			#end
 		}
 		
 		return yieldCount;
@@ -190,6 +221,10 @@ class YieldSplitter
 	 * @return Quantity of yield statements.
 	 */
 	public function parse (e:Expr, subParsing:Bool, ?ic:IdentChannel): Int {
+		
+		#if (display || yield_debug_display)
+		subParsing = true;
+		#end
 		
 		var yieldCount:Int = m_yieldMetaCounter;
 		
@@ -328,10 +363,7 @@ class YieldSplitter
 				eswitchParser.run(e, subParsing, _e, _cases, _edef);
 				
 			case EDisplay(_e, _isCall):
-				Context.fatalError("EDisplay not implemented", e.pos);
-			
 			case EDisplayNew(_t):
-				Context.fatalError("EDisplayNew not implemented", e.pos);
 		}
 		
 		return m_yieldMetaCounter - yieldCount;

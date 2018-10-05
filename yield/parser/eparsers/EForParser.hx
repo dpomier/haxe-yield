@@ -41,7 +41,7 @@ class EForParser extends BaseParser
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 		
-		if (MetaTools.hasMetaExpr(m_we.yieldKeywork, _expr, true)) {
+		if (#if (!display && !yield_debug_display) MetaTools.hasMetaExpr(m_we.yieldKeywork, _expr, true) #else false #end) {
 			runSplitMode(e, subParsing, _it, _expr, loopExprs);
 		} else {
 			runPreserveMode(e, subParsing, _it, _expr, loopExprs);

@@ -31,6 +31,8 @@ class YieldSplitterOptimizer
 	
 	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Void {
 		
+		#if (!display && !yield_debug_display)
+		
 		var pass:Int = 0;
 		var subpass:Int = 0;
 		var needRepass:Bool = true;
@@ -49,8 +51,11 @@ class YieldSplitterOptimizer
 		}
 
 		#if debug
-		if (env.debug)
+		if (env.debug) {
 			trace('"${env.fieldName}" optimazed in $pass pass');
+		}
+		#end
+		
 		#end
 	}
 

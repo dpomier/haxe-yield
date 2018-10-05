@@ -73,11 +73,13 @@ class EMetaParser extends BaseParser
 		switch (_e.expr) {
 			
 			case EReturn(__e):
+				#if (display || yield_debug_display)
+				m_ys.addDisplayDummy(e); // TODO parse __e to know the type when inferred typing
+				#else
 				m_ys.parse(__e, true);
-				
+				#end
 			case EBreak:
 				m_ys.addBreakAction(e);
-				
 			default:
 				Context.fatalError( "Unexpected " + m_we.yieldKeywork, e.pos );
 		}

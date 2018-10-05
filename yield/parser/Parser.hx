@@ -431,6 +431,10 @@ class Parser
 			funcRetType = RetType.DYNAMIC;
 		}
 		
+		#if (display || yield_debug_display)
+		env.classField.access.remove(AInline);
+		#end
+		
 		// Parse
 		
 		env.setFunctionData(name, f, funcRetType, returnType, pos);
@@ -440,9 +444,11 @@ class Parser
 		
 		// Generate type
 		
+		#if (!display && !yield_debug_display)
 		if (env.yieldMode || env.requiredBySubEnv) {
 			f.expr = DefaultGenerator.add(ibd, pos, env);
 		}
+		#end
 		
 		return true;
 	}

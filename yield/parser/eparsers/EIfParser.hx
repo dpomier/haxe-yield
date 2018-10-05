@@ -107,8 +107,10 @@ class EIfParser extends BaseParser
 				// add goto sub-expressions
 				var altExprs:Array<Expr> = ExpressionTools.checkIsInEBlock(alternativeExprs[i]);
 				var ldefNext:Expr = { expr: null, pos: alternativeExprs[i].pos };
+				#if (!display && !yield_debug_display)
 				altExprs.unshift(ldefNext);
 				m_ys.addSetAction(ldefNext, posFirst);
+				#end
 				
 				// add goto post EIf
 				m_ys.addIntoBlock(lgotoPostEIf);
@@ -125,11 +127,15 @@ class EIfParser extends BaseParser
 			
 		} else {
 			
+			#if (!display && !yield_debug_display)
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
+			#end
 			
 			// add goto post EIf
+			#if (!display && !yield_debug_display)
 			for (lexprs in unYieldedScopes) lexprs.push(lgotoPostEIf);
 			m_ys.addGotoAction(lgotoPostEIf, m_ys.cursor);
+			#end
 		}
 	}
 	

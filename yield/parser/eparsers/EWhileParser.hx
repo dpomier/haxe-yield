@@ -100,6 +100,7 @@ class EWhileParser extends BaseParser
 			
 		} else {
 			
+			#if (!display && !yield_debug_display) 
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
 			
 			var posLastWhilePart:Int = m_ys.cursor;
@@ -150,6 +151,8 @@ class EWhileParser extends BaseParser
 			for (lexpr in breaks) {
 				m_ys.addGotoAction( lexpr, posAfterWhile );
 			}
+			
+			#end
 		}
 		
 	}

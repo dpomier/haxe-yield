@@ -115,12 +115,14 @@ class ESwitchParser extends BaseParser
 				var lnewExprs:Array<Expr> = m_ys.iteratorBlocks[posFirstSub];
 				
 				// Goto first sub-expression
-				var ldefineNextSubExpr:Expr  = { expr: EConst(CIdent("null")), pos: _e.pos };
+				#if (!display && !yield_debug_display) 
+				var ldefineNextSubExpr:Expr  = { expr: null, pos: _e.pos };
 				m_ys.addSetAction(ldefineNextSubExpr, posFirstSub+1);
 				lnewExprs.unshift(ldefineNextSubExpr);
 				
 				lcase.expr = { expr: EBlock( lnewExprs ), pos: lcase.expr.pos };
 				m_ys.spliceIteratorBlocks(posFirstSub, 1);
+				#end
 				
 				// Goto after the switch
 				m_ys.addIntoBlock(lgotoAfterSwitch);
@@ -137,6 +139,7 @@ class ESwitchParser extends BaseParser
 			
 		} else {
 			
+			#if (!display && !yield_debug_display)
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
 			
 			for (lcase in _cases) {
@@ -147,6 +150,7 @@ class ESwitchParser extends BaseParser
 			m_ys.addIntoBlock(lgotoAfterSwitch, posInitial);
 			
 			m_ys.addGotoAction(lgotoAfterSwitch, m_ys.cursor);
+			#end
 		}
 		
 		// Parse default

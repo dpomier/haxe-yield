@@ -172,10 +172,7 @@ class MetaTools
 				return hasMetaExpr(name, _e) || _t != null && hasMetaCT(name, _t);
 				
 			case EDisplay(_e, _isCall):
-				return hasMetaExpr(name, _e);
-				
 			case EDisplayNew(_t):
-				return hasMetaTP(name, _t);
 				
 			case ETernary(_econd, _eif, _eelse):
 				return hasMetaExpr(name, _econd) || hasMetaExpr(name, _eif) || hasMetaExpr(name, _eelse);
