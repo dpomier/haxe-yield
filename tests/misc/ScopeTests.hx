@@ -401,13 +401,9 @@ class ScopeTests extends utest.Test {
 		Assert.equals(false, it.hasNext());
 	}
 	
-	function self ():Iterator<Dynamic> {
+	function self (recusive = true):Iterator<Dynamic> {
 		
-		#if (neko || js || php || python || lua)
-		var a = self();
-		#else
-		var a:Iterator<Dynamic> = self();
-		#end
+		var a:Iterator<Dynamic> = if (recusive) self(false) else [].iterator();
 		
 		@yield return 5;
 		
