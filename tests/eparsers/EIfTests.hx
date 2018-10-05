@@ -1,9 +1,9 @@
 package eparsers;
 
 import utest.Assert;
-import yield.Yield;
 
-class EIfTests extends utest.Test implements Yield {
+@:yield
+class EIfTests extends utest.Test {
 	
 	function testSimpleIf () {
 		var it = simpleIf();

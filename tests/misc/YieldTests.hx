@@ -2,7 +2,6 @@ package misc;
 
 import utest.Assert;
 import pack.pack2.MiscYielded;
-import yield.Yield;
 
 @:yield
 class YieldTests extends utest.Test {

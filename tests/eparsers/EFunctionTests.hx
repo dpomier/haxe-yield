@@ -1,9 +1,9 @@
 package eparsers;
 
 import utest.Assert;
-import yield.Yield;
 
-class EFunctionTests extends utest.Test implements Yield {
+@:yield
+class EFunctionTests extends utest.Test {
 	
 	private static var NULL_INT:Int;
 

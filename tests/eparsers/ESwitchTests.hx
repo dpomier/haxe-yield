@@ -3,9 +3,8 @@ package eparsers;
 import utest.Assert;
 import haxe.macro.Expr;
 
-import yield.Yield;
-
-class ESwitchTests extends utest.Test implements Yield {
+@:yield
+class ESwitchTests extends utest.Test {
 	
 	function testBase () {
 		

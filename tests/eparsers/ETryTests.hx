@@ -1,9 +1,9 @@
 package eparsers;
 
 import utest.Assert;
-import yield.Yield;
 
-class ETryTests extends utest.Test implements Yield {
+@:yield
+class ETryTests extends utest.Test {
 	
 	function testSimpleTry () {
 		var it = simpleTry();

@@ -2,9 +2,9 @@ package eparsers;
 
 import utest.Assert;
 import eparsers.EForTests.FuuIterable;
-import yield.Yield;
 
-class EForTests extends utest.Test implements Yield {
+@:yield
+class EForTests extends utest.Test {
 	
 	private static var NULL_INT:Int;
 

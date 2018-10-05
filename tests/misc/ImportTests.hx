@@ -8,10 +8,10 @@ import pack.pack1.MoreMiscFunctions.a1;
 import pack.pack1.MoreMiscFunctions.MoreMiscFunctions3.*;
 import pack.pack3.SomeFunctions.*;
 import pack.pack2.*;
-import yield.Yield;
 
+@:yield
 @:access(pack.pack1.MoreMiscFunctions.priv)
-class ImportTests extends utest.Test implements Yield {
+class ImportTests extends utest.Test {
 	
 	function testSimpleImport () {
 		var it = simpleImport("Patrick");

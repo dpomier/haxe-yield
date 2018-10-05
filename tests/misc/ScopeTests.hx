@@ -1,9 +1,9 @@
 package misc;
 
 import utest.Assert;
-import yield.Yield;
 
-class ScopeTests extends utest.Test implements Yield {
+@:yield
+class ScopeTests extends utest.Test {
 	
 	function testEBlock () {
 		var it = eblock();

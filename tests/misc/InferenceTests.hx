@@ -3,9 +3,8 @@ package misc;
 import utest.Assert;
 import haxe.Json;
 
-import yield.Yield;
-
-class InferenceTests extends utest.Test implements Yield {
+@:yield
+class InferenceTests extends utest.Test {
 	
 	function testFromConsts () {
 		var it:Iterator<Dynamic> = fromConsts();
