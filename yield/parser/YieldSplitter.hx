@@ -83,10 +83,10 @@ class YieldSplitter
 		
 		if (f.expr == null) Context.fatalError("Function body required", pos);
 		
-		cursor = -1;
+		cursor = 0;
 		iteratorBlocks  = new IteratorBlockData();
+		iteratorBlocks[cursor] = new IteratorBlock();
 		m_positionManager = new PositionManager(iteratorBlocks);
-		moveCursor();
 		
 		m_env.openScope();
 		
