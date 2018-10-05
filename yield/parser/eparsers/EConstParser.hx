@@ -85,13 +85,13 @@ class EConstParser extends BaseParser
 									types:       [type],
 									ident:       IdentRef.IEConst(e),
 									channel:     ic,
-									option:      __definition.option,
+									options:     __definition.options.copy(),
 									scope:       m_we.currentScope,
 									env:         m_we,
 									pos:         e.pos
 								};
 								
-								if (__definition.option == IdentOption.KeepAsVar) {
+								if (__definition.options.indexOf(IdentOption.KeepAsVar) != -1) {
 									m_we.addParentAsVarDependencies(__definition.env, data);
 								} else {
 									m_we.addParentDependencies(__definition.env);

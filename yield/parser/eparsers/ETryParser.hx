@@ -126,7 +126,7 @@ class ETryParser extends BaseParser
 			expr: EVars([{name: c.name, type: c.type, expr: initializationValue}]),
 			pos: c.expr.pos
 		};
-		m_we.addLocalDefinition([c.name], [true], [c.type], false, IdentRef.IEVars(ldefinition), IdentChannel.Normal, IdentOption.None, ldefinition.pos);
+		m_we.addLocalDefinition([c.name], [true], [c.type], false, IdentRef.IEVars(ldefinition), IdentChannel.Normal, [], ldefinition.pos);
 		
 		
 		var posOriginal = m_ys.cursor;

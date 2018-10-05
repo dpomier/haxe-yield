@@ -59,7 +59,7 @@ class EFunctionParser extends BaseParser
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferFunction(_f);
 			if (ltype == null) ltype	= macro:StdTypes.Dynamic;
 			
-			m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, IdentOption.None, e.pos);
+			m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, [], e.pos);
 			
 		}
 		

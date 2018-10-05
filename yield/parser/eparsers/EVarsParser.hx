@@ -66,7 +66,7 @@ class EVarsParser extends BaseParser
 			initialized.push(_vars[j].expr != null);
 		}
 		
-		m_we.addLocalDefinition(names, initialized, types, false, IdentRef.IEVars(e), ic, IdentOption.None, e.pos);
+		m_we.addLocalDefinition(names, initialized, types, false, IdentRef.IEVars(e), ic, [], e.pos);
 		
 		if (!subParsing) m_ys.addIntoBlock( e );
 	}

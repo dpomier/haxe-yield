@@ -620,7 +620,7 @@ class DefaultGenerator
 			switch (statement) {
 			case Statement.Accession(_data, _defData):
 				
-				if (_data.option != IdentOption.KeepAsVar) {
+				if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 					
 					var parentFieldName:String = NameController.fieldParent(env, _defData.env);
 					
@@ -713,7 +713,7 @@ class DefaultGenerator
 								
 								case EConst(_c):
 									
-									if (_definition.option != IdentOption.KeepAsVar) {
+									if (_definition.options.indexOf(IdentOption.KeepAsVar) == -1) {
 										eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, newNames[_data.names[0]]);
 									} else {
 										eRef.expr = EConst(CIdent(newNames[_data.names[0]]));
@@ -777,7 +777,7 @@ class DefaultGenerator
 										
 										// add local variable as field
 										
-										if (_data.option != IdentOption.KeepAsVar) {
+										if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 											
 											var lfieldDecl:Field;
 											
@@ -797,7 +797,7 @@ class DefaultGenerator
 								
 								// transform var declaration into field assignment
 								
-								if (_data.option != IdentOption.KeepAsVar) {
+								if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 									
 									var assignations:Array<Expr> = [];
 									
@@ -822,7 +822,7 @@ class DefaultGenerator
 						case IdentRef.IEFunction(eRef): switch (eRef.expr) {
 							case EFunction(_name, _f):
 								
-								if (_data.option != IdentOption.KeepAsVar) {
+								if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 									
 									// add local function as field
 									var lfieldDecl:Field;

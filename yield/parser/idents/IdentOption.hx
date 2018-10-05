@@ -25,7 +25,7 @@
 package yield.parser.idents;
 
 enum IdentOption {
-	None;
+	ReadOnly;
 	KeepAsVar;
 }
 #end

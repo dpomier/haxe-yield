@@ -219,7 +219,7 @@ class WorkEnv
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferArg(arg);
 			if (ltype == null) ltype = macro:StdTypes.Dynamic;
 			
-			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], false, IdentRef.IEVars(evars), IdentChannel.Normal, IdentOption.None, evars.pos);
+			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], false, IdentRef.IEVars(evars), IdentChannel.Normal, [], evars.pos);
 			
 			functionArguments.push({ definition: data, originalArg: arg });
 		}
@@ -360,7 +360,7 @@ class WorkEnv
 		}
 	}
 	
-	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, inlined:Bool, ident:IdentRef, ic:IdentChannel, option:IdentOption, pos:Position): IdentData {
+	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, inlined:Bool, ident:IdentRef, ic:IdentChannel, options:Array<IdentOption>, pos:Position): IdentData {
 		
 		var data:IdentData = {
 			names:       names, 
@@ -368,7 +368,7 @@ class WorkEnv
 			types:       types,
 			ident:       ident,
 			channel:     ic,
-			option:      option,
+			options:     options,
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
@@ -399,7 +399,7 @@ class WorkEnv
 			types:       [type],
 			ident:       ident,
 			channel:     ic,
-			option:      IdentOption.None,
+			options:     [],
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
@@ -424,7 +424,7 @@ class WorkEnv
 			types:       [type],
 			ident:       ident,
 			channel:     ic,
-			option:      IdentOption.None,
+			options:     [],
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
@@ -490,7 +490,7 @@ class WorkEnv
 					lpos  = pos;
 			}
 			
-			addLocalDefinition([lname], [true], [ident.type], false, ident.ref, IdentChannel.Normal, IdentOption.KeepAsVar, lpos);
+			addLocalDefinition([lname], [true], [ident.type], false, ident.ref, IdentChannel.Normal, [IdentOption.KeepAsVar], lpos);
 		}
 	}
 	

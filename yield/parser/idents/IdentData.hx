@@ -49,7 +49,7 @@ typedef IdentData = {
 	
 	var channel:IdentChannel;
 	
-	var option:IdentOption;
+	var options:Array<IdentOption>;
 	
 	var scope:Scope;
 	
