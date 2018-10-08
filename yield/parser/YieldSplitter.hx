@@ -23,6 +23,7 @@
  */
 #if macro
 package yield.parser;
+import yield.parser.tools.ExpressionTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import yield.parser.PositionManager.LinkedPosition;
