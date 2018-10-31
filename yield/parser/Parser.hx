@@ -447,13 +447,13 @@ class Parser
 		env.setFunctionData(name, f, funcRetType, returnType, funcReturnType, f.expr.pos);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
-		var ibd:IteratorBlockData = yieldSplitter.split(f, pos);
+		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
 		
 		// Generate type
 		
 		#if (!display && !yield_debug_display)
 		if (env.yieldMode || env.requiredBySubEnv) {
-			f.expr = DefaultGenerator.add(ibd, pos, env);
+			f.expr = DefaultGenerator.add(ibd, f.expr.pos, env);
 		}
 		#end
 		
