@@ -121,12 +121,28 @@ class WorkEnv
 	public var debug (default, null):Bool = false;
 	#end
 	
-	public function new (ct:ClassType, t:Type) {
+	public function new () {
+		
+		parentDependencies      = [];
+		parentAsVarDependencies = [];
+		parent = null;
+
+		untypedMode = false;
+	}
+	
+	public function setOptions (keywork:String, explicit:Bool, extend:Bool): Void {
+		
+		yieldKeywork  = keywork;
+		yieldExplicit = explicit;
+		yieldExtend   = extend;
+	}
+	
+	public function setClassData (ct:ClassType, t:Type): Void {
 		
 		localClass = ct;
 		localType  = t;
 		localComplexType = Context.toComplexType(t);
-		
+
 		switch (ct.kind) {
 			case KAbstractImpl(_.get() => __a):
 				abstractType = __a;
@@ -141,19 +157,6 @@ class WorkEnv
 		imports        = Context.getLocalImports();
 		importedFields = ImportTools.getFieldShorthands(imports);
 		functionsPack  = [localClass.name];
-		
-		parentDependencies      = [];
-		parentAsVarDependencies = [];
-		parent = null;
-
-		untypedMode = false;
-	}
-	
-	public function setOptions (keywork:String, explicit:Bool, extend:Bool): Void {
-		
-		yieldKeywork  = keywork;
-		yieldExplicit = explicit;
-		yieldExtend   = extend;
 	}
 	
 	public function setFieldData (f:Field, fun:Function): Void {
@@ -227,14 +230,23 @@ class WorkEnv
 	
 	public function getInheritedData (): WorkEnv {
 		
-		var we:WorkEnv = new WorkEnv(localClass, localType);
+		var we:WorkEnv = new WorkEnv();
+
+		we.localClass = localClass;
+		we.localType  = localType;
+		we.localComplexType = localComplexType;
+		we.isAbstract   = isAbstract;
+		we.abstractType = abstractType;
+		we.isPrivate    = isPrivate;
+		we.classFields  = classFields;
+
+		we.imports        = imports;
+		we.importedFields = importedFields;
 		
 		we.functionsPack = functionsPack.copy();
 		we.functionsPack.push( fieldName );
+
 		we.parent        = this;
-		we.isAbstract    = isAbstract;
-		we.isPrivate     = isPrivate;
-		we.abstractType  = abstractType;
 		we.classField    = classField;
 		we.classFunction = classFunction;
 		we.currentScope  = currentScope;

@@ -177,7 +177,11 @@ class Parser
 	private static function createEnv (ct:ClassType, t:Type, options:Array<Expr>, hasAutoBuild:Bool): WorkEnv {
 		
 		markHasProcessed(ct);
-		var env = new WorkEnv(ct, t);
+		
+		var env = new WorkEnv();
+		
+		env.setClassData(ct, t);
+		
 		initOptions(options, !hasAutoBuild, env);
 
 		return env;
