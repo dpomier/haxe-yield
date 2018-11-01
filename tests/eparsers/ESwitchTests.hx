@@ -2,6 +2,8 @@ package eparsers;
 
 import utest.Assert;
 import haxe.macro.Expr;
+import pack.enums.EnumB;
+import pack.enums.*;
 
 @:yield
 class ESwitchTests extends utest.Test {
@@ -389,46 +391,45 @@ class ESwitchTests extends utest.Test {
 		@yield return v;
 	}
 
-	function testLocalEnumIdent () {
-		var it = localEnumIdent(ValueEnum.Value1);
+	function testLocalEnum () {
+		var it = localEnum(ValueEnum.Value1);
 		Assert.equals(1, it.next());
 		Assert.equals(-2, it.next());
 		Assert.equals(-3, it.next());
 		Assert.equals(-4, it.next());
 		Assert.equals(10, it.next());
 		Assert.equals(100, it.next());
-		var it = localEnumIdent(ValueEnum._Value2);
+		var it = localEnum(ValueEnum._Value2);
 		Assert.equals(-1, it.next());
 		Assert.equals(2, it.next());
 		Assert.equals(-3, it.next());
 		Assert.equals(-4, it.next());
 		Assert.equals(20, it.next());
 		Assert.equals(200, it.next());
-		var it = localEnumIdent(ValueEnum.value3);
+		var it = localEnum(ValueEnum.value3);
 		Assert.equals(-1, it.next());
 		Assert.equals(-2, it.next());
 		Assert.equals(3, it.next());
 		Assert.equals(-4, it.next());
 		Assert.equals(30, it.next());
 		Assert.equals(300, it.next());
-		var it = localEnumIdent(ValueEnum._value4);
+		var it = localEnum(ValueEnum._value4);
 		Assert.equals(-1, it.next());
 		Assert.equals(-2, it.next());
 		Assert.equals(-3, it.next());
 		Assert.equals(4, it.next());
 		Assert.equals(40, it.next());
 		Assert.equals(400, it.next());
-		var it = localEnumIdent(ValueEnum.None);
+		var it = localEnum(ValueEnum.None);
 		Assert.equals(-1, it.next());
 		Assert.equals(-2, it.next());
 		Assert.equals(-3, it.next());
 		Assert.equals(-4, it.next());
 		Assert.equals(0, it.next());
 		Assert.equals(0, it.next());
-		Assert.isTrue(true);
 	}
 
-	function localEnumIdent (value:ValueEnum):Iterator<Int> {
+	function localEnum (value:ValueEnum):Iterator<Int> {
 		
 		if (value == Value1) {
 			@yield return 1;
@@ -472,6 +473,41 @@ class ESwitchTests extends utest.Test {
 		}
 	}
 	
+	function testImportedEnum () {
+		var it = importedEnum(B);
+		Assert.equals(1, it.next());
+		var it = importedEnum(BB);
+		Assert.equals(2, it.next());
+		var it = importedEnum(BBB);
+		Assert.equals(3, it.next());
+	}
+
+	function importedEnum (value:EnumB):Iterator<Int> {
+		
+		switch (value) {
+			case EnumB.B: @yield return 1;
+			case BB: @yield return 2;
+			case _: @yield return 3;
+		}
+	}
+	
+	// function testImportedAllEnum () { // TODO
+	// 	var it = importedAllEnum(A);
+	// 	Assert.equals(1, it.next());
+	// 	var it = importedAllEnum(AA);
+	// 	Assert.equals(2, it.next());
+	// 	var it = importedAllEnum(AAA);
+	// 	Assert.equals(3, it.next());
+	// }
+
+	// function importedAllEnum (value:EnumA):Iterator<Int> {
+		
+	// 	switch (value) {
+	// 		case EnumA.A: @yield return 1;
+	// 		case AA: @yield return 2;
+	// 		case _: @yield return 3;
+	// 	}
+	// }
 }
 
 enum Data {
