@@ -3,7 +3,11 @@ import yield.parser.Parser;
 
 #if (!cs && !java) // error CS1004 repeated modifier
 @:build(yield.parser.Parser.run())
+#end
 abstract OperatorOverloading2(String) {
+
+	#if (!cs && !java) // error CS1004 repeated modifier
+
 	public inline function new(s:String) {
 		this = s;
 	}
@@ -22,5 +26,6 @@ abstract OperatorOverloading2(String) {
 		
 		@yield break;
 	}
+	
+	#end
 }
-#end
