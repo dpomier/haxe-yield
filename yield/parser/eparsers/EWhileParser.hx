@@ -135,9 +135,9 @@ class EWhileParser extends BaseParser
 			
 			// Setup actions
 			
-			m_ys.addGotoAction( lgotoWhileDecl, posWhileDeclaration );
-			m_ys.addGotoAction( lgotoFirstSubExpr, posFirstSubExpression );
-			m_ys.addGotoAction( lgotoAfterWhile, posAfterWhile );
+			m_ys.registerGotoAction( lgotoWhileDecl, posWhileDeclaration );
+			m_ys.registerGotoAction( lgotoFirstSubExpr, posFirstSubExpression );
+			m_ys.registerGotoAction( lgotoAfterWhile, posAfterWhile );
 			
 			// Setup break and continue statements
 			
@@ -145,11 +145,11 @@ class EWhileParser extends BaseParser
 			var breaks:Array<Expr>	= breakStatements.pop();
 			
 			for (lexpr in continues) {
-				m_ys.addGotoAction( lexpr, posWhileDeclaration );
+				m_ys.registerGotoAction( lexpr, posWhileDeclaration );
 			}
 			
 			for (lexpr in breaks) {
-				m_ys.addGotoAction( lexpr, posAfterWhile );
+				m_ys.registerGotoAction( lexpr, posAfterWhile );
 			}
 			
 			#end

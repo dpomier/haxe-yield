@@ -109,7 +109,7 @@ class EIfParser extends BaseParser
 				var ldefNext:Expr = { expr: null, pos: alternativeExprs[i].pos };
 				#if (!display && !yield_debug_display)
 				altExprs.unshift(ldefNext);
-				m_ys.addSetAction(ldefNext, posFirst);
+				m_ys.registerSetAction(ldefNext, posFirst);
 				#end
 				
 				// add goto post EIf
@@ -134,7 +134,7 @@ class EIfParser extends BaseParser
 			// add goto post EIf
 			#if (!display && !yield_debug_display)
 			for (lexprs in unYieldedScopes) lexprs.push(lgotoPostEIf);
-			m_ys.addGotoAction(lgotoPostEIf, m_ys.cursor);
+			m_ys.registerGotoAction(lgotoPostEIf, m_ys.cursor);
 			#end
 		}
 	}

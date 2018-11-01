@@ -106,7 +106,7 @@ class YieldSplitter
 		m_env.closeScope();
 		
 		var yieldBreak:Expr = { expr: null, pos: f.expr.pos };
-		addBreakAction(yieldBreak);
+		registerBreakAction(yieldBreak);
 		
 		#if (!display && !yield_debug_display)
 		addIntoBlock(yieldBreak);
@@ -153,14 +153,14 @@ class YieldSplitter
 	}
 	
 	#if (!display && !yield_debug_display)
-	public function addGotoAction (emptyExpr:Expr, toPos:Int): Void {
+	public function registerGotoAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
 		m_env.gotoActions.push(lp);
 		m_positionManager.addPosPointer(lp);
 	}
 	
-	public function addSetAction (emptyExpr:Expr, toPos:Int): Void {
+	public function registerSetAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
 		m_env.setActions.push(lp);
@@ -168,7 +168,7 @@ class YieldSplitter
 	}
 	#end
 	
-	public function addBreakAction (emptyExpr:Expr): Void {
+	public function registerBreakAction (emptyExpr:Expr): Void {
 		
 		#if (display || yield_debug_display)
 		addDisplayDummy(emptyExpr);

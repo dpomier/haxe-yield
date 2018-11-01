@@ -79,7 +79,7 @@ class EMetaParser extends BaseParser
 				m_ys.parse(__e, true);
 				#end
 			case EBreak:
-				m_ys.addBreakAction(e);
+				m_ys.registerBreakAction(e);
 			default:
 				Context.fatalError( "Unexpected " + m_we.yieldKeywork, e.pos );
 		}

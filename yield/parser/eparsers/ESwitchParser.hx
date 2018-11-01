@@ -117,7 +117,7 @@ class ESwitchParser extends BaseParser
 				// Goto first sub-expression
 				#if (!display && !yield_debug_display) 
 				var ldefineNextSubExpr:Expr  = { expr: null, pos: _e.pos };
-				m_ys.addSetAction(ldefineNextSubExpr, posFirstSub+1);
+				m_ys.registerSetAction(ldefineNextSubExpr, posFirstSub+1);
 				lnewExprs.unshift(ldefineNextSubExpr);
 				
 				lcase.expr = { expr: EBlock( lnewExprs ), pos: lcase.expr.pos };
@@ -149,7 +149,7 @@ class ESwitchParser extends BaseParser
 			
 			m_ys.addIntoBlock(lgotoAfterSwitch, posInitial);
 			
-			m_ys.addGotoAction(lgotoAfterSwitch, m_ys.cursor);
+			m_ys.registerGotoAction(lgotoAfterSwitch, m_ys.cursor);
 			#end
 		}
 		

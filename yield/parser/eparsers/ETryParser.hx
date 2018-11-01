@@ -77,7 +77,7 @@ class ETryParser extends BaseParser
 		
 		// goto the first try statement expressions
 		e.expr = null;
-		m_ys.addGotoAction(e, posFirstTry);
+		m_ys.registerGotoAction(e, posFirstTry);
 		
 		if (!subParsing) m_ys.addIntoBlock(e, posOriginalIterator);
 		
@@ -106,7 +106,7 @@ class ETryParser extends BaseParser
 		
 		// Setup Goto actions
 		
-		m_ys.addGotoAction(lgotoPost, posPostETry);
+		m_ys.registerGotoAction(lgotoPost, posPostETry);
 		#end
 	}
 	
@@ -140,7 +140,7 @@ class ETryParser extends BaseParser
 		#if (!display && !yield_debug_display) 
 		var lgotoNext:Expr   = { expr: null, pos: c.expr.pos };
 		c.expr = {expr:EBlock([ldefinition, lgotoNext]), pos:c.expr.pos};
-		m_ys.addGotoAction(lgotoNext, posFirst);
+		m_ys.registerGotoAction(lgotoNext, posFirst);
 		#end
 		
 		// Goto after the try-catch
