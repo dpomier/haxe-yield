@@ -388,6 +388,89 @@ class ESwitchTests extends utest.Test {
 		
 		@yield return v;
 	}
+
+	function testLocalEnumIdent () {
+		var it = localEnumIdent(ValueEnum.Value1);
+		Assert.equals(1, it.next());
+		Assert.equals(-2, it.next());
+		Assert.equals(-3, it.next());
+		Assert.equals(-4, it.next());
+		Assert.equals(10, it.next());
+		Assert.equals(100, it.next());
+		var it = localEnumIdent(ValueEnum._Value2);
+		Assert.equals(-1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(-3, it.next());
+		Assert.equals(-4, it.next());
+		Assert.equals(20, it.next());
+		Assert.equals(200, it.next());
+		var it = localEnumIdent(ValueEnum.value3);
+		Assert.equals(-1, it.next());
+		Assert.equals(-2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(-4, it.next());
+		Assert.equals(30, it.next());
+		Assert.equals(300, it.next());
+		var it = localEnumIdent(ValueEnum._value4);
+		Assert.equals(-1, it.next());
+		Assert.equals(-2, it.next());
+		Assert.equals(-3, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(40, it.next());
+		Assert.equals(400, it.next());
+		var it = localEnumIdent(ValueEnum.None);
+		Assert.equals(-1, it.next());
+		Assert.equals(-2, it.next());
+		Assert.equals(-3, it.next());
+		Assert.equals(-4, it.next());
+		Assert.equals(0, it.next());
+		Assert.equals(0, it.next());
+		Assert.isTrue(true);
+	}
+
+	function localEnumIdent (value:ValueEnum):Iterator<Int> {
+		
+		if (value == Value1) {
+			@yield return 1;
+		} else {
+			@yield return -1;
+		}
+
+		if (value == _Value2) {
+			@yield return 2;
+		} else {
+			@yield return -2;
+		}
+
+		if (value == value3) {
+			@yield return 3;
+		} else {
+			@yield return -3;
+		}
+
+		if (value == _value4) {
+			@yield return 4;
+		} else {
+			@yield return -4;
+		}
+
+		var result:Int = switch (value) {
+			case Value1: 10;
+			case _Value2: 20;
+			case value3: 30;
+			case _value4: 40;
+			case _: 0;
+		};
+		@yield return result;
+
+		switch (value) {
+			case Value1: @yield return 100;
+			case _Value2: @yield return 200;
+			case value3: @yield return 300;
+			case _value4: @yield return 400;
+			case _: @yield return 0;
+		}
+	}
 	
 }
 
@@ -397,6 +480,14 @@ enum Data {
 	WrappedMessage(msg:Getter<String>);
 	Messages(msg1:String, msg2:Int);
 	WrappedMessages(msg1:Getter<String>, msg2:Getter<Int>);
+}
+
+enum ValueEnum {
+	Value1;
+	_Value2;
+	value3;
+	_value4;
+	None;
 }
 
 typedef Getter<T> = {

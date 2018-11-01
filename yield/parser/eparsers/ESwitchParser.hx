@@ -25,6 +25,7 @@
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import yield.parser.env.WorkEnv;
 import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentRef.IdentRefTyped;
 import yield.parser.tools.ExpressionTools;
@@ -74,7 +75,7 @@ class ESwitchParser extends BaseParser {
 				var paramNames:Array<Expr> = [];
 				
 				if (lcase.values.length != 0)
-					for (v in getParamsFromCase(lcase.values[0]))
+					for (v in getParamsFromCase(lcase.values[0], m_we))
 						paramNames.push(v);
 				
 				MetaTools.option = MetaToolsOption.SkipNestedFunctions;
@@ -160,7 +161,7 @@ class ESwitchParser extends BaseParser {
 		}
 	}
 	
-	private static function getParamsFromCase (value:Expr): Array<Expr> {
+	private static function getParamsFromCase (value:Expr, env:WorkEnv): Array<Expr> {
 		
 		var params:Array<Expr> = [];
 		
@@ -168,17 +169,26 @@ class ESwitchParser extends BaseParser {
 			
 			case ECall(_e, _params):
 				for (larg in _params)
-					for (p in getParamsFromCase(larg))
+					for (p in getParamsFromCase(larg, env))
 						params.push(p);
 				
 			case EBinop(_op, _e1, _e2) if (_op == Binop.OpArrow):
-				for (p in getParamsFromCase(_e2))
+				for (p in getParamsFromCase(_e2, env))
 						params.push(p);
 				
 			case EConst(_c):
 				switch (_c) {
-					case CIdent(_s) if (_s != "_"):
+					case CIdent(_s):
+
+						for (enumType in env.classData.importedEnums) {
+							for (construct in enumType.constructs.keys()) {
+								if (_s == construct) {
+									return params;
+								}
+							}
+						}
 						params.push(value);
+						
 					default:
 				}
 				
