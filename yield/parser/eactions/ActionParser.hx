@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eactions;
 import yield.parser.idents.IdentData;
 import yield.parser.WorkEnv;

@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser;
 import yield.parser.tools.ImportTools;
 import haxe.macro.Context;

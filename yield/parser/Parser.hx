@@ -23,7 +23,7 @@
  */
 package yield.parser;
 import haxe.macro.Expr;
-#if macro
+#if (macro || display)
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
 import yield.parser.WorkEnv;
@@ -51,7 +51,7 @@ class Parser
 	 */
 	public static macro function run (options:Array<ExprOf<YieldOption>>): Array<Field> {
 		
-		#if macro
+		#if (macro || display)
 			
 			var t:Type = Context.getLocalType();
 			
@@ -84,7 +84,7 @@ class Parser
 		#end
 	}
 	
-	#if macro
+	#if (macro || display)
 	
 	private static function auto (): Void {
 		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
