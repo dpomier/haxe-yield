@@ -51,7 +51,7 @@ class EConstParser extends BaseParser {
 				
 				if (_s == "this") {
 					
-					m_we.addInstanceAccession(null, m_we.localComplexType, IdentRef.IEConst(e), ic, e.pos);
+					m_we.addInstanceAccession(null, m_we.classData.localComplexType, IdentRef.IEConst(e), ic, e.pos);
 					
 				} else {
 					

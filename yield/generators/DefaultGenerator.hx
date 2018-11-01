@@ -59,8 +59,8 @@ class DefaultGenerator {
 		var iteratorClassName:String = NameController.extraTypeName(env, ++extraTypeCounter);
 		
 		var c  = macro class $iteratorClassName { };
-		c.pos  = env.localClass.pos;
-		c.meta = env.localClass.meta.get().copy();
+		c.pos  = env.classData.localClass.pos;
+		c.meta = env.classData.localClass.meta.get().copy();
 		
 		return c;
 	}
@@ -140,7 +140,7 @@ class DefaultGenerator {
 			runDebugPrint(Context.definedValue("yDebug")); 
 		}
 		
-		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.imports, usings);
+		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.classData.imports, usings);
 		
 		typeDefinitionStack = new Array<TypeDefinition>();
 	}
@@ -317,7 +317,7 @@ class DefaultGenerator {
 			
 			// Add the argument of the instance as a field
 			
-			var lInstanceCT:ComplexType = !env.isAbstract ? env.localComplexType : TypeTools.toComplexType(env.abstractType.type);
+			var lInstanceCT:ComplexType = !env.classData.isAbstract ? env.classData.localComplexType : TypeTools.toComplexType(env.classData.abstractType.type);
 			
 			addProperty(bd, NameController.fieldInstance(), [APrivate], lInstanceCT, pos);
 			
@@ -525,11 +525,11 @@ class DefaultGenerator {
 		
 		// Add params from the Class and Function
 		
-		if (env.isAbstract) {
-			addTypeParameters(env.abstractType.params);
+		if (env.classData.isAbstract) {
+			addTypeParameters(env.classData.abstractType.params);
 		}
 		
-		addTypeParameters(env.localClass.params);
+		addTypeParameters(env.classData.localClass.params);
 		
 		for (param in env.classFunction.params) {
 			
@@ -943,25 +943,25 @@ class DefaultGenerator {
 	
 	private static function allowAccessToPrivateFields (env:WorkEnv, pos:Position): Void {
 		
-		if (env.localComplexType != null) {
+		if (env.classData.localComplexType != null) {
 			
 			function setAccess (c:ClassType) {
 				
 				env.generatedIteratorClass.meta.push({
 					name : ":access",
-					params : [Context.parse(getTypePath(c, env.isAbstract, env.abstractType), pos)],
+					params : [Context.parse(getTypePath(c, env.classData.isAbstract, env.classData.abstractType), pos)],
 					pos : pos
 				});
 				if (c.superClass != null) setAccess(c.superClass.t.get());
 			}
 			
-			setAccess(env.localClass);
+			setAccess(env.classData.localClass);
 			
-			if (env.isAbstract) {
+			if (env.classData.isAbstract) {
 				
 				env.generatedIteratorClass.meta.push({
 					name : ":access",
-					params : [Context.parse(getTypePath(env.abstractType.type), pos)],
+					params : [Context.parse(getTypePath(env.classData.abstractType.type), pos)],
 					pos : pos
 				});
 			}

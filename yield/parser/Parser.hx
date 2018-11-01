@@ -43,7 +43,7 @@ import haxe.macro.TypeTools;
 import yield.YieldOption;
 
 class Parser {
-	
+
 	/**
 	 * Implement iterators from iterator blocks defined with yield statements.
 	 * Preferably use `:yield` metadata instead of `:build` or `:autoBuild` metadata
@@ -253,7 +253,7 @@ class Parser {
 		}
 		
 		if (yieldExtend) {
-			env.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.localClass.pos);
+			env.classData.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.classData.localClass.pos);
 		}
 		
 		env.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
@@ -261,10 +261,10 @@ class Parser {
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
 
-		for (field in env.classFields)
+		for (field in env.classData.classFields)
 			parseField(field, env);
 		
-		return env.classFields;
+		return env.classData.classFields;
 	}
 	
 	private static function parseField (field:Field, env:WorkEnv): Void {

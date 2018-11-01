@@ -70,19 +70,11 @@ class WorkEnv {
 	public var currentScope (default, null):Scope;
 	public var scopeCounter (default, null):UInt;
 	
-	public var localClass       (default, null):ClassType;
-	public var localType        (default, null):Type;
-	public var classField       (default, null):Field;
-	public var classFunction    (default, null):Function;
-	public var isAbstract       (default, null):Bool;
-	public var isPrivate        (default, null):Bool;
-	public var abstractType     (default, null):AbstractType;
-	public var localComplexType (default, null):ComplexType;
-	public var classFields      (default, null):Array<Field>;
-	public var importedFields   (default, null):Array<String>;
-	public var imports          (default, null):Array<ImportExpr>;
+	public var classData (default, null):ClassData;
 	
 	public var fieldName          (default, null):String;
+	public var classField         (default, null):Field;
+	public var classFunction      (default, null):Function;
 	public var functionReturnKind (default, null):ReturnKind;
 	public var functionReturnType (default, null):ComplexType;
 	public var yieldedType        (default, null):ComplexType;
@@ -138,24 +130,9 @@ class WorkEnv {
 	
 	public function setClassData (ct:ClassType, t:Type): Void {
 		
-		localClass = ct;
-		localType  = t;
-		localComplexType = Context.toComplexType(t);
+		classData = ClassData.of(ct, t);
 
-		switch (ct.kind) {
-			case KAbstractImpl(_.get() => __a):
-				abstractType = __a;
-				isAbstract   = true;
-			default: 
-				isAbstract = false;
-		}
-		
-		isPrivate = ct.isPrivate;
-		
-		classFields    = Context.getBuildFields();
-		imports        = Context.getLocalImports();
-		importedFields = ImportTools.getFieldShorthands(imports);
-		functionsPack  = [localClass.name];
+		functionsPack = [classData.localClass.name];
 	}
 	
 	public function setFieldData (f:Field, fun:Function): Void {
@@ -231,16 +208,7 @@ class WorkEnv {
 		
 		var we:WorkEnv = new WorkEnv();
 
-		we.localClass = localClass;
-		we.localType  = localType;
-		we.localComplexType = localComplexType;
-		we.isAbstract   = isAbstract;
-		we.abstractType = abstractType;
-		we.isPrivate    = isPrivate;
-		we.classFields  = classFields;
-
-		we.imports        = imports;
-		we.importedFields = importedFields;
+		we.classData = classData;
 		
 		we.functionsPack = functionsPack.copy();
 		we.functionsPack.push( fieldName );
@@ -304,17 +272,17 @@ class WorkEnv {
 	
 	public function getExtraTypePath (): TypePath {
 		
-		var moduleName:String = (isAbstract ? abstractType.module : localClass.module).split(".").pop();
-		var className:String = isAbstract ? abstractType.name : localClass.name;
+		var moduleName:String = (classData.isAbstract ? classData.abstractType.module : classData.localClass.module).split(".").pop();
+		var className:String = classData.isAbstract ? classData.abstractType.name : classData.localClass.name;
 		var isSubType:Bool = moduleName != className;
 		
 		var p = {
-			pack : !isAbstract ? localClass.pack : abstractType.pack,
+			pack : !classData.isAbstract ? classData.localClass.pack : classData.abstractType.pack,
 			name : isSubType ? moduleName : generatedIteratorClass.name,
 			sub  : isSubType ? generatedIteratorClass.name : null
 		};
 		
-		if (isPrivate && p.pack[p.pack.length - 1] == "_" + moduleName) {
+		if (classData.isPrivate && p.pack[p.pack.length - 1] == "_" + moduleName) {
 			p.pack.pop();
 		}
 		
@@ -544,7 +512,7 @@ class WorkEnv {
 		if (data != null) {
 			return IdentCategory.LocalVar(data);
 		} else {
-			return FieldTools.resolveIdent(name, localClass, classFields, importedFields);
+			return FieldTools.resolveIdent(name, classData.localClass, classData.classFields, classData.importedFields);
 		}
 	}
 	
