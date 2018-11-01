@@ -27,7 +27,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
 import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.RetType;
+import yield.parser.WorkEnv.ReturnKind;
 import yield.parser.YieldSplitter;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.generators.DefaultGenerator;
@@ -328,8 +328,8 @@ class Parser
 			Context.fatalError( "Yielded functions must have a name to be parsed", pos );
 		}
 		
-		var returnType:ComplexType;
-		var funcRetType:RetType;
+		var yieldedType:ComplexType;
+		var returnKind:ReturnKind;
 		var funcReturnType:ComplexType;
 		
 		// Typing
@@ -344,15 +344,15 @@ class Parser
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
 					
-					returnType     = macro:StdTypes.Dynamic;
+					yieldedType = macro:StdTypes.Dynamic;
 					
 					#if (haxe_ver < 4.000)
-					funcReturnType = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$returnType; var iterator(default, never):Void->Iterator<$returnType>; };
+					funcReturnType = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$yieldedType; var iterator(default, never):Void->Iterator<$yieldedType>; };
 					#else
-					funcReturnType = ComplexType.TIntersection([macro:Iterator<$returnType>, macro:Iterable<$returnType>]);
+					funcReturnType = ComplexType.TIntersection([macro:Iterator<$yieldedType>, macro:Iterable<$yieldedType>]);
 					#end
 					
-					funcRetType	= RetType.BOTH;
+					returnKind	= ReturnKind.BOTH;
 				}
 				
 			} else {
@@ -364,20 +364,20 @@ class Parser
 					case (macro:Iterator<$p>)
 					   | (macro:StdTypes.Iterator<$p>):
 						
-						returnType  = p;
-						funcRetType = RetType.ITERATOR;
+						yieldedType = p;
+						returnKind   = ReturnKind.ITERATOR;
 						
 					case (macro:Iterable<$p>)
 					   | (macro:StdTypes.Iterable<$p>):
 						
-						returnType  = p;
-						funcRetType = RetType.ITERABLE;
+						yieldedType = p;
+						returnKind   = ReturnKind.ITERABLE;
 						
 					case (macro:Dynamic)
 					   | (macro:StdTypes.Dynamic):
 					   
-						returnType  = macro:StdTypes.Dynamic;
-						funcRetType = RetType.BOTH;
+						yieldedType = macro:StdTypes.Dynamic;
+						returnKind   = ReturnKind.BOTH;
 						
 					default:
 						
@@ -391,25 +391,22 @@ class Parser
 							
 							var retType:Type = TypeTools.followWithAbstracts(resolvedType);
 							
-							var iteratorType:Type = ComplexTypeTools.toType(macro:Iterator<Dynamic>);
-							var iterableType:Type = ComplexTypeTools.toType(macro:Iterable<Dynamic>);
-							
 							switch (retType) {
 								
-								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],rt), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iteratorType)):
+								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],rt), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterator<Dynamic>))):
 									
-									returnType = TypeTools.toComplexType(rt);
-									funcRetType = RetType.ITERATOR;
+									yieldedType = TypeTools.toComplexType(rt);
+									returnKind   = ReturnKind.ITERATOR;
 									
-								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],rt), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iterableType)):
+								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],rt), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterable<Dynamic>))):
 									
-									returnType = TypeTools.toComplexType(rt);
-									funcRetType = RetType.ITERABLE;
+									yieldedType = TypeTools.toComplexType(rt);
+									returnKind   = ReturnKind.ITERABLE;
 									
 								case TDynamic(_):
 									
-									returnType  = f.ret;
-									funcRetType = RetType.BOTH;
+									yieldedType = f.ret;
+									returnKind   = ReturnKind.BOTH;
 									
 								case _:
 									
@@ -419,9 +416,9 @@ class Parser
 							
 						} else {
 							
-							returnType  = macro:Dynamic;
-							f.ret       = macro:Dynamic;
-							funcRetType = RetType.BOTH;
+							yieldedType = macro:Dynamic;
+							f.ret        = macro:Dynamic;
+							returnKind   = ReturnKind.BOTH;
 							
 						}
 				}
@@ -432,8 +429,8 @@ class Parser
 			
 			env.yieldMode = false;
 			
-			returnType  = macro:StdTypes.Dynamic;
-			funcRetType = RetType.BOTH;
+			yieldedType = macro:StdTypes.Dynamic;
+			returnKind   = ReturnKind.BOTH;
 			
 			funcReturnType = f.ret != null ? f.ret : (macro:Dynamic);
 		}
@@ -444,7 +441,7 @@ class Parser
 		
 		// Parse
 		
-		env.setFunctionData(name, f, funcRetType, returnType, funcReturnType, f.expr.pos);
+		env.setFunctionData(name, f, returnKind, yieldedType, funcReturnType, f.expr.pos);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
 		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);

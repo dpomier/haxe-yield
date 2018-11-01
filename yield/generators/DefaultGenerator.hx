@@ -318,7 +318,7 @@ class DefaultGenerator
 			
 			// Add the argument of the instance as a field
 			
-			var lInstanceCT:ComplexType = !env.isAbstract ? env.classComplexType : TypeTools.toComplexType(env.abstractType.type);
+			var lInstanceCT:ComplexType = !env.isAbstract ? env.localComplexType : TypeTools.toComplexType(env.abstractType.type);
 			
 			addProperty(bd, NameController.fieldInstance(), [APrivate], lInstanceCT, pos);
 			
@@ -364,10 +364,10 @@ class DefaultGenerator
 	
 	private static function initIteratorInitialisations (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
 		
-		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], env.returnType);
+		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], env.yieldedType);
 		
 		addProperty(bd, NameController.fieldCursor(), [APrivate], macro:StdTypes.Int, pos);
-		addProperty(bd, NameController.fieldCurrent(), [APrivate], env.returnType, pos);
+		addProperty(bd, NameController.fieldCurrent(), [APrivate], env.yieldedType, pos);
 		addProperty(bd, NameController.fieldIsConsumed(), [APrivate], macro:StdTypes.Bool, pos); 
 		addProperty(bd, NameController.fieldCompleted(), [APrivate], macro:StdTypes.Bool, pos); 
 		
@@ -420,7 +420,7 @@ class DefaultGenerator
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCursor()}	 = -1);
 		
-		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultReturnType});
+		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultYieldedType});
 		bd.constructorBlock.push(macro $i{NameController.fieldIsConsumed()} = true);
 		bd.constructorBlock.push(macro $i{NameController.fieldCompleted()}  = false);
 	}
@@ -433,7 +433,7 @@ class DefaultGenerator
 			expr: { expr: ExprDef.ECall({ expr: EConst(CIdent(NameController.iterativeFunction(i))), pos: pos}, []), pos: pos }
 		}];
 		
-		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultReturnType}), pos: pos };
+		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultYieldedType}), pos: pos };
 		
 		// public function hasNext():Bool
 		
@@ -456,18 +456,18 @@ class DefaultGenerator
 		
 		var body:Expr = {
 			expr: EBlock([
-				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultReturnType}; },
+				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultYieldedType}; },
 				macro $i{NameController.fieldIsConsumed()} = true,
 				macro return $i{NameController.fieldCurrent()}
 			]), 
 			pos: pos
 		};
 		
-		addMethod(bd, "next", [APublic], [], env.returnType, body, pos);
+		addMethod(bd, "next", [APublic], [], env.yieldedType, body, pos);
 		
 		// public inline function iterator():Iterator<???>
 		
-		switch (env.functionRetType) {
+		switch (env.functionReturnKind) {
 			case ITERABLE | BOTH:
 				
 				var body:Expr = {
@@ -477,10 +477,10 @@ class DefaultGenerator
 					pos: pos
 				};
 				
-				var rtype:ComplexType = env.returnType;
+				var rtype:ComplexType = env.yieldedType;
 				var metadata:Metadata = null;
 				
-				if (env.functionRetType == BOTH) {
+				if (env.functionReturnKind == BOTH) {
 					metadata = [{
 						name: ":keep",
 						params: null,
@@ -577,7 +577,7 @@ class DefaultGenerator
 			
 			aBreak.e.expr = EBlock([
 				macro $i{NameController.fieldCompleted()} = true,
-				macro return ${env.defaultReturnType}
+				macro return ${env.defaultYieldedType}
 			]);
 		}
 	}
@@ -879,7 +879,7 @@ class DefaultGenerator
 			
 			var body:Expr = { expr: EBlock(lExpressions), pos: lExpressions[0].pos };
 			
-			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.returnType, body, lExpressions[0].pos, env.classField.meta.copy());
+			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.yieldedType, body, lExpressions[0].pos, env.classField.meta.copy());
 		}
 	}
 	
@@ -944,7 +944,7 @@ class DefaultGenerator
 	
 	private static function allowAccessToPrivateFields (env:WorkEnv, pos:Position): Void {
 		
-		if (env.classComplexType != null) {
+		if (env.localComplexType != null) {
 			
 			function setAccess (c:ClassType) {
 				

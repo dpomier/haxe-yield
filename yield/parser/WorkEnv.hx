@@ -52,7 +52,7 @@ typedef Scope = {
 	var defaultCondition:Bool;
 }
 
-enum RetType {
+enum ReturnKind {
 	ITERABLE;
 	ITERATOR;
 	BOTH;
@@ -78,16 +78,16 @@ class WorkEnv
 	public var isAbstract       (default, null):Bool;
 	public var isPrivate        (default, null):Bool;
 	public var abstractType     (default, null):AbstractType;
-	public var classComplexType (default, null):ComplexType;
+	public var localComplexType (default, null):ComplexType;
 	public var classFields      (default, null):Array<Field>;
 	public var importedFields   (default, null):Array<String>;
 	public var imports          (default, null):Array<ImportExpr>;
 	
-	public var fieldName        (default, null):String;
-	public var functionRetType  (default, null):RetType;
 	public var functionReturnType (default, null):ComplexType;
-	public var returnType       (default, null):ComplexType;
-	public var defaultReturnType (default, null):Expr;
+	public var fieldName          (default, null):String;
+	public var functionReturnKind (default, null):ReturnKind;
+	public var yieldedType        (default, null):ComplexType;
+	public var defaultYieldedType (default, null):Expr;
 	
 	/**
 	 * [ClassName, FunctionName, FunctionName1, ... FunctionNameN] where FunctionNameN is the parent of the current parsed function.
@@ -125,7 +125,7 @@ class WorkEnv
 		
 		localClass = ct;
 		localType  = t;
-		classComplexType = Context.toComplexType(t);
+		localComplexType = Context.toComplexType(t);
 		
 		switch (ct.kind) {
 			case KAbstractImpl(_.get() => __a):
@@ -176,7 +176,7 @@ class WorkEnv
 		requiresInstance = false;
 	}
 	
-	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, funcReturnType:ComplexType, pos:Position): Void {
+	public function setFunctionData (name:String, f:Function, returnKind:ReturnKind, yieldedType:ComplexType, returnType:ComplexType, pos:Position): Void {
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -190,11 +190,11 @@ class WorkEnv
 		
 		// set data
 		fieldName = name;
-		this.returnType = returnType;
-		this.functionRetType = functionRetType;
-		this.functionReturnType = funcReturnType;
+		functionReturnKind = returnKind;
+		functionReturnType = returnType;
+		this.yieldedType   = yieldedType;
 		
-		defaultReturnType = WorkEnv.getDefaultValue(returnType);
+		defaultYieldedType = WorkEnv.getDefaultValue(yieldedType);
 		
 		// set arguments
 		addConstructorArgs(f.args, pos);

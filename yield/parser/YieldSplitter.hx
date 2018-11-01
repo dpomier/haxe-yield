@@ -180,7 +180,7 @@ class YieldSplitter
 	
 	public function addDisplayDummy (emptyDummy:Expr): Void {
 		
-		if (m_env.returnType != null) {
+		if (m_env.yieldedType != null) {
 			processDisplayDummy(emptyDummy);
 		}
 	}
