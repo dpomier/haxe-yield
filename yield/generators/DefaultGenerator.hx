@@ -36,8 +36,8 @@ import haxe.macro.Type.AbstractType;
 import haxe.macro.Type.TypeParameter;
 import haxe.macro.TypeTools;
 import yield.generators.NameController;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentData;
@@ -48,8 +48,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.FieldTools;
 import yield.parser.tools.IdentCategory;
 
-class DefaultGenerator
-{
+class DefaultGenerator {
 	
 	private static var extraTypeCounter:UInt = 0;
 	

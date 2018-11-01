@@ -23,8 +23,9 @@
  */
 #if (macro || display)
 package yield.parser.eparsers;
-import yield.parser.Parser;
 import haxe.macro.Expr;
+import yield.parser.Parser;
+import yield.parser.env.WorkEnv;
 import yield.generators.NameController;
 import yield.parser.checks.TypeInferencer;
 import yield.parser.idents.IdentChannel;
@@ -35,8 +36,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
 
-class EFunctionParser extends BaseParser
-{
+class EFunctionParser extends BaseParser {
 
 	public function run (e:Expr, subParsing:Bool, _name:Null<String>, _f:Function): Void {
 		

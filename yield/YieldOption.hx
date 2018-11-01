@@ -26,8 +26,8 @@ package yield;
 #if !macro
 extern
 #end
-enum YieldOption 
-{
+enum YieldOption {
+	
 	/**
 	 * Use a custom keyword instead of "yield".
 	 */

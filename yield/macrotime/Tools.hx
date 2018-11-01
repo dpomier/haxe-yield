@@ -26,8 +26,8 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 
-class Tools
-{
+class Tools {
+	
 	public static macro function getIterator (e:Expr): Expr {
 		
 		var t:Type = Context.typeExpr(e).t;

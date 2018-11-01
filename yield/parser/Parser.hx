@@ -26,8 +26,8 @@ import haxe.macro.Expr;
 #if (macro || display)
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.ReturnKind;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.ReturnKind;
 import yield.parser.YieldSplitter;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.generators.DefaultGenerator;
@@ -42,8 +42,8 @@ import haxe.macro.TypeTools;
 #end
 import yield.YieldOption;
 
-class Parser
-{
+class Parser {
+	
 	/**
 	 * Implement iterators from iterator blocks defined with yield statements.
 	 * Preferably use `:yield` metadata instead of `:build` or `:autoBuild` metadata

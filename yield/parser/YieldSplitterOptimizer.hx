@@ -24,10 +24,10 @@
 #if (macro || display)
 package yield.parser;
 import haxe.macro.Expr.Position;
+import yield.parser.env.WorkEnv;
 import yield.parser.PositionManager.LinkedPosition;
 
-class YieldSplitterOptimizer
-{
+class YieldSplitterOptimizer {
 	
 	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Void {
 		

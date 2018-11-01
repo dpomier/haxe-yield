@@ -28,8 +28,7 @@ import haxe.macro.Expr;
 import yield.parser.eactions.Action;
 import yield.parser.eactions.ActionParser;
 
-class EMetaParser extends BaseParser
-{
+class EMetaParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _s:MetadataEntry, _e:Expr): Void {
 		

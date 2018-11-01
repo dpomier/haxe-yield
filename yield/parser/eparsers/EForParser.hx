@@ -34,8 +34,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
 
-class EForParser extends BaseParser
-{
+class EForParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _it:Expr, _expr:Expr): Void {
 		

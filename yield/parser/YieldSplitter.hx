@@ -30,14 +30,13 @@ import yield.parser.PositionManager.LinkedPosition;
 import yield.parser.eactions.ActionParser;
 import yield.parser.eparsers.*;
 import yield.parser.idents.IdentChannel;
-import yield.parser.WorkEnv;
+import yield.parser.env.WorkEnv;
 
 typedef IteratorBlock = Array<Expr>;
 
 typedef IteratorBlockData = Array<IteratorBlock>;
 
-class YieldSplitter
-{
+class YieldSplitter {
 	
 	public var eblockParser    (default, null):EBlockParser;
 	public var ewhileParser    (default, null):EWhileParser;

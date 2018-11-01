@@ -23,9 +23,9 @@
  */
 #if (macro || display)
 package yield.parser.eparsers;
+import yield.parser.env.WorkEnv;
 
-class BaseParser
-{
+class BaseParser {
 	
 	private var m_ys:YieldSplitter;
 	private var m_we:WorkEnv;

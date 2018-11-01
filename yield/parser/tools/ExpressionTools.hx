@@ -29,8 +29,7 @@ import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.TypeTools;
 
-class ExpressionTools
-{
+class ExpressionTools {
 	
 	public static function checkIsInEBlock (e:Expr): Array<Expr> {
 		

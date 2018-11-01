@@ -25,13 +25,12 @@
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentRef.IdentRefTyped;
 import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 
-class ESwitchParser extends BaseParser
-{
+class ESwitchParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _e:Expr, _cases:Array<Case>, _edef:Null<Expr>): Void {
 		

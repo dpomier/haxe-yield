@@ -26,8 +26,7 @@ package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
-class EWhileParser extends BaseParser
-{
+class EWhileParser extends BaseParser {
 	
 	private static var continueStatements:Array<Array<Expr>> = [];
 	private static var breakStatements:Array<Array<Expr>>	= [];

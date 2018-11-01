@@ -36,8 +36,7 @@ import haxe.macro.Type.ClassType;
 import haxe.macro.TypeTools;
 import yield.parser.checks.TypeInferencer;
 
-class FieldTools
-{
+class FieldTools {
 	
 	public static function makeFieldFromVar (v:Var, access:Array<Access>, initialValue:Expr, pos:Position): Field {
 		return {

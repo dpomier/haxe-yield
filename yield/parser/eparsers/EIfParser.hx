@@ -25,11 +25,10 @@
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.tools.ExpressionTools;
 
-class EIfParser extends BaseParser
-{
+class EIfParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _econd:Expr, _eif:Expr, _eelse:Null<Expr>, lastAlternativeScope:Scope = null): Void {
 		

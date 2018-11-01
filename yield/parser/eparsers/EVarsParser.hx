@@ -24,13 +24,13 @@
 #if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Expr;
+import yield.parser.env.WorkEnv;
 import yield.parser.checks.TypeInferencer;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentRef;
 
-class EVarsParser extends BaseParser
-{
+class EVarsParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _vars:Array<Var>, ?ic:IdentChannel, ?options:Array<IdentOption>): Void {
 		

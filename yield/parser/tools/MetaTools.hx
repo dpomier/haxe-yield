@@ -31,8 +31,7 @@ enum MetaToolsOption {
 	SkipNestedFunctions;
 }
 
-class MetaTools
-{
+class MetaTools {
 	
 	private static var functionStack:Array<Function> = [];
 	private static var onlyInBody:Bool = false;

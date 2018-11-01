@@ -30,8 +30,8 @@ import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.Expr.ImportExpr;
 
-class ImportTools
-{
+class ImportTools {
+	
 	public static function getFieldShorthands (importedExprs:Array<ImportExpr>): Array<String> {
 		
 		var ret:Array<String> = new Array<String>();

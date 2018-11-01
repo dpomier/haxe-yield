@@ -24,15 +24,14 @@
 #if (macro || display)
 package yield.parser.eactions;
 import yield.parser.idents.IdentData;
-import yield.parser.WorkEnv;
+import yield.parser.env.WorkEnv;
 import haxe.Serializer;
 import haxe.Unserializer;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import yield.parser.eparsers.BaseParser;
 
-class ActionParser extends BaseParser
-{
+class ActionParser extends BaseParser {
 	
 	public static function addActionToExpr (actions:Array<Action>, e:Expr, env:WorkEnv): Void {
 		

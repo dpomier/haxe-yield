@@ -31,8 +31,7 @@ typedef LinkedPosition = {
 	var e:Expr;
 }
 
-class PositionManager
-{
+class PositionManager {
 	
 	private var m_ibd:IteratorBlockData;
 	private var m_posPointers:Array<Array<LinkedPosition>>;

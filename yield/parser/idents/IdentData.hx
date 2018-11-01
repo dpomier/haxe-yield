@@ -25,8 +25,8 @@
 package yield.parser.idents;
 import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.Position;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.Scope;
 
 typedef IdentData = {
 	

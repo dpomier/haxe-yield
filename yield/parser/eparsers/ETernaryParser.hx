@@ -25,8 +25,7 @@
 package yield.parser.eparsers;
 import haxe.macro.Expr;
 
-class ETernaryParser extends BaseParser
-{
+class ETernaryParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _econd:Expr, _eif:Expr, _eelse:Expr):Void {
 		

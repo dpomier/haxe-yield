@@ -22,7 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 #if (macro || display)
-package yield.parser;
+package yield.parser.env;
 import yield.parser.tools.ImportTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -61,8 +61,7 @@ enum ReturnKind {
 /**
  * Data of the function being parsed.
  */
-class WorkEnv
-{
+class WorkEnv {
 	
 	public var yieldKeywork  (default, null):String;
 	public var yieldExplicit (default, null):Bool;
@@ -83,9 +82,9 @@ class WorkEnv
 	public var importedFields   (default, null):Array<String>;
 	public var imports          (default, null):Array<ImportExpr>;
 	
-	public var functionReturnType (default, null):ComplexType;
 	public var fieldName          (default, null):String;
 	public var functionReturnKind (default, null):ReturnKind;
+	public var functionReturnType (default, null):ComplexType;
 	public var yieldedType        (default, null):ComplexType;
 	public var defaultYieldedType (default, null):Expr;
 	

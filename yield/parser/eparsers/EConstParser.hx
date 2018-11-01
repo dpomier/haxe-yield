@@ -30,11 +30,10 @@ import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentRef;
 import yield.parser.idents.IdentData;
-import yield.parser.WorkEnv;
+import yield.parser.env.WorkEnv;
 import yield.parser.tools.IdentCategory;
 
-class EConstParser extends BaseParser
-{
+class EConstParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _c:Constant, ?ic:IdentChannel, initialized = false, beingModified = false): Void {
 		
