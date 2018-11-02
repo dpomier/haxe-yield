@@ -46,17 +46,13 @@ class UsingTests extends utest.Test {
 	
 	function testLambaAnonymous () {
 		
-		var result:List<String> = lamba().flatMap(function (a:Int):Iterable<String> {
+		var result:Iterable<String> = lamba().flatMap(function (a:Int):Iterable<String> {
 			@yield return ""+a;
 			@yield return ""+a+1;
 			@yield return ""+a+2;
 		});
 		
-		var expected:List<String> = new List();
-		for (i in ["0", "01", "02", "2", "21", "22", "4", "41", "42"])
-			expected.add(i);
-		
-		Assert.equals(expected.toString(), result.toString());
+		Assert.equals(["0", "01", "02", "2", "21", "22", "4", "41", "42"].toString(), [for (item in result) item].toString());
 	}
 }
 
