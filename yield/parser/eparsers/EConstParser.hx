@@ -81,7 +81,7 @@ class EConstParser extends BaseParser {
 									
 								} else {
 									
-									Context.error('This variable cannot be modified (reference is readonly)', e.pos);
+									Context.error('Cannot access field or identifier $_s for writing', e.pos);
 								}
 							}
 							
