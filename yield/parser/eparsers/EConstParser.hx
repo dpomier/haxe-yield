@@ -77,11 +77,11 @@ class EConstParser extends BaseParser {
 								
 								if (__definition.options.indexOf(IsVarLoop) != -1) {
 									
-									Context.fatalError('Loop variable cannot be modified', e.pos);
+									Context.error('Loop variable cannot be modified', e.pos);
 									
 								} else {
 									
-									Context.fatalError('This variable cannot be modified (reference is readonly)', e.pos);
+									Context.error('This variable cannot be modified (reference is readonly)', e.pos);
 								}
 							}
 							
