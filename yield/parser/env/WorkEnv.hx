@@ -155,7 +155,7 @@ class WorkEnv {
 		requiresInstance = false;
 	}
 	
-	public function setFunctionData (name:String, f:Function, returnKind:ReturnKind, yieldedType:ComplexType, returnType:ComplexType, pos:Position): Void {
+	public function setFunctionData (name:String, f:Function, returnKind:ReturnKind, pos:Position): Void {
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -170,8 +170,10 @@ class WorkEnv {
 		// set data
 		fieldName = name;
 		functionReturnKind = returnKind;
-		functionReturnType = returnType;
-		this.yieldedType   = yieldedType;
+		functionReturnType = f.ret != null ? f.ret : (macro:StdTypes.Dynamic);
+		yieldedType = switch (returnKind) {
+			case ITERABLE(t), ITERATOR(t), BOTH(t): t;
+		};
 		
 		defaultYieldedType = WorkEnv.getDefaultValue(yieldedType);
 		

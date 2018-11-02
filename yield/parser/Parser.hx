@@ -335,7 +335,6 @@ class Parser {
 		
 		var yieldedType:ComplexType;
 		var returnKind:ReturnKind;
-		var funcReturnType:ComplexType;
 		
 		// Typing
 		
@@ -349,39 +348,29 @@ class Parser {
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
 					
-					yieldedType = macro:StdTypes.Dynamic;
+					var yieldedType = macro:StdTypes.Dynamic;
 					
 					#if (haxe_ver < 4.000)
-					funcReturnType = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$yieldedType; var iterator(default, never):Void->Iterator<$yieldedType>; };
+					f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$yieldedType; var iterator(default, never):Void->Iterator<$yieldedType>; };
 					#else
-					funcReturnType = ComplexType.TIntersection([macro:Iterator<$yieldedType>, macro:Iterable<$yieldedType>]);
+					f.ret = ComplexType.TIntersection([macro:Iterator<$yieldedType>, macro:Iterable<$yieldedType>]);
 					#end
 					
-					returnKind	= ReturnKind.BOTH(yieldedType);
+					returnKind = ReturnKind.BOTH(yieldedType);
 				}
 				
 			} else {
 				
-				funcReturnType = f.ret;
-				
-				returnKind = TypeInferencer.resolveYieldedType(funcReturnType, pos);
+				returnKind = TypeInferencer.resolveYieldedType(f.ret, pos);
 
-				yieldedType = switch (returnKind) {
-					case ITERABLE(t): t;
-					case ITERATOR(t): t;
-					case BOTH(t): t;
-				};
-				
 			}
 			
 		} else {
 			
 			env.yieldMode = false;
 			
-			yieldedType = macro:StdTypes.Dynamic;
-			returnKind   = ReturnKind.BOTH(yieldedType);
+			returnKind = ReturnKind.BOTH(macro:StdTypes.Dynamic);
 			
-			funcReturnType = f.ret != null ? f.ret : (macro:Dynamic);
 		}
 		
 		#if (display || yield_debug_display)
@@ -390,7 +379,7 @@ class Parser {
 		
 		// Parse
 		
-		env.setFunctionData(name, f, returnKind, yieldedType, funcReturnType, f.expr.pos);
+		env.setFunctionData(name, f, returnKind, f.expr.pos);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
 		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
