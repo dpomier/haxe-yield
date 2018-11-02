@@ -2,10 +2,9 @@ package misc;
 
 import utest.Assert;
 import misc.packs.Parent;
-import yield.Yield;
 
-class AccessionTests extends misc.packs.Parent implements Yield
-{
+@:yield
+class AccessionTests extends misc.packs.Parent {
 
 	public function new() 
 	{

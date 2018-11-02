@@ -21,15 +21,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.tools.ExpressionTools;
 
-class EIfParser extends BaseParser
-{
+class EIfParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _econd:Expr, _eif:Expr, _eelse:Null<Expr>, lastAlternativeScope:Scope = null): Void {
 		
@@ -107,8 +106,10 @@ class EIfParser extends BaseParser
 				// add goto sub-expressions
 				var altExprs:Array<Expr> = ExpressionTools.checkIsInEBlock(alternativeExprs[i]);
 				var ldefNext:Expr = { expr: null, pos: alternativeExprs[i].pos };
+				#if (!display && !yield_debug_display)
 				altExprs.unshift(ldefNext);
-				m_ys.addSetAction(ldefNext, posFirst);
+				m_ys.registerSetAction(ldefNext, posFirst);
+				#end
 				
 				// add goto post EIf
 				m_ys.addIntoBlock(lgotoPostEIf);
@@ -125,11 +126,15 @@ class EIfParser extends BaseParser
 			
 		} else {
 			
+			#if (!display && !yield_debug_display)
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
+			#end
 			
 			// add goto post EIf
+			#if (!display && !yield_debug_display)
 			for (lexprs in unYieldedScopes) lexprs.push(lgotoPostEIf);
-			m_ys.addGotoAction(lgotoPostEIf, m_ys.cursor);
+			m_ys.registerGotoAction(lgotoPostEIf, m_ys.cursor);
+			#end
 		}
 	}
 	

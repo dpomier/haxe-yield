@@ -21,13 +21,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
-class EWhileParser extends BaseParser
-{
+class EWhileParser extends BaseParser {
 	
 	private static var continueStatements:Array<Array<Expr>> = [];
 	private static var breakStatements:Array<Array<Expr>>	= [];
@@ -100,6 +99,7 @@ class EWhileParser extends BaseParser
 			
 		} else {
 			
+			#if (!display && !yield_debug_display) 
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
 			
 			var posLastWhilePart:Int = m_ys.cursor;
@@ -134,9 +134,9 @@ class EWhileParser extends BaseParser
 			
 			// Setup actions
 			
-			m_ys.addGotoAction( lgotoWhileDecl, posWhileDeclaration );
-			m_ys.addGotoAction( lgotoFirstSubExpr, posFirstSubExpression );
-			m_ys.addGotoAction( lgotoAfterWhile, posAfterWhile );
+			m_ys.registerGotoAction( lgotoWhileDecl, posWhileDeclaration );
+			m_ys.registerGotoAction( lgotoFirstSubExpr, posFirstSubExpression );
+			m_ys.registerGotoAction( lgotoAfterWhile, posAfterWhile );
 			
 			// Setup break and continue statements
 			
@@ -144,12 +144,14 @@ class EWhileParser extends BaseParser
 			var breaks:Array<Expr>	= breakStatements.pop();
 			
 			for (lexpr in continues) {
-				m_ys.addGotoAction( lexpr, posWhileDeclaration );
+				m_ys.registerGotoAction( lexpr, posWhileDeclaration );
 			}
 			
 			for (lexpr in breaks) {
-				m_ys.addGotoAction( lexpr, posAfterWhile );
+				m_ys.registerGotoAction( lexpr, posAfterWhile );
 			}
+			
+			#end
 		}
 		
 	}

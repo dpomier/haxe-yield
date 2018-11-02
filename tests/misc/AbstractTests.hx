@@ -2,7 +2,6 @@ package misc;
 
 import utest.Assert;
 import pack.pack1.OperatorOverloading2;
-import yield.Yield;
 import yield.parser.Parser;
 
 class AbstractTests extends utest.Test {
@@ -234,7 +233,8 @@ abstract MyForward(MyForwardedClass) {
 	}
 }
 
-class MyForwardedClass implements Yield {
+@:yield
+class MyForwardedClass {
 	
 	public function new () { }
 	

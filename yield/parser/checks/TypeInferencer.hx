@@ -21,19 +21,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.checks;
 import yield.parser.tools.ExpressionTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.ComplexType;
-import yield.parser.WorkEnv;
+import yield.parser.env.WorkEnv;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentData;
 import yield.parser.tools.IdentCategory;
 
-class TypeInferencer
-{
+class TypeInferencer {
 	
 	/**
 	 * @return Returns the complex type of `expr` if it can be determined.

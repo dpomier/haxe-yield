@@ -21,14 +21,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.tools;
 import haxe.macro.Type.ClassType;
 import haxe.macro.Expr.ComplexType;
 import yield.parser.idents.IdentData;
 
-enum IdentCategory 
-{
+enum IdentCategory {
 	LocalVar(definition:IdentData);
 	InstanceField(type:Null<ComplexType>);
 	InstanceStaticField(type:Null<ComplexType>, c:ClassType);

@@ -1,12 +1,12 @@
 package misc;
 
 import utest.Assert;
-import yield.Yield;
 
 using pack.pack1.MiscFunctions;
 using Lambda;
 
-class UsingTests extends utest.Test implements Yield {
+@:yield
+class UsingTests extends utest.Test {
 	
 	function testSimpleUsing () {
 		var it = simpleUsing("Patrick");

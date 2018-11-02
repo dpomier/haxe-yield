@@ -21,8 +21,8 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
-package yield.parser;
+#if (macro || display)
+package yield.parser.env;
 import yield.parser.tools.ImportTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -52,41 +52,33 @@ typedef Scope = {
 	var defaultCondition:Bool;
 }
 
-enum RetType {
-	DYNAMIC;
+enum ReturnKind {
 	ITERABLE;
 	ITERATOR;
+	BOTH;
 }
 
 /**
  * Data of the function being parsed.
  */
-class WorkEnv
-{
+class WorkEnv {
 	
-	public static var YIELD_KEYWORD  (default, null):String;
-	public static var YIELD_EXPLICIT (default, null):Bool;
-	public static var YIELD_EXTEND   (default, null):Bool;
+	public var yieldKeywork  (default, null):String;
+	public var yieldExplicit (default, null):Bool;
+	public var yieldExtend   (default, null):Bool;
 	
 	public var currentScope (default, null):Scope;
 	public var scopeCounter (default, null):UInt;
 	
-	public var localClass       (default, null):ClassType;
-	public var localType        (default, null):Type;
-	public var classField       (default, null):Field;
-	public var classFunction    (default, null):Function;
-	public var isAbstract       (default, null):Bool;
-	public var isPrivate        (default, null):Bool;
-	public var abstractType     (default, null):AbstractType;
-	public var classComplexType (default, null):ComplexType;
-	public var classFields      (default, null):Array<Field>;
-	public var importedFields   (default, null):Array<String>;
-	public var imports          (default, null):Array<ImportExpr>;
+	public var classData (default, null):ClassData;
 	
-	public var fieldName        (default, null):String;
-	public var functionRetType  (default, null):RetType;
-	public var returnType       (default, null):ComplexType;
-	public var defaultReturnType (default, null):Expr;
+	public var fieldName          (default, null):String;
+	public var classField         (default, null):Field;
+	public var classFunction      (default, null):Function;
+	public var functionReturnKind (default, null):ReturnKind;
+	public var functionReturnType (default, null):ComplexType;
+	public var yieldedType        (default, null):ComplexType;
+	public var defaultYieldedType (default, null):Expr;
 	
 	/**
 	 * [ClassName, FunctionName, FunctionName1, ... FunctionNameN] where FunctionNameN is the parent of the current parsed function.
@@ -116,29 +108,11 @@ class WorkEnv
 	public var untypedMode:Bool;
 
 	#if debug
+	@:allow(yield.parser.Parser)
 	public var debug (default, null):Bool = false;
 	#end
 	
-	public function new (ct:ClassType, t:Type) {
-		
-		localClass = ct;
-		localType  = t;
-		classComplexType = Context.toComplexType(t);
-		
-		switch (ct.kind) {
-			case KAbstractImpl(_.get() => __a):
-				abstractType = __a;
-				isAbstract   = true;
-			default: 
-				isAbstract = false;
-		}
-		
-		isPrivate = ct.isPrivate;
-		
-		classFields    = Context.getBuildFields();
-		imports        = Context.getLocalImports();
-		importedFields = ImportTools.getFieldShorthands(imports);
-		functionsPack  = [localClass.name];
+	public function new () {
 		
 		parentDependencies      = [];
 		parentAsVarDependencies = [];
@@ -147,11 +121,18 @@ class WorkEnv
 		untypedMode = false;
 	}
 	
-	public static function setOptions (yieldKeywork:String, yieldExplicit:Bool, yieldExtend:Bool): Void {
+	public function setOptions (keywork:String, explicit:Bool, extend:Bool): Void {
 		
-		YIELD_KEYWORD  = yieldKeywork;
-		YIELD_EXPLICIT = yieldExplicit;
-		YIELD_EXTEND   = yieldExtend;
+		yieldKeywork  = keywork;
+		yieldExplicit = explicit;
+		yieldExtend   = extend;
+	}
+	
+	public function setClassData (ct:ClassType, t:Type): Void {
+		
+		classData = ClassData.of(ct, t);
+
+		functionsPack = [classData.localClass.name];
 	}
 	
 	public function setFieldData (f:Field, fun:Function): Void {
@@ -174,14 +155,7 @@ class WorkEnv
 		requiresInstance = false;
 	}
 	
-	public function setFunctionData (name:String, f:Function, functionRetType:RetType, returnType:ComplexType, pos:Position): Void {
-		
-		#if debug
-		if (Context.defined("yDebug")) {
-			var match:String = Context.definedValue("yDebug");
-			debug = match != null && name == StringTools.trim(match);
-		}
-		#end
+	public function setFunctionData (name:String, f:Function, returnKind:ReturnKind, yieldedType:ComplexType, returnType:ComplexType, pos:Position): Void {
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -195,10 +169,11 @@ class WorkEnv
 		
 		// set data
 		fieldName = name;
-		this.returnType = returnType;
-		this.functionRetType = functionRetType;
+		functionReturnKind = returnKind;
+		functionReturnType = returnType;
+		this.yieldedType   = yieldedType;
 		
-		defaultReturnType = WorkEnv.getDefaultValue(returnType);
+		defaultYieldedType = WorkEnv.getDefaultValue(yieldedType);
 		
 		// set arguments
 		addConstructorArgs(f.args, pos);
@@ -223,7 +198,7 @@ class WorkEnv
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferArg(arg);
 			if (ltype == null) ltype = macro:StdTypes.Dynamic;
 			
-			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], false, IdentRef.IEVars(evars), IdentChannel.Normal, IdentOption.None, evars.pos);
+			var data:IdentData = addLocalDefinition([arg.name], [true], [ltype], false, IdentRef.IEVars(evars), IdentChannel.Normal, [], evars.pos);
 			
 			functionArguments.push({ definition: data, originalArg: arg });
 		}
@@ -231,24 +206,25 @@ class WorkEnv
 	
 	public function getInheritedData (): WorkEnv {
 		
-		var we:WorkEnv = new WorkEnv(localClass, localType);
+		var we:WorkEnv = new WorkEnv();
+
+		we.classData = classData;
 		
 		we.functionsPack = functionsPack.copy();
 		we.functionsPack.push( fieldName );
+
 		we.parent        = this;
-		we.isAbstract    = isAbstract;
-		we.isPrivate     = isPrivate;
-		we.abstractType  = abstractType;
 		we.classField    = classField;
 		we.classFunction = classFunction;
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
 		we.scopeCounter  = 0;
+		we.setOptions(yieldKeywork, yieldExplicit, yieldExtend);
 		
 		#if debug
 		we.debug = debug;
 		#end
-
+		
 		return we;
 	}
 	
@@ -296,17 +272,17 @@ class WorkEnv
 	
 	public function getExtraTypePath (): TypePath {
 		
-		var moduleName:String = (isAbstract ? abstractType.module : localClass.module).split(".").pop();
-		var className:String = isAbstract ? abstractType.name : localClass.name;
+		var moduleName:String = (classData.isAbstract ? classData.abstractType.module : classData.localClass.module).split(".").pop();
+		var className:String = classData.isAbstract ? classData.abstractType.name : classData.localClass.name;
 		var isSubType:Bool = moduleName != className;
 		
 		var p = {
-			pack : !isAbstract ? localClass.pack : abstractType.pack,
+			pack : !classData.isAbstract ? classData.localClass.pack : classData.abstractType.pack,
 			name : isSubType ? moduleName : generatedIteratorClass.name,
 			sub  : isSubType ? generatedIteratorClass.name : null
 		};
 		
-		if (isPrivate && p.pack[p.pack.length - 1] == "_" + moduleName) {
+		if (classData.isPrivate && p.pack[p.pack.length - 1] == "_" + moduleName) {
 			p.pack.pop();
 		}
 		
@@ -363,7 +339,7 @@ class WorkEnv
 		}
 	}
 	
-	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, inlined:Bool, ident:IdentRef, ic:IdentChannel, option:IdentOption, pos:Position): IdentData {
+	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, inlined:Bool, ident:IdentRef, ic:IdentChannel, options:Array<IdentOption>, pos:Position): IdentData {
 		
 		var data:IdentData = {
 			names:       names, 
@@ -371,11 +347,17 @@ class WorkEnv
 			types:       types,
 			ident:       ident,
 			channel:     ic,
-			option:      option,
+			options:     options,
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
 		};
+		
+		if (options.indexOf(ReadOnly) != -1) {
+			for (i in 0...initialized.length) {
+				if (!initialized[i]) Context.fatalError(names[i] + ' must be initialized to be readonly', pos);
+			}
+		}
 		
 		localStack.push(Statement.Definitions(data, inlined));
 		currentScope.localIdentStack.push(Statement.Definitions(data, inlined));
@@ -402,7 +384,7 @@ class WorkEnv
 			types:       [type],
 			ident:       ident,
 			channel:     ic,
-			option:      IdentOption.None,
+			options:     defIdent.options,
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
@@ -427,7 +409,7 @@ class WorkEnv
 			types:       [type],
 			ident:       ident,
 			channel:     ic,
-			option:      IdentOption.None,
+			options:     [],
 			scope:       currentScope,
 			env:         this,
 			pos:         pos
@@ -493,7 +475,7 @@ class WorkEnv
 					lpos  = pos;
 			}
 			
-			addLocalDefinition([lname], [true], [ident.type], false, ident.ref, IdentChannel.Normal, IdentOption.KeepAsVar, lpos);
+			addLocalDefinition([lname], [true], [ident.type], false, ident.ref, IdentChannel.Normal, [IdentOption.KeepAsVar], lpos);
 		}
 	}
 	
@@ -530,7 +512,7 @@ class WorkEnv
 		if (data != null) {
 			return IdentCategory.LocalVar(data);
 		} else {
-			return FieldTools.resolveIdent(name, localClass, classFields, importedFields);
+			return FieldTools.resolveIdent(name, classData.localClass, classData.classFields, classData.importedFields);
 		}
 	}
 	

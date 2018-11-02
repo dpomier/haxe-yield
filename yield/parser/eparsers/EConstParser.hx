@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import yield.parser.idents.Statement;
@@ -30,13 +30,12 @@ import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentRef;
 import yield.parser.idents.IdentData;
-import yield.parser.WorkEnv;
+import yield.parser.env.WorkEnv;
 import yield.parser.tools.IdentCategory;
 
-class EConstParser extends BaseParser
-{
+class EConstParser extends BaseParser {
 	
-	public function run (e:Expr, subParsing:Bool, _c:Constant, ?ic:IdentChannel, initialized:Bool = false): Void {
+	public function run (e:Expr, subParsing:Bool, _c:Constant, ?ic:IdentChannel, initialized = false, beingModified = false): Void {
 		
 		if (ic == null) ic = IdentChannel.Normal;
 		
@@ -52,7 +51,7 @@ class EConstParser extends BaseParser
 				
 				if (_s == "this") {
 					
-					m_we.addInstanceAccession(null, m_we.classComplexType, IdentRef.IEConst(e), ic, e.pos);
+					m_we.addInstanceAccession(null, m_we.classData.localComplexType, IdentRef.IEConst(e), ic, e.pos);
 					
 				} else {
 					
@@ -73,6 +72,19 @@ class EConstParser extends BaseParser
 							var type:ComplexType = __definition.types[defIndex];
 							var initialized:Bool = initialized ? true : __definition.initialized[defIndex];
 							
+							
+							if (beingModified && __definition.options.indexOf(ReadOnly) != -1) {
+								
+								if (__definition.options.indexOf(IsVarLoop) != -1) {
+									
+									Context.fatalError('Loop variable cannot be modified', e.pos);
+									
+								} else {
+									
+									Context.fatalError('This variable cannot be modified (reference is readonly)'+beingModified+__definition.options.toString(), e.pos);
+								}
+							}
+							
 							if (__definition.env == m_we) {
 								
 								m_we.addLocalAccession(_s, initialized, type, IdentRef.IEConst(e), ic, e.pos);
@@ -85,13 +97,13 @@ class EConstParser extends BaseParser
 									types:       [type],
 									ident:       IdentRef.IEConst(e),
 									channel:     ic,
-									option:      __definition.option,
+									options:     __definition.options.copy(),
 									scope:       m_we.currentScope,
 									env:         m_we,
 									pos:         e.pos
 								};
 								
-								if (__definition.option == IdentOption.KeepAsVar) {
+								if (__definition.options.indexOf(IdentOption.KeepAsVar) != -1) {
 									m_we.addParentAsVarDependencies(__definition.env, data);
 								} else {
 									m_we.addParentDependencies(__definition.env);

@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser;
 import haxe.macro.Expr;
 import yield.parser.YieldSplitter.IteratorBlockData;
@@ -31,8 +31,7 @@ typedef LinkedPosition = {
 	var e:Expr;
 }
 
-class PositionManager
-{
+class PositionManager {
 	
 	private var m_ibd:IteratorBlockData;
 	private var m_posPointers:Array<Array<LinkedPosition>>;

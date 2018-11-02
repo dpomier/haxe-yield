@@ -21,22 +21,22 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser;
+import yield.parser.tools.ExpressionTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import yield.parser.PositionManager.LinkedPosition;
 import yield.parser.eactions.ActionParser;
 import yield.parser.eparsers.*;
 import yield.parser.idents.IdentChannel;
-import yield.parser.WorkEnv;
+import yield.parser.env.WorkEnv;
 
 typedef IteratorBlock = Array<Expr>;
 
 typedef IteratorBlockData = Array<IteratorBlock>;
 
-class YieldSplitter
-{
+class YieldSplitter {
 	
 	public var eblockParser    (default, null):EBlockParser;
 	public var ewhileParser    (default, null):EWhileParser;
@@ -83,10 +83,10 @@ class YieldSplitter
 		
 		if (f.expr == null) Context.fatalError("Function body required", pos);
 		
-		cursor = -1;
+		cursor = 0;
 		iteratorBlocks  = new IteratorBlockData();
+		iteratorBlocks[cursor] = new IteratorBlock();
 		m_positionManager = new PositionManager(iteratorBlocks);
-		moveCursor();
 		
 		m_env.openScope();
 		
@@ -105,8 +105,13 @@ class YieldSplitter
 		m_env.closeScope();
 		
 		var yieldBreak:Expr = { expr: null, pos: f.expr.pos };
-		iteratorBlocks[cursor].push(yieldBreak);
-		addBreakAction(yieldBreak);
+		registerBreakAction(yieldBreak);
+		
+		#if (!display && !yield_debug_display)
+		addIntoBlock(yieldBreak);
+		#else
+		ExpressionTools.checkIsInEBlock(f.expr).push(yieldBreak);
+		#end
 		
 		YieldSplitterOptimizer.optimizeAll(this, m_positionManager, m_env, f.expr.pos);
 		
@@ -118,19 +123,23 @@ class YieldSplitter
 	//{ ITERATOR OPERATIONS
 	
 	public function moveCursor (): Void {
+		#if (!display && !yield_debug_display)
 		if (iteratorBlocks[++cursor] == null)
 			iteratorBlocks[cursor] = new IteratorBlock();
+		#end
 	}
 	
 	public function addIntoBlock (e:Expr, ?pos:Int): Void {
+		#if (!display && !yield_debug_display)
 		if (m_env.untypedMode) {
 			e = { expr: EUntyped(e), pos: e.pos };
 		}
 		iteratorBlocks[pos == null ? cursor : pos].push(e);
+		#end
 	}
 	
 	public function spliceIteratorBlocks (pos:Int, len:Int): Void {
-		
+		#if (!display && !yield_debug_display)
 		if (pos < 0) {
 			len += pos;
 			pos = 0;
@@ -139,26 +148,46 @@ class YieldSplitter
 		iteratorBlocks.splice(pos, len);
 		m_positionManager.adjustIteratorPos(len *-1, pos);
 		cursor -= len;
+		#end
 	}
 	
-	public function addGotoAction (emptyExpr:Expr, toPos:Int): Void {
+	#if (!display && !yield_debug_display)
+	public function registerGotoAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
 		m_env.gotoActions.push(lp);
 		m_positionManager.addPosPointer(lp);
 	}
 	
-	public function addSetAction (emptyExpr:Expr, toPos:Int): Void {
+	public function registerSetAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
 		m_env.setActions.push(lp);
 		m_positionManager.addPosPointer(lp);
 	}
+	#end
 	
-	public function addBreakAction (emptyExpr:Expr): Void {
+	public function registerBreakAction (emptyExpr:Expr): Void {
 		
+		#if (display || yield_debug_display)
+		addDisplayDummy(emptyExpr);
+		#else
 		var lp:LinkedPosition = { e: emptyExpr, pos: null };
 		m_env.breakActions.push(lp);
+		#end
+	}
+	
+	public function addDisplayDummy (emptyDummy:Expr): Void {
+		
+		if (m_env.yieldedType != null) {
+			processDisplayDummy(emptyDummy);
+		}
+	}
+	
+	private function processDisplayDummy (emptyDummy:Expr): Void {
+		
+		var ft = m_env.functionReturnType;
+		emptyDummy.expr = EReturn(macro (null:$ft));
 	}
 	
 	//}
@@ -180,7 +209,9 @@ class YieldSplitter
 		spliceIteratorBlocks(initialPos + 1, cursor - initialPos);
 		
 		if (returnValue && yieldCount != 0) {
+			#if (!display && !yield_debug_display)
 			Context.fatalError("Missing return " + returnedType, e.pos);
+			#end
 		}
 		
 		return yieldCount;
@@ -191,6 +222,10 @@ class YieldSplitter
 	 */
 	public function parse (e:Expr, subParsing:Bool, ?ic:IdentChannel): Int {
 		
+		#if (display || yield_debug_display)
+		subParsing = true;
+		#end
+		
 		var yieldCount:Int = m_yieldMetaCounter;
 		
 		switch (e.expr) {
@@ -199,13 +234,13 @@ class YieldSplitter
 				eblockParser.run(e, subParsing, _exprs);
 				
 			case EMeta(_s, _e):
-				if (_s.name == WorkEnv.YIELD_KEYWORD && (_s.params == null || _s.params.length == 0))
+				if (_s.name == m_env.yieldKeywork && (_s.params == null || _s.params.length == 0))
 					m_yieldMetaCounter += 1;
 				emetaParser.run(e, subParsing, _s, _e);
 				
 			case EReturn(_e):
 				if (yieldedScope && m_env.yieldMode)
-					Context.fatalError( "Cannot return a value from an iterator. Use the " + WorkEnv.YIELD_KEYWORD + " return expression to return a value, or " + WorkEnv.YIELD_KEYWORD + " break to end the iteration", e.pos );
+					Context.fatalError( "Cannot return a value from an iterator. Use the " + m_env.yieldKeywork + " return expression to return a value, or " + m_env.yieldKeywork + " break to end the iteration", e.pos );
 				else if (_e != null)
 					parse(_e, true, ic);
 				
@@ -240,11 +275,10 @@ class YieldSplitter
 			case EBinop(_op, _e1, _e2):
 				switch (_e1.expr) {
 				case EConst(__c):
+					var beingModified:Bool = switch (_op) { case OpAssign, OpAssignOp(_): true; case _: false; }
 					switch (_op) {
-					case Binop.OpAssign:
-						econstParser.run(_e1, true, __c, ic, true);
-					default:
-						econstParser.run(_e1, true, __c, ic, false);
+					case Binop.OpAssign: econstParser.run(_e1, true, __c, ic, true, beingModified);
+					case _:              econstParser.run(_e1, true, __c, ic, false, beingModified);
 					}
 				default:
 					parse(_e1, true, ic);
@@ -267,7 +301,11 @@ class YieldSplitter
 				eternaryParser.run(e, subParsing, _econd, _eif, _eelse);
 				
 			case EUnop(_op, _postFix, _e):
-				parse(_e, true);
+				var beingModified:Bool = switch (_op) { case OpIncrement, OpDecrement: true; case _: false; }
+				switch (_e.expr) {
+					case EConst(_c): econstParser.run(_e, true, _c, ic, false, beingModified);
+					case _:           parse(_e, true);
+				}
 				if (!subParsing) addIntoBlock(e);
 				
 			case ECast(_e, _t):
@@ -328,10 +366,7 @@ class YieldSplitter
 				eswitchParser.run(e, subParsing, _e, _cases, _edef);
 				
 			case EDisplay(_e, _isCall):
-				Context.fatalError("EDisplay not implemented", e.pos);
-			
 			case EDisplayNew(_t):
-				Context.fatalError("EDisplayNew not implemented", e.pos);
 		}
 		
 		return m_yieldMetaCounter - yieldCount;

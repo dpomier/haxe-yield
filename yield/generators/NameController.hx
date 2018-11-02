@@ -21,18 +21,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.generators;
 import haxe.crypto.Md5;
 import haxe.macro.Expr.Function;
 import haxe.macro.Expr.FunctionArg;
 import haxe.macro.Expr.Position;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentChannel;
 
-class NameController
-{
+class NameController {
 	
 	private static var ID_CHANNELS:Map<IdentChannel, String> = [
 		IdentChannel.Normal 	 => "y",

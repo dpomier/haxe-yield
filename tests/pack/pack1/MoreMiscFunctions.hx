@@ -8,6 +8,8 @@ class MoreMiscFunctions
 	public static function a2 (s:String) return 2;
 	private static function priv (s:String) return 100;
 	private static function priv2 (s:String) return 200;
+
+	public static function UppercaseFunction () return 42;
 }
 
 class MoreMiscFunctions2

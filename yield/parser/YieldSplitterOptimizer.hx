@@ -21,15 +21,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser;
 import haxe.macro.Expr.Position;
+import yield.parser.env.WorkEnv;
 import yield.parser.PositionManager.LinkedPosition;
 
-class YieldSplitterOptimizer
-{
+class YieldSplitterOptimizer {
 	
 	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Void {
+		
+		#if (!display && !yield_debug_display)
 		
 		var pass:Int = 0;
 		var subpass:Int = 0;
@@ -49,8 +51,11 @@ class YieldSplitterOptimizer
 		}
 
 		#if debug
-		if (env.debug)
+		if (env.debug) {
 			trace('"${env.fieldName}" optimazed in $pass pass');
+		}
+		#end
+		
 		#end
 	}
 

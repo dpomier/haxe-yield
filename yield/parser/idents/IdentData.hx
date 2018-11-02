@@ -21,12 +21,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.idents;
 import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.Position;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.Scope;
 
 typedef IdentData = {
 	
@@ -49,7 +49,7 @@ typedef IdentData = {
 	
 	var channel:IdentChannel;
 	
-	var option:IdentOption;
+	var options:Array<IdentOption>;
 	
 	var scope:Scope;
 	

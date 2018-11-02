@@ -21,21 +21,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Expr;
+import yield.parser.env.WorkEnv;
 import yield.parser.checks.TypeInferencer;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentOption;
 import yield.parser.idents.IdentRef;
 
-class EVarsParser extends BaseParser
-{
+class EVarsParser extends BaseParser {
 	
-	public function run (e:Expr, subParsing:Bool, _vars:Array<Var>, ?ic:IdentChannel): Void {
+	public function run (e:Expr, subParsing:Bool, _vars:Array<Var>, ?ic:IdentChannel, ?options:Array<IdentOption>): Void {
 		
 		if (ic == null) {
 			ic = IdentChannel.Normal;
+		}
+		
+		if (options == null) {
+			options = [];
 		}
 		
 		var names:Array<String>      = [];
@@ -66,7 +70,11 @@ class EVarsParser extends BaseParser
 			initialized.push(_vars[j].expr != null);
 		}
 		
-		m_we.addLocalDefinition(names, initialized, types, false, IdentRef.IEVars(e), ic, IdentOption.None, e.pos);
+		if (ic == IdentChannel.IterationOp) {
+			options.push(IdentOption.ReadOnly);
+		}
+		
+		m_we.addLocalDefinition(names, initialized, types, false, IdentRef.IEVars(e), ic, options, e.pos);
 		
 		if (!subParsing) m_ys.addIntoBlock( e );
 	}

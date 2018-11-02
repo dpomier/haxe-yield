@@ -1,9 +1,9 @@
 package misc;
 
 import utest.Assert;
-import yield.Yield;
 
-class IterationTests extends utest.Test implements Yield {
+@:yield
+class IterationTests extends utest.Test {
 	
 	function testReturnedType () {
 		

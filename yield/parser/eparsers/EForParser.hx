@@ -21,8 +21,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
+import yield.parser.idents.IdentOption;
+import yield.parser.eactions.Action;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
@@ -32,8 +34,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
 
-class EForParser extends BaseParser
-{
+class EForParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _it:Expr, _expr:Expr): Void {
 		
@@ -41,7 +42,7 @@ class EForParser extends BaseParser
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 		
-		if (MetaTools.hasMetaExpr(WorkEnv.YIELD_KEYWORD, _expr, true)) {
+		if (#if (!display && !yield_debug_display) MetaTools.hasMetaExpr(m_we.yieldKeywork, _expr, true) #else false #end) {
 			runSplitMode(e, subParsing, _it, _expr, loopExprs);
 		} else {
 			runPreserveMode(e, subParsing, _it, _expr, loopExprs);
@@ -71,7 +72,7 @@ class EForParser extends BaseParser
 					pos: e.pos
 				};
 				
-				ActionParser.addActionToExpr(Action.DefineChannel(IdentChannel.IterationOp), opIdent);
+				ActionParser.addActionToExpr([Action.DefineChannel(IdentChannel.IterationOp), Action.DefineOptions([IdentOption.ReadOnly], IdentChannel.IterationOp)], opIdent, m_we);
 				
 				switch (__e2.expr) {
 					case EBinop(___op, ___e1, ___e2): 
@@ -144,7 +145,10 @@ class EForParser extends BaseParser
 			default:
 		}
 		
-		for (v in updateExprs) loopExprs.unshift(v);
+		for (v in updateExprs) {
+			ActionParser.addActionToExpr([Action.DefineOptions([IsVarLoop, ReadOnly])], v, m_we);
+			loopExprs.unshift(v);
+		}
 		
 		e.expr = ewhile.expr;
 		m_ys.ewhileParser.run(ewhile, subParsing, ewhileEcond, ewhileE, true, true);

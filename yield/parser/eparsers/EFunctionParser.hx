@@ -21,10 +21,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
-import yield.parser.Parser;
 import haxe.macro.Expr;
+import yield.parser.Parser;
+import yield.parser.env.WorkEnv;
 import yield.generators.NameController;
 import yield.parser.checks.TypeInferencer;
 import yield.parser.idents.IdentChannel;
@@ -35,8 +36,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
 
-class EFunctionParser extends BaseParser
-{
+class EFunctionParser extends BaseParser {
 
 	public function run (e:Expr, subParsing:Bool, _name:Null<String>, _f:Function): Void {
 		
@@ -50,7 +50,7 @@ class EFunctionParser extends BaseParser
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 		
-		if (!MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, _f) || !Parser.parseFunction(safeName, _f, e.pos, m_we.getInheritedData())) {
+		if (!MetaTools.hasMeta(m_we.yieldKeywork, _f) || !Parser.parseFunction(safeName, _f, e.pos, m_we.getInheritedData())) {
 			parseFun(_f, e.pos, true, false);
 		}
 		
@@ -59,7 +59,7 @@ class EFunctionParser extends BaseParser
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferFunction(_f);
 			if (ltype == null) ltype	= macro:StdTypes.Dynamic;
 			
-			m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, IdentOption.None, e.pos);
+			m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, [], e.pos);
 			
 		}
 		

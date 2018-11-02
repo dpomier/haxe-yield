@@ -21,17 +21,17 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentRef.IdentRefTyped;
 import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 
-class ESwitchParser extends BaseParser
-{
+class ESwitchParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _e:Expr, _cases:Array<Case>, _edef:Null<Expr>): Void {
 		
@@ -75,12 +75,12 @@ class ESwitchParser extends BaseParser
 				var paramNames:Array<Expr> = [];
 				
 				if (lcase.values.length != 0)
-					for (v in getParamsFromCase(lcase.values[0]))
+					for (v in getParamsFromCase(lcase.values[0], m_we))
 						paramNames.push(v);
 				
 				MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 				
-				if (MetaTools.hasMetaExpr(WorkEnv.YIELD_KEYWORD, lcase.expr)) {
+				if (MetaTools.hasMetaExpr(m_we.yieldKeywork, lcase.expr)) {
 					for (econst in paramNames) {
 						
 						predefineNativeVars.push({ ref: IdentRef.IEConst(econst), type: macro:StdTypes.Dynamic });
@@ -115,12 +115,14 @@ class ESwitchParser extends BaseParser
 				var lnewExprs:Array<Expr> = m_ys.iteratorBlocks[posFirstSub];
 				
 				// Goto first sub-expression
-				var ldefineNextSubExpr:Expr  = { expr: EConst(CIdent("null")), pos: _e.pos };
-				m_ys.addSetAction(ldefineNextSubExpr, posFirstSub+1);
+				#if (!display && !yield_debug_display) 
+				var ldefineNextSubExpr:Expr  = { expr: null, pos: _e.pos };
+				m_ys.registerSetAction(ldefineNextSubExpr, posFirstSub+1);
 				lnewExprs.unshift(ldefineNextSubExpr);
 				
 				lcase.expr = { expr: EBlock( lnewExprs ), pos: lcase.expr.pos };
 				m_ys.spliceIteratorBlocks(posFirstSub, 1);
+				#end
 				
 				// Goto after the switch
 				m_ys.addIntoBlock(lgotoAfterSwitch);
@@ -137,6 +139,7 @@ class ESwitchParser extends BaseParser
 			
 		} else {
 			
+			#if (!display && !yield_debug_display)
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
 			
 			for (lcase in _cases) {
@@ -146,7 +149,8 @@ class ESwitchParser extends BaseParser
 			
 			m_ys.addIntoBlock(lgotoAfterSwitch, posInitial);
 			
-			m_ys.addGotoAction(lgotoAfterSwitch, m_ys.cursor);
+			m_ys.registerGotoAction(lgotoAfterSwitch, m_ys.cursor);
+			#end
 		}
 		
 		// Parse default
@@ -157,7 +161,7 @@ class ESwitchParser extends BaseParser
 		}
 	}
 	
-	private static function getParamsFromCase (value:Expr): Array<Expr> {
+	private static function getParamsFromCase (value:Expr, env:WorkEnv): Array<Expr> {
 		
 		var params:Array<Expr> = [];
 		
@@ -165,17 +169,26 @@ class ESwitchParser extends BaseParser
 			
 			case ECall(_e, _params):
 				for (larg in _params)
-					for (p in getParamsFromCase(larg))
+					for (p in getParamsFromCase(larg, env))
 						params.push(p);
 				
 			case EBinop(_op, _e1, _e2) if (_op == Binop.OpArrow):
-				for (p in getParamsFromCase(_e2))
+				for (p in getParamsFromCase(_e2, env))
 						params.push(p);
 				
 			case EConst(_c):
 				switch (_c) {
-					case CIdent(_s) if (_s != "_"):
+					case CIdent(_s):
+
+						for (enumType in env.classData.importedEnums) {
+							for (construct in enumType.constructs.keys()) {
+								if (_s == construct) {
+									return params;
+								}
+							}
+						}
 						params.push(value);
+						
 					default:
 				}
 				

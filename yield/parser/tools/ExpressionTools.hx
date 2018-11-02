@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.tools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -29,8 +29,7 @@ import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.TypeTools;
 
-class ExpressionTools
-{
+class ExpressionTools {
 	
 	public static function checkIsInEBlock (e:Expr): Array<Expr> {
 		

@@ -21,14 +21,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.checks;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentData;
 import yield.parser.idents.Statement;
 
-class InitializationChecker
-{
+class InitializationChecker {
 	
 	public static function hasBeenInitialized (accession:IdentData, definition:IdentData, currentScope:Scope, previousScopes:Array<Scope> = null): Bool {
 		

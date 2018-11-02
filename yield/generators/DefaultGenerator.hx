@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.generators;
 import haxe.macro.ExprTools;
 import haxe.macro.ComplexTypeTools;
@@ -36,8 +36,8 @@ import haxe.macro.Type.AbstractType;
 import haxe.macro.Type.TypeParameter;
 import haxe.macro.TypeTools;
 import yield.generators.NameController;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentData;
@@ -48,8 +48,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.FieldTools;
 import yield.parser.tools.IdentCategory;
 
-class DefaultGenerator
-{
+class DefaultGenerator {
 	
 	private static var extraTypeCounter:UInt = 0;
 	
@@ -60,8 +59,8 @@ class DefaultGenerator
 		var iteratorClassName:String = NameController.extraTypeName(env, ++extraTypeCounter);
 		
 		var c  = macro class $iteratorClassName { };
-		c.pos  = env.localClass.pos;
-		c.meta = env.localClass.meta.get().copy();
+		c.pos  = env.classData.localClass.pos;
+		c.meta = env.classData.localClass.meta.get().copy();
 		
 		return c;
 	}
@@ -141,7 +140,7 @@ class DefaultGenerator
 			runDebugPrint(Context.definedValue("yDebug")); 
 		}
 		
-		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.imports, usings);
+		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.classData.imports, usings);
 		
 		typeDefinitionStack = new Array<TypeDefinition>();
 	}
@@ -318,7 +317,7 @@ class DefaultGenerator
 			
 			// Add the argument of the instance as a field
 			
-			var lInstanceCT:ComplexType = !env.isAbstract ? env.classComplexType : TypeTools.toComplexType(env.abstractType.type);
+			var lInstanceCT:ComplexType = !env.classData.isAbstract ? env.classData.localComplexType : TypeTools.toComplexType(env.classData.abstractType.type);
 			
 			addProperty(bd, NameController.fieldInstance(), [APrivate], lInstanceCT, pos);
 			
@@ -364,10 +363,10 @@ class DefaultGenerator
 	
 	private static function initIteratorInitialisations (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
 		
-		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], env.returnType);
+		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], env.yieldedType);
 		
 		addProperty(bd, NameController.fieldCursor(), [APrivate], macro:StdTypes.Int, pos);
-		addProperty(bd, NameController.fieldCurrent(), [APrivate], env.returnType, pos);
+		addProperty(bd, NameController.fieldCurrent(), [APrivate], env.yieldedType, pos);
 		addProperty(bd, NameController.fieldIsConsumed(), [APrivate], macro:StdTypes.Bool, pos); 
 		addProperty(bd, NameController.fieldCompleted(), [APrivate], macro:StdTypes.Bool, pos); 
 		
@@ -420,7 +419,7 @@ class DefaultGenerator
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCursor()}	 = -1);
 		
-		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultReturnType});
+		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultYieldedType});
 		bd.constructorBlock.push(macro $i{NameController.fieldIsConsumed()} = true);
 		bd.constructorBlock.push(macro $i{NameController.fieldCompleted()}  = false);
 	}
@@ -433,7 +432,7 @@ class DefaultGenerator
 			expr: { expr: ExprDef.ECall({ expr: EConst(CIdent(NameController.iterativeFunction(i))), pos: pos}, []), pos: pos }
 		}];
 		
-		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultReturnType}), pos: pos };
+		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultYieldedType}), pos: pos };
 		
 		// public function hasNext():Bool
 		
@@ -456,19 +455,19 @@ class DefaultGenerator
 		
 		var body:Expr = {
 			expr: EBlock([
-				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultReturnType}; },
+				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultYieldedType}; },
 				macro $i{NameController.fieldIsConsumed()} = true,
 				macro return $i{NameController.fieldCurrent()}
 			]), 
 			pos: pos
 		};
 		
-		addMethod(bd, "next", [APublic], [], env.returnType, body, pos);
+		addMethod(bd, "next", [APublic], [], env.yieldedType, body, pos);
 		
 		// public inline function iterator():Iterator<???>
 		
-		switch (env.functionRetType) {
-			case ITERABLE | DYNAMIC:
+		switch (env.functionReturnKind) {
+			case ITERABLE | BOTH:
 				
 				var body:Expr = {
 					expr: EBlock([
@@ -477,10 +476,10 @@ class DefaultGenerator
 					pos: pos
 				};
 				
-				var rtype:ComplexType = env.returnType;
+				var rtype:ComplexType = env.yieldedType;
 				var metadata:Metadata = null;
 				
-				if (env.functionRetType == RetType.DYNAMIC) {
+				if (env.functionReturnKind == BOTH) {
 					metadata = [{
 						name: ":keep",
 						params: null,
@@ -526,11 +525,11 @@ class DefaultGenerator
 		
 		// Add params from the Class and Function
 		
-		if (env.isAbstract) {
-			addTypeParameters(env.abstractType.params);
+		if (env.classData.isAbstract) {
+			addTypeParameters(env.classData.abstractType.params);
 		}
 		
-		addTypeParameters(env.localClass.params);
+		addTypeParameters(env.classData.localClass.params);
 		
 		for (param in env.classFunction.params) {
 			
@@ -577,7 +576,7 @@ class DefaultGenerator
 			
 			aBreak.e.expr = EBlock([
 				macro $i{NameController.fieldCompleted()} = true,
-				macro return ${env.defaultReturnType}
+				macro return ${env.defaultYieldedType}
 			]);
 		}
 	}
@@ -620,7 +619,7 @@ class DefaultGenerator
 			switch (statement) {
 			case Statement.Accession(_data, _defData):
 				
-				if (_data.option != IdentOption.KeepAsVar) {
+				if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 					
 					var parentFieldName:String = NameController.fieldParent(env, _defData.env);
 					
@@ -713,7 +712,7 @@ class DefaultGenerator
 								
 								case EConst(_c):
 									
-									if (_definition.option != IdentOption.KeepAsVar) {
+									if (_definition.options.indexOf(IdentOption.KeepAsVar) == -1) {
 										eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, newNames[_data.names[0]]);
 									} else {
 										eRef.expr = EConst(CIdent(newNames[_data.names[0]]));
@@ -777,7 +776,7 @@ class DefaultGenerator
 										
 										// add local variable as field
 										
-										if (_data.option != IdentOption.KeepAsVar) {
+										if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 											
 											var lfieldDecl:Field;
 											
@@ -797,7 +796,7 @@ class DefaultGenerator
 								
 								// transform var declaration into field assignment
 								
-								if (_data.option != IdentOption.KeepAsVar) {
+								if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 									
 									var assignations:Array<Expr> = [];
 									
@@ -822,7 +821,7 @@ class DefaultGenerator
 						case IdentRef.IEFunction(eRef): switch (eRef.expr) {
 							case EFunction(_name, _f):
 								
-								if (_data.option != IdentOption.KeepAsVar) {
+								if (_data.options.indexOf(IdentOption.KeepAsVar) == -1) {
 									
 									// add local function as field
 									var lfieldDecl:Field;
@@ -879,7 +878,7 @@ class DefaultGenerator
 			
 			var body:Expr = { expr: EBlock(lExpressions), pos: lExpressions[0].pos };
 			
-			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.returnType, body, lExpressions[0].pos, env.classField.meta.copy());
+			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.yieldedType, body, lExpressions[0].pos, env.classField.meta.copy());
 		}
 	}
 	
@@ -944,25 +943,25 @@ class DefaultGenerator
 	
 	private static function allowAccessToPrivateFields (env:WorkEnv, pos:Position): Void {
 		
-		if (env.classComplexType != null) {
+		if (env.classData.localComplexType != null) {
 			
 			function setAccess (c:ClassType) {
 				
 				env.generatedIteratorClass.meta.push({
 					name : ":access",
-					params : [Context.parse(getTypePath(c, env.isAbstract, env.abstractType), pos)],
+					params : [Context.parse(getTypePath(c, env.classData.isAbstract, env.classData.abstractType), pos)],
 					pos : pos
 				});
 				if (c.superClass != null) setAccess(c.superClass.t.get());
 			}
 			
-			setAccess(env.localClass);
+			setAccess(env.classData.localClass);
 			
-			if (env.isAbstract) {
+			if (env.classData.isAbstract) {
 				
 				env.generatedIteratorClass.meta.push({
 					name : ":access",
-					params : [Context.parse(getTypePath(env.abstractType.type), pos)],
+					params : [Context.parse(getTypePath(env.classData.abstractType.type), pos)],
 					pos : pos
 				});
 			}

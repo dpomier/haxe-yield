@@ -21,16 +21,15 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Expr;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentOption;
 import yield.parser.tools.ExpressionTools;
 
-class ETryParser extends BaseParser
-{
+class ETryParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _e:Expr, _catches:Array<Catch>): Void {
 		
@@ -69,13 +68,15 @@ class ETryParser extends BaseParser
 			previousCatchScope = parseCatch(lcatch, lgotoPost, previousCatchScope);
 		}
 		
+		#if (!display && !yield_debug_display) 
+		
 		// Parse try block
 		
 		var posFirstTry = m_ys.cursor;
 		
 		// goto the first try statement expressions
 		e.expr = null;
-		m_ys.addGotoAction(e, posFirstTry);
+		m_ys.registerGotoAction(e, posFirstTry);
 		
 		if (!subParsing) m_ys.addIntoBlock(e, posOriginalIterator);
 		
@@ -104,7 +105,8 @@ class ETryParser extends BaseParser
 		
 		// Setup Goto actions
 		
-		m_ys.addGotoAction(lgotoPost, posPostETry);
+		m_ys.registerGotoAction(lgotoPost, posPostETry);
+		#end
 	}
 	
 	private function parseCatch (c:Catch, gotoPostTry:Expr, previousCatchScope:Scope): Scope {
@@ -123,7 +125,7 @@ class ETryParser extends BaseParser
 			expr: EVars([{name: c.name, type: c.type, expr: initializationValue}]),
 			pos: c.expr.pos
 		};
-		m_we.addLocalDefinition([c.name], [true], [c.type], false, IdentRef.IEVars(ldefinition), IdentChannel.Normal, IdentOption.None, ldefinition.pos);
+		m_we.addLocalDefinition([c.name], [true], [c.type], false, IdentRef.IEVars(ldefinition), IdentChannel.Normal, [], ldefinition.pos);
 		
 		
 		var posOriginal = m_ys.cursor;
@@ -134,9 +136,11 @@ class ETryParser extends BaseParser
 		m_ys.parse(c.expr, false);
 		
 		// Replace the body with Goto action to the first catch sub-expressions
+		#if (!display && !yield_debug_display) 
 		var lgotoNext:Expr   = { expr: null, pos: c.expr.pos };
 		c.expr = {expr:EBlock([ldefinition, lgotoNext]), pos:c.expr.pos};
-		m_ys.addGotoAction(lgotoNext, posFirst);
+		m_ys.registerGotoAction(lgotoNext, posFirst);
+		#end
 		
 		// Goto after the try-catch
 		m_ys.addIntoBlock(gotoPostTry);

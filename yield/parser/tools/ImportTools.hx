@@ -21,22 +21,23 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.tools;
 import haxe.macro.Expr.ImportMode;
 import haxe.macro.Context;
+import haxe.macro.Type;
 import haxe.macro.Expr.Position;
 import haxe.macro.Expr.ComplexType;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.Expr.ImportExpr;
 
-class ImportTools
-{
-	public static function getFieldShorthands (importedExprs:Array<ImportExpr>): Array<String> {
+class ImportTools {
+	
+	public static function getFieldShorthands (imports:Array<ImportExpr>): Array<String> {
 		
-		var ret:Array<String> = new Array<String>();
+		var ret = new Array<String>();
 		
-		for (iexpr in importedExprs) {
+		for (iexpr in imports) {
 			switch (iexpr.mode) {
 				case IAsName(alias):
 					ret.push(alias);
@@ -45,6 +46,46 @@ class ImportTools
 		}
 		
 		return ret;
+	}
+
+	public static function getEnumConstructors (imports:Array<ImportExpr>, module:Array<Type>): Array<EnumType> {
+
+		var enums = new Array<EnumType>();
+
+		inline function extractEnum (type:Type, into:Array<EnumType>):Void {
+			switch (type) {
+				case TEnum(t, params): into.push(t.get());
+				case _: null;
+			}
+		}
+
+		// from module
+
+		for (type in module) {
+			extractEnum(type, enums);
+		}
+
+		// from imports
+
+		for (iexpr in imports) {
+			switch (iexpr.mode) {
+				case INormal, IAsName(_):
+
+					if (~/^_?[A-Z][A-Za-z0-9_$]*$/.match(iexpr.path[iexpr.path.length - 1].name)) {
+
+						var path:String = [for (p in iexpr.path) p.name].join(".");
+						
+						var type:Null<Type> = try Context.getType(path) catch (_:Dynamic) null;
+
+						if (type != null) extractEnum(type, enums);
+					}
+					
+				case IAll:
+					// TODO
+			}
+		}
+
+		return enums;
 	}
 }
 #end

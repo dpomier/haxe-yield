@@ -21,15 +21,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Expr;
-import yield.parser.WorkEnv.Scope;
+import yield.parser.env.WorkEnv.Scope;
 import yield.parser.idents.IdentRef.IdentRefTyped;
 import yield.parser.tools.ExpressionTools;
 
-class EBlockParser extends BaseParser
-{
+class EBlockParser extends BaseParser {
 	
 	/**
 	 * Wrap `e` into an EBlock expression if it isn't already one

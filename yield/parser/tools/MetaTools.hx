@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.tools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -31,8 +31,7 @@ enum MetaToolsOption {
 	SkipNestedFunctions;
 }
 
-class MetaTools
-{
+class MetaTools {
 	
 	private static var functionStack:Array<Function> = [];
 	private static var onlyInBody:Bool = false;
@@ -172,10 +171,7 @@ class MetaTools
 				return hasMetaExpr(name, _e) || _t != null && hasMetaCT(name, _t);
 				
 			case EDisplay(_e, _isCall):
-				return hasMetaExpr(name, _e);
-				
 			case EDisplayNew(_t):
-				return hasMetaTP(name, _t);
 				
 			case ETernary(_econd, _eif, _eelse):
 				return hasMetaExpr(name, _econd) || hasMetaExpr(name, _eif) || hasMetaExpr(name, _eelse);

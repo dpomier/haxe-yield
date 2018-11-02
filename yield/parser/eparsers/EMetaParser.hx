@@ -21,19 +21,18 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.eparsers;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import yield.parser.eactions.Action;
 import yield.parser.eactions.ActionParser;
 
-class EMetaParser extends BaseParser
-{
+class EMetaParser extends BaseParser {
 	
 	public function run (e:Expr, subParsing:Bool, _s:MetadataEntry, _e:Expr): Void {
 		
-		if (_s.name == WorkEnv.YIELD_KEYWORD) {
+		if (_s.name == m_we.yieldKeywork) {
 			
 			if (_s.params == null || _s.params.length == 0) {
 				parseYieldMeta(e, subParsing, _s, _e);
@@ -44,11 +43,11 @@ class EMetaParser extends BaseParser
 				
 				for (lparamExpr in _s.params) {
 					
-					var action:Action = ActionParser.getAction(lparamExpr);
+					var actions:Array<Action> = ActionParser.getAction(lparamExpr);
 					
-					if (action != null) {
+					if (actions != null) {
 						
-						m_ys.actionParser.executeAction(action, _e);
+						m_ys.actionParser.executeAction(actions, _e);
 						m_ys.addIntoBlock(e);
 						return;
 						
@@ -73,13 +72,15 @@ class EMetaParser extends BaseParser
 		switch (_e.expr) {
 			
 			case EReturn(__e):
+				#if (display || yield_debug_display)
+				m_ys.addDisplayDummy(e); // TODO parse __e to know the type when inferred typing
+				#else
 				m_ys.parse(__e, true);
-				
+				#end
 			case EBreak:
-				m_ys.addBreakAction(e);
-				
+				m_ys.registerBreakAction(e);
 			default:
-				Context.fatalError( "Unexpected " + WorkEnv.YIELD_KEYWORD, e.pos );
+				Context.fatalError( "Unexpected " + m_we.yieldKeywork, e.pos );
 		}
 		
 		m_ys.addIntoBlock(e);

@@ -23,11 +23,11 @@
  */
 package yield.parser;
 import haxe.macro.Expr;
-#if macro
+#if (macro || display)
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
-import yield.parser.WorkEnv;
-import yield.parser.WorkEnv.RetType;
+import yield.parser.env.WorkEnv;
+import yield.parser.env.WorkEnv.ReturnKind;
 import yield.parser.YieldSplitter;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.generators.DefaultGenerator;
@@ -42,8 +42,8 @@ import haxe.macro.TypeTools;
 #end
 import yield.YieldOption;
 
-class Parser
-{
+class Parser {
+
 	/**
 	 * Implement iterators from iterator blocks defined with yield statements.
 	 * Preferably use `:yield` metadata instead of `:build` or `:autoBuild` metadata
@@ -51,7 +51,7 @@ class Parser
 	 */
 	public static macro function run (options:Array<ExprOf<YieldOption>>): Array<Field> {
 		
-		#if macro
+		#if (macro || display)
 			
 			var t:Type = Context.getLocalType();
 			
@@ -84,7 +84,7 @@ class Parser
 		#end
 	}
 	
-	#if macro
+	#if (macro || display)
 	
 	private static function auto (): Void {
 		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
@@ -177,7 +177,11 @@ class Parser
 	private static function createEnv (ct:ClassType, t:Type, options:Array<Expr>, hasAutoBuild:Bool): WorkEnv {
 		
 		markHasProcessed(ct);
-		var env = new WorkEnv(ct, t);
+		
+		var env = new WorkEnv();
+		
+		env.setClassData(ct, t);
+		
 		initOptions(options, !hasAutoBuild, env);
 
 		return env;
@@ -249,18 +253,18 @@ class Parser
 		}
 		
 		if (yieldExtend) {
-			env.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.localClass.pos);
+			env.classData.localClass.meta.add(":autoBuild", [macro yield.parser.Parser.extendedRun($a{options})] , env.classData.localClass.pos);
 		}
 		
-		WorkEnv.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
+		env.setOptions( yieldKeyword, yieldExplicit, yieldExtend );
 	}
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
 
-		for (field in env.classFields)
+		for (field in env.classData.classFields)
 			parseField(field, env);
 		
-		return env.classFields;
+		return env.classData.classFields;
 	}
 	
 	private static function parseField (field:Field, env:WorkEnv): Void {
@@ -279,7 +283,7 @@ class Parser
 				
 				MetaTools.option = MetaToolsOption.None;
 				
-				if (MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, _e)) {
+				if (MetaTools.hasMeta(env.yieldKeywork, _e)) {
 					
 					func               = MetaTools.selectedFunc;
 					alternativeRetType = switch (_t) {
@@ -311,9 +315,16 @@ class Parser
 	@:noCompletion
 	public static function parseFunction (name:String, f:Function, pos:Position, env:WorkEnv): Bool {
 		
+		#if debug
+		if (Context.defined("yDebug")) {
+			var match:String = Context.definedValue("yDebug");
+			env.debug = match != null && name == StringTools.trim(match);
+		}
+		#end
+		
 		MetaTools.option = MetaToolsOption.None;
 		
-		if (!MetaTools.hasMeta(WorkEnv.YIELD_KEYWORD, f, true)) {
+		if (!MetaTools.hasMeta(env.yieldKeywork, f, true)) {
 			return false;
 		}
 		
@@ -321,8 +332,9 @@ class Parser
 			Context.fatalError( "Yielded functions must have a name to be parsed", pos );
 		}
 		
-		var returnType:ComplexType;
-		var funcRetType:RetType;
+		var yieldedType:ComplexType;
+		var returnKind:ReturnKind;
+		var funcReturnType:ComplexType;
 		
 		// Typing
 		
@@ -332,35 +344,44 @@ class Parser
 			
 			if (f.ret == null) {
 				
-				if (WorkEnv.YIELD_EXPLICIT) {
-					Context.fatalError( "Method must have a return type when using " + WorkEnv.YIELD_KEYWORD + " expressions", pos );
+				if (env.yieldExplicit) {
+					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
-					f.ret		= macro:StdTypes.Dynamic;
-					returnType	= macro:StdTypes.Dynamic;
-					funcRetType	= RetType.DYNAMIC;
+					
+					yieldedType = macro:StdTypes.Dynamic;
+					
+					#if (haxe_ver < 4.000)
+					funcReturnType = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$yieldedType; var iterator(default, never):Void->Iterator<$yieldedType>; };
+					#else
+					funcReturnType = ComplexType.TIntersection([macro:Iterator<$yieldedType>, macro:Iterable<$yieldedType>]);
+					#end
+					
+					returnKind	= ReturnKind.BOTH;
 				}
 				
 			} else {
+				
+				funcReturnType = f.ret;
 				
 				switch (f.ret) {
 					
 					case (macro:Iterator<$p>)
 					   | (macro:StdTypes.Iterator<$p>):
 						
-						returnType  = p;
-						funcRetType = RetType.ITERATOR;
+						yieldedType = p;
+						returnKind   = ReturnKind.ITERATOR;
 						
 					case (macro:Iterable<$p>)
 					   | (macro:StdTypes.Iterable<$p>):
 						
-						returnType  = p;
-						funcRetType = RetType.ITERABLE;
+						yieldedType = p;
+						returnKind   = ReturnKind.ITERABLE;
 						
 					case (macro:Dynamic)
 					   | (macro:StdTypes.Dynamic):
 					   
-						returnType  = macro:StdTypes.Dynamic;
-						funcRetType = RetType.DYNAMIC;
+						yieldedType = macro:StdTypes.Dynamic;
+						returnKind   = ReturnKind.BOTH;
 						
 					default:
 						
@@ -374,25 +395,22 @@ class Parser
 							
 							var retType:Type = TypeTools.followWithAbstracts(resolvedType);
 							
-							var iteratorType:Type = ComplexTypeTools.toType(macro:Iterator<Dynamic>);
-							var iterableType:Type = ComplexTypeTools.toType(macro:Iterable<Dynamic>);
-							
 							switch (retType) {
 								
-								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],iteratortype), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iteratorType)):
+								case Type.TAnonymous(_.get() => { fields : [_, { name:"next", type:TFun([],rt), isPublic:true, expr:_, kind:_, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterator<Dynamic>))):
 									
-									returnType = TypeTools.toComplexType(iteratortype);
-									funcRetType = RetType.ITERATOR;
+									yieldedType = TypeTools.toComplexType(rt);
+									returnKind   = ReturnKind.ITERATOR;
 									
-								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],iterabletype), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, iterableType)):
+								case Type.TAnonymous(_.get() => { fields : [{ name:"iterator", type:TFun([],rt), isPublic:true, expr:_, kind: _, meta:_, overloads:_, params:_, doc:_, pos:_ }], status:status }) if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterable<Dynamic>))):
 									
-									returnType = TypeTools.toComplexType(iterabletype);
-									funcRetType = RetType.ITERABLE;
+									yieldedType = TypeTools.toComplexType(rt);
+									returnKind   = ReturnKind.ITERABLE;
 									
 								case TDynamic(_):
 									
-									returnType  = f.ret;
-									funcRetType = RetType.DYNAMIC;
+									yieldedType = f.ret;
+									returnKind   = ReturnKind.BOTH;
 									
 								case _:
 									
@@ -402,8 +420,9 @@ class Parser
 							
 						} else {
 							
-							returnType  = macro:Dynamic;
-							funcRetType = RetType.DYNAMIC;
+							yieldedType = macro:Dynamic;
+							f.ret        = macro:Dynamic;
+							returnKind   = ReturnKind.BOTH;
 							
 						}
 				}
@@ -414,22 +433,30 @@ class Parser
 			
 			env.yieldMode = false;
 			
-			returnType  = macro:StdTypes.Dynamic;
-			funcRetType = RetType.DYNAMIC;
+			yieldedType = macro:StdTypes.Dynamic;
+			returnKind   = ReturnKind.BOTH;
+			
+			funcReturnType = f.ret != null ? f.ret : (macro:Dynamic);
 		}
+		
+		#if (display || yield_debug_display)
+		env.classField.access.remove(AInline);
+		#end
 		
 		// Parse
 		
-		env.setFunctionData(name, f, funcRetType, returnType, pos);
+		env.setFunctionData(name, f, returnKind, yieldedType, funcReturnType, f.expr.pos);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
-		var ibd:IteratorBlockData = yieldSplitter.split(f, pos);
+		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
 		
 		// Generate type
 		
+		#if (!display && !yield_debug_display)
 		if (env.yieldMode || env.requiredBySubEnv) {
-			f.expr = DefaultGenerator.add(ibd, pos, env);
+			f.expr = DefaultGenerator.add(ibd, f.expr.pos, env);
 		}
+		#end
 		
 		return true;
 	}

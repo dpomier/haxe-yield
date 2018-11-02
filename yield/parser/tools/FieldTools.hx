@@ -21,7 +21,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#if macro
+#if (macro || display)
 package yield.parser.tools;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.ExprTools;
@@ -36,8 +36,7 @@ import haxe.macro.Type.ClassType;
 import haxe.macro.TypeTools;
 import yield.parser.checks.TypeInferencer;
 
-class FieldTools
-{
+class FieldTools {
 	
 	public static function makeFieldFromVar (v:Var, access:Array<Access>, initialValue:Expr, pos:Position): Field {
 		return {

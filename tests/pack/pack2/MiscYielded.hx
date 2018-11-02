@@ -1,7 +1,7 @@
 package pack.pack2;
-import yield.Yield;
 
-class MiscYielded implements Yield
+@:yield
+class MiscYielded
 {
 	public static inline function inlineMethod2 (s:String) {
 		@yield return s+1;
