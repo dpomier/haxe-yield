@@ -71,7 +71,7 @@ class ImportTools {
 			switch (iexpr.mode) {
 				case INormal, IAsName(_):
 
-					if (~/_?[A-Z][A-Za-z0-9_$]*/.match(iexpr.path[iexpr.path.length - 1].name)) {
+					if (~/^_?[A-Z][A-Za-z0-9_$]*$/.match(iexpr.path[iexpr.path.length - 1].name)) {
 
 						var path:String = [for (p in iexpr.path) p.name].join(".");
 						extractEnum(Context.getType(path), enums);
