@@ -40,7 +40,7 @@ class EFunctionParser extends BaseParser {
 
 	public function run (e:Expr, subParsing:Bool, _name:Null<String>, _f:Function, inlined:Bool): Void {
 		
-		#if (haxe_ver < "4.0.0")
+		#if (haxe_ver < 4.000)
 
 		if (_name != null && StringTools.startsWith(_name, "inline_")) {
 			_name   = _name.substr(7);
@@ -56,7 +56,7 @@ class EFunctionParser extends BaseParser {
 		if (!MetaTools.hasMeta(m_we.yieldKeywork, _f) || !Parser.parseFunction(safeName, _f, e.pos, m_we.getInheritedData())) {
 
 			parseFun(_f, e.pos, true, false);
-			
+
 		}
 		
 		if (_name != null) { // If it isn't an anonymous function
