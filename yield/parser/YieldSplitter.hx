@@ -220,7 +220,7 @@ class YieldSplitter {
 	/**
 	 * @return Quantity of yield statements.
 	 */
-	public function parse (e:Expr, subParsing:Bool, ?ic:IdentChannel): Int {
+	public function parse (e:Expr, subParsing:Bool, ?ic:IdentChannel, inlined = false): Int {
 		
 		#if (display || yield_debug_display)
 		subParsing = true;
@@ -248,7 +248,7 @@ class YieldSplitter {
 				evarsParser.run(e, subParsing, _vars, ic);
 				
 			case EFunction(_name, _f): 
-				efunctionParser.run(e, subParsing, _name, _f);
+				efunctionParser.run(e, subParsing, _name, _f, inlined);
 				
 			case ECall(_e, _params):
 				for (i in 0..._params.length) parse(_params[i], true, ic);

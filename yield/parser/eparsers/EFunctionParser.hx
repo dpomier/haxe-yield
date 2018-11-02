@@ -38,20 +38,25 @@ import yield.parser.tools.MetaTools.MetaToolsOption;
 
 class EFunctionParser extends BaseParser {
 
-	public function run (e:Expr, subParsing:Bool, _name:Null<String>, _f:Function): Void {
+	public function run (e:Expr, subParsing:Bool, _name:Null<String>, _f:Function, inlined:Bool): Void {
 		
-		var isInlined = _name != null && StringTools.startsWith(_name, "inline_");
-		
-		if (isInlined) {
-			_name = _name.substr(7);
+		#if (haxe_ver < "4.0.0")
+
+		if (_name != null && StringTools.startsWith(_name, "inline_")) {
+			_name   = _name.substr(7);
+			inlined = true;
 		}
+
+		#end
 		
 		var safeName:String = NameController.anonymousFunction(m_we, _f, e.pos);
 		
 		MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 		
 		if (!MetaTools.hasMeta(m_we.yieldKeywork, _f) || !Parser.parseFunction(safeName, _f, e.pos, m_we.getInheritedData())) {
+
 			parseFun(_f, e.pos, true, false);
+			
 		}
 		
 		if (_name != null) { // If it isn't an anonymous function
@@ -59,7 +64,7 @@ class EFunctionParser extends BaseParser {
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferFunction(_f);
 			if (ltype == null) ltype	= macro:StdTypes.Dynamic;
 			
-			m_we.addLocalDefinition([_name], [true], [ltype], isInlined, IdentRef.IEFunction(e), IdentChannel.Normal, [], e.pos);
+			m_we.addLocalDefinition([_name], [true], [ltype], inlined, IdentRef.IEFunction(e), IdentChannel.Normal, [], e.pos);
 			
 		}
 		

@@ -27,6 +27,7 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import yield.parser.eactions.Action;
 import yield.parser.eactions.ActionParser;
+import yield.parser.idents.IdentChannel;
 
 class EMetaParser extends BaseParser {
 	
@@ -61,8 +62,11 @@ class EMetaParser extends BaseParser {
 			}
 			
 		} else {
+
+			var inlined:Bool = _s.name == ":inline";
+
 			m_ys.parseMetadataEntry(_s, true);
-			m_ys.parse(_e, true);
+			m_ys.parse(_e, true, IdentChannel.Normal, inlined);
 			if (!subParsing) m_ys.addIntoBlock(e);
 		}
 	}
