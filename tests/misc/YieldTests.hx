@@ -296,5 +296,19 @@ class YieldTests extends utest.Test {
 			}
 		}
 	}
+
+	#if (haxe_ver >= 4.000)
+	function testIntersection () {
+		var it = intersection();
+		Assert.equals("a", it.next());
+		Assert.equals("b", it.iterator().next());
+	}
+
+	function intersection ():Iterator<String> & Iterable<String> {
+
+		@yield return "a";
+		@yield return "b";
+	}
+	#end
 	
 }
