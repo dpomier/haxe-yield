@@ -53,9 +53,9 @@ typedef Scope = {
 }
 
 enum ReturnKind {
-	ITERABLE;
-	ITERATOR;
-	BOTH;
+	ITERABLE(t:ComplexType);
+	ITERATOR(t:ComplexType);
+	BOTH(t:ComplexType);
 }
 
 /**

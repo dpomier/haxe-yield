@@ -467,7 +467,7 @@ class DefaultGenerator {
 		// public inline function iterator():Iterator<???>
 		
 		switch (env.functionReturnKind) {
-			case ITERABLE | BOTH:
+			case ITERABLE(yieldedType) | BOTH(yieldedType):
 				
 				var body:Expr = {
 					expr: EBlock([
@@ -476,20 +476,15 @@ class DefaultGenerator {
 					pos: pos
 				};
 				
-				var rtype:ComplexType = env.yieldedType;
-				var metadata:Metadata = null;
+				var metadata:Metadata = [{
+					name: ":keep",
+					params: null,
+					pos:    pos
+				}];
 				
-				if (env.functionReturnKind == BOTH) {
-					metadata = [{
-						name: ":keep",
-						params: null,
-						pos:    pos
-					}];
-				}
+				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$yieldedType>, body, pos, metadata);
 				
-				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$rtype>, body, pos, metadata);
-				
-			case ITERATOR:
+			case ITERATOR(yieldedType):
 		}
 	}
 	

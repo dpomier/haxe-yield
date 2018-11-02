@@ -27,12 +27,138 @@ import yield.parser.tools.ExpressionTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Expr.ComplexType;
+import haxe.macro.ComplexTypeTools;
+import haxe.macro.TypeTools;
+import haxe.macro.Type;
 import yield.parser.env.WorkEnv;
 import yield.parser.idents.IdentChannel;
 import yield.parser.idents.IdentData;
 import yield.parser.tools.IdentCategory;
 
 class TypeInferencer {
+
+	public static function resolveYieldedType (yieldableType:Null<ComplexType>, pos:Position):ReturnKind {
+		
+		if (yieldableType == null) {
+			return ReturnKind.BOTH(macro:StdTypes.Dynamic);
+		}
+
+		switch (yieldableType) {
+					
+			case (macro:Iterator<$p>)
+				| (macro:StdTypes.Iterator<$p>):
+				
+				return ReturnKind.ITERATOR(p);
+				
+			case (macro:Iterable<$p>)
+				| (macro:StdTypes.Iterable<$p>):
+				
+				return ReturnKind.ITERABLE(p);
+				
+			case (macro:Dynamic)
+				| (macro:StdTypes.Dynamic):
+				
+				return ReturnKind.BOTH(macro:StdTypes.Dynamic);
+				
+			default:
+				
+				var resolvedType:Null<Type> = try {
+					ComplexTypeTools.toType(yieldableType);
+				} catch (err:Dynamic) {
+					null;
+				};
+				
+				if (resolvedType != null) {
+					
+					var retType:Type = TypeTools.followWithAbstracts(resolvedType);
+					
+					switch (retType) {
+							
+						case TDynamic(_):
+							
+							return ReturnKind.BOTH(macro:StdTypes.Dynamic);
+						
+						case Type.TAnonymous(_.get() => at):
+							
+							var isIterator = false;
+							var isIterable = false;
+							var iteratorYieldedType:Null<ComplexType>;
+							var iterableYieldedType:Null<ComplexType>;
+
+							if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterator<Dynamic>))) {
+								
+								isIterator = true;
+								
+								for (field in at.fields) if (field.name == "next") {
+
+									iteratorYieldedType = switch (field.type) {
+										case TFun(args, ret): ret != null ? TypeTools.toComplexType(ret) : macro:StdTypes.Dynamic;
+										case _: throw "unexpected result";
+									};
+
+									break;
+								}
+							}
+
+							if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterable<Dynamic>))) {
+								
+								isIterable = true;
+								
+								for (field in at.fields) if (field.name == "iterator") {
+
+									var iteratorType:ComplexType = switch (field.type) {
+										case TFun(args, ret): ret != null ? TypeTools.toComplexType(ret) : macro:StdTypes.Dynamic;
+										case _: throw "unexpected result";
+									};
+
+									iterableYieldedType = switch (resolveYieldedType(iteratorType, pos)) {
+										case ITERATOR(p): p;
+										case _: throw "unexpected result";
+									}
+
+									break;
+								}
+							}
+
+							return if (isIterator && isIterable) {
+								ReturnKind.BOTH(getLowerComplexType(iteratorYieldedType, iterableYieldedType));
+							} else if (isIterator) {
+								ReturnKind.ITERATOR(iteratorYieldedType);
+							} else if (isIterable) {
+								ReturnKind.ITERABLE(iterableYieldedType);
+							} else {
+								Context.fatalError(ComplexTypeTools.toString(yieldableType) + " should be Iterator or Iterable", pos);
+							};
+							
+						case _:
+							
+							return Context.fatalError(ComplexTypeTools.toString(yieldableType) + " should be Iterator or Iterable", pos);
+							
+					}
+					
+				} else {
+					
+					return ReturnKind.BOTH(macro:StdTypes.Dynamic);
+					
+				}
+		}
+	}
+
+	public static function getLowerType (t1:Type, t2:Type):Type {
+
+		return if (Context.unify(t1, t2)) {
+			t1;
+		} else if (Context.unify(t2, t1)) {
+			t2;
+		} else {
+			ComplexTypeTools.toType(macro:StdTypes.Dynamic);
+		}
+	}
+
+	public static inline function getLowerComplexType (t1:ComplexType, t2:ComplexType):ComplexType {
+
+		return TypeTools.toComplexType(getLowerType(ComplexTypeTools.toType(t1), ComplexTypeTools.toType(t2)));
+	}
 	
 	/**
 	 * @return Returns the complex type of `expr` if it can be determined.
@@ -212,7 +338,7 @@ class TypeInferencer {
 			if (v.type == null) throwTypeRequiredFor(v.name, pos);
 		}
 	}
-	
+
 	private static function throwTypeRequiredFor (name:String, pos:Position): Void {
 		Context.fatalError("Type required on static targets for local variable " + name, pos);
 	}
