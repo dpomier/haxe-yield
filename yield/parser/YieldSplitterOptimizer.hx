@@ -50,7 +50,7 @@ class YieldSplitterOptimizer {
 				needRepass = true;
 		}
 
-		#if debug
+		#if yield_debug
 		if (env.debug) {
 			trace('"${env.fieldName}" optimazed in $pass pass');
 		}

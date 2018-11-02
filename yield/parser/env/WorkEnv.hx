@@ -107,7 +107,7 @@ class WorkEnv {
 	public var yieldMode:Bool;
 	public var untypedMode:Bool;
 
-	#if debug
+	#if yield_debug
 	@:allow(yield.parser.Parser)
 	public var debug (default, null):Bool = false;
 	#end
@@ -223,7 +223,7 @@ class WorkEnv {
 		we.scopeCounter  = 0;
 		we.setOptions(yieldKeywork, yieldExplicit, yieldExtend);
 		
-		#if debug
+		#if yield_debug
 		we.debug = debug;
 		#end
 		

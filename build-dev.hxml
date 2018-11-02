@@ -7,5 +7,5 @@
 --interp
 
 # -debug
-# -D yDebug=functionName
+# -D yield-debug=functionName
 # -D yield-debug-display

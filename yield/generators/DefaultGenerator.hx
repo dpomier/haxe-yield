@@ -47,7 +47,7 @@ import yield.parser.idents.Statement;
 import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.FieldTools;
 import yield.parser.tools.IdentCategory;
-
+import haxe.macro.Printer;
 class DefaultGenerator {
 	
 	private static var extraTypeCounter:UInt = 0;
@@ -95,6 +95,13 @@ class DefaultGenerator {
 		typeDefinitionStack.push( bd.typeDefinition );
 		
 		initInstanceFunctionBody(bd, pos);
+
+		#if yield_debug
+		if (env.debug) {
+			trace(new Printer().printTypeDefinition( bd.typeDefinition ));
+		}
+		#end
+
 		return bd.instanceFunctionBody;
 	}
 	
@@ -136,54 +143,9 @@ class DefaultGenerator {
 			}
 		}
 		
-		if (Context.defined("yDebug")) {
-			runDebugPrint(Context.definedValue("yDebug")); 
-		}
-		
 		Context.defineModule(Context.getLocalClass().get().module, typeDefinitionStack, env.classData.imports, usings);
 		
 		typeDefinitionStack = new Array<TypeDefinition>();
-	}
-	
-	private static function runDebugPrint (yDebug:String): Void {
-		
-		if (yDebug == null) {
-			return;
-		}
-		
-		var patterns:Array<String> = [for (s in yDebug.split(".")) s.toLowerCase()];
-		var tdName:String;
-		var match:Bool;
-		
-		for (td in typeDefinitionStack) {
-			
-			tdName = td.name.toLowerCase();
-			match = true;
-			
-			for (p in patterns) {
-				
-				if (tdName.indexOf(p) == -1) {
-					match = false;
-					break;
-				}
-			}
-			
-			if (match) {
-				printTypeDefinition(td);
-			}
-		}
-	}
-	
-	private static function printTypeDefinition (td:TypeDefinition): Void {
-		
-		var data:String = "EXTRA TYPE `" + td.name + "`\n";
-		
-		for (field in td.fields) {
-			
-			data += FieldTools.toString(field) + "\n";
-		}
-		
-		trace(data);
 	}
 	
 	private static function addProperty (bd:BuildingData, name:String, access:Array<Access>, type:ComplexType, pos:Position): Void {
