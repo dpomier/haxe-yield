@@ -10,7 +10,7 @@ os:
 haxe:
   - "3.4.2"
   - "3.4.7"
-  - "4.0.0-preview.4"
+  - "4.0.0-preview.5"
   - development
   
 matrix:
