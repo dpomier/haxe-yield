@@ -87,13 +87,13 @@ You can compile with some options or pass several `yield.YieldOption` into the `
 
 Available options are:
 
- - `yieldExtend`
+ - `yield-extend`
 		If the option is enabled, all extending classes will be able to use yield statements. If this option affects an interface, all implementing classes and all extending interfaces will be able to use yield statements. This is disabled by default.
 		Compile with `-D yieldExtend`.
- - `yieldExplicit`
+ - `yield-explicit`
 		If the option is enabled, the return type of iterative functions needs to be explicitly specified. This is disabled by default.
 		Compile with `-D yieldExplicit`.
- - `yieldKeyword`
+ - `yield-keyword`
 		Use a custom keyword instead of "yield".
 		Compile with `-D yieldKeyword=myCustomMetaName`.
 
