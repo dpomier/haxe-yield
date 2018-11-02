@@ -45,10 +45,16 @@ class EVarsParser extends BaseParser {
 		var names:Array<String>      = [];
 		var initialized:Array<Bool>  = [];
 		var types:Array<ComplexType> = [];
+
+		var isFinal:Bool = false;
 		
 		for (j in 0..._vars.length) {
 			
 			var typeInferred:Bool = false;
+
+			#if (haxe_ver >= 4.000)
+			isFinal = _vars[j].isFinal;
+			#end
 			
 			if (!WorkEnv.isDynamicTarget()) {
 				TypeInferencer.checkLocalVariableType(_vars[j], m_we, ic, e.pos); // Force typing because the type is required for member variables on static targets
@@ -70,7 +76,7 @@ class EVarsParser extends BaseParser {
 			initialized.push(_vars[j].expr != null);
 		}
 		
-		if (ic == IdentChannel.IterationOp) {
+		if (ic == IdentChannel.IterationOp || isFinal) {
 			options.push(IdentOption.ReadOnly);
 		}
 		

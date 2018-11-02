@@ -198,6 +198,48 @@ class AccessionTests extends misc.packs.Parent {
 		@yield break;
 	}
 	#end
+
+	#if (haxe_ver >= 4.000)
+
+	function testFinalAccess () {
+		var it = finalAccess();
+		Assert.equals(1, it.next());
+		Assert.equals(2, it.next());
+		Assert.equals(3, it.next());
+		Assert.equals(4, it.next());
+		Assert.equals(5, it.next());
+		Assert.equals(6, it.next());
+		Assert.equals(7, it.next());
+		Assert.isFalse(it.hasNext());
+	}
+
+	function finalAccess ():Iterator<Int> {
+
+		final a = 1;
+		@yield return a;
+		// a = 2; // TODO: test compilation error
+
+		final o = {
+			v: 2
+		};
+		@yield return o.v;
+		o.v = 3;
+		@yield return o.v;
+		// o = 4; // TODO: test compilation error
+
+		var o2:{ final v:Int; } = {
+			v: 4
+		};
+		@yield return o2.v;
+		// o2.v = 5; // TODO: test compilation error
+
+		for (i in 5...8) {
+			final v = i;
+			@yield return v;
+		}
+	}
+
+	#end
 }
 
 #if (!cs && !java) // error: repeated modifier
