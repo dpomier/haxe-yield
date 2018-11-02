@@ -88,6 +88,34 @@ class Parser {
 	#if (macro || display)
 	
 	private static function auto (): Void {
+
+		var yieldParse:Null<String> = Context.definedValue("yield-parsing");
+
+		if (yieldParse != null && yieldParse != "1") {
+
+			var filters:Array<String> = yieldParse.split(",");
+
+			for (filter in filters) {
+
+				filter = StringTools.trim(filter);
+
+				var recursive = false;
+
+				// wildcards
+				if (StringTools.ltrim(filter.substr(filter.lastIndexOf(".") + 1)) == "*") {
+					filter = filter.substr(0, filter.lastIndexOf("."));
+					recursive = true;
+				}
+				
+				trace("include", filter);
+
+				haxe.macro.Compiler.addGlobalMetadata(filter, "@:build(yield.parser.Parser.run())", recursive, true, false);
+
+			}
+			
+		}
+
+
 		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
 	}
 	

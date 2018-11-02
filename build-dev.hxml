@@ -2,6 +2,7 @@
 -lib yield
 -lib utest
 -main Tests
+-D yield-parsing= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
 
 #-js bin/Tests.js
 --interp

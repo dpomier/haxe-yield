@@ -21,6 +21,11 @@ import eparsers.EIfTests;
 import options.ExplicitTests;
 import options.ExtendTests;
 import options.KeywordTests;
+import options.parsing.ParsingTests;
+import options.parsing.subparsing.SubParsingTests;
+import options.parsing.subparsing.unparsed.UnparsedTests;
+import options.parsing.recursive.RecursiveParsingTests;
+import options.parsing.recursive.parsed.RecursiveSubParsingTests;
 
 class Tests
 {
@@ -52,6 +57,11 @@ class Tests
 		r.addCase(new ExtendTests());
 		r.addCase(new KeywordTests());
 		r.addCase(new ExplicitTests());
+		r.addCase(new ParsingTests());
+		r.addCase(new SubParsingTests());
+		r.addCase(new UnparsedTests());
+		r.addCase(new RecursiveParsingTests());
+		r.addCase(new RecursiveSubParsingTests());
 		
 		Report.create(r);
 

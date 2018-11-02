@@ -3,3 +3,4 @@
 -main Tests
 -dce no
 -D travis
+-D yield-parsing= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
