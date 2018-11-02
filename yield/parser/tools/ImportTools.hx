@@ -74,7 +74,10 @@ class ImportTools {
 					if (~/^_?[A-Z][A-Za-z0-9_$]*$/.match(iexpr.path[iexpr.path.length - 1].name)) {
 
 						var path:String = [for (p in iexpr.path) p.name].join(".");
-						extractEnum(Context.getType(path), enums);
+						
+						var type:Null<Type> = try Context.getType(path) catch (_:Dynamic) null;
+
+						if (type != null) extractEnum(type, enums);
 					}
 					
 				case IAll:

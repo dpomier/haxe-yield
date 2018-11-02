@@ -5,6 +5,7 @@ import pack.pack1.MiscFunctions;
 import pack.pack1.MoreMiscFunctions;
 import pack.pack1.MoreMiscFunctions.a0 as funcA0;
 import pack.pack1.MoreMiscFunctions.a1;
+import pack.pack1.MoreMiscFunctions.UppercaseFunction;
 import pack.pack1.MoreMiscFunctions.MoreMiscFunctions3.*;
 import pack.pack3.SomeFunctions.*;
 import pack.pack2.*;
@@ -42,19 +43,21 @@ class ImportTests extends utest.Test {
 		var it = importField();
 		
 		Assert.isTrue(it.hasNext());
-		Assert.equals(1, it.next());
+		Assert.equals(a1(""), it.next());
+		Assert.equals(UppercaseFunction(), it.next());
 		Assert.isFalse(it.hasNext());
 	}
 	
 	function importField (): Iterator<Int> {
 		@yield return a1("");
+		@yield return UppercaseFunction();
 	}
 	
 	function testAsImport () {
 		var it = asImport();
 		
 		Assert.isTrue(it.hasNext());
-		Assert.equals(0, it.next());
+		Assert.equals(funcA0(""), it.next());
 		Assert.isFalse(it.hasNext());
 	}
 	
