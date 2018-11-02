@@ -81,7 +81,7 @@ class EConstParser extends BaseParser {
 									
 								} else {
 									
-									Context.fatalError('This variable cannot be modified (reference is readonly)'+beingModified+__definition.options.toString(), e.pos);
+									Context.fatalError('This variable cannot be modified (reference is readonly)', e.pos);
 								}
 							}
 							
