@@ -4,9 +4,10 @@
 -main Tests
 -D yield-parsing= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
 
-#-js bin/Tests.js
+# -js bin/Tests.js
 --interp
 
 # -debug
 # -D yield-debug=functionName
 # -D yield-debug-display
+# -D yield_debug_no_display
