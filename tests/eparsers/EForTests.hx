@@ -263,10 +263,10 @@ class EForTests extends utest.Test {
 	}
 	function iterator () {
 		
-		var a:Array<Int> = [25, 50, 75, 100];
+		var a:Array<String> = ["25", "50", "75", "100"];
 		
 		for (i in a.iterator()) {
-			@yield return i;
+			@yield return Std.parseInt(i);
 		}
 		
 		@yield return NULL_INT;
