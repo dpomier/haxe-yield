@@ -151,17 +151,17 @@ class InferenceTests extends utest.Test {
 		var i = 0;
 		var len = 4;
 
-		var a:Void->Iterator<String> = function () { // TODO: should fail to compile
-			@yield return i;
-			@yield return i*2;
-		};
+		// var a:Void->Iterator<String> = function () { // TODO: should throw a `Int should be String` error
+		// 	@yield return i;
+		// 	@yield return i*2;
+		// };
 
-		var b:Array<Void->Iterator<String>> = [while (++i < len) { // TODO: should fail to compile
-			function () {
-				@yield return i;
-				@yield return i*2;
-			};
-		}];
+		// var b:Array<Void->Iterator<String>> = [while (++i < len) { // TODO: should throw a `Int should be String` error
+		// 	function () {
+		// 		@yield return i;
+		// 		@yield return i*2;
+		// 	};
+		// }];
 
 	}
 	

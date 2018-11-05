@@ -390,7 +390,7 @@ class Parser {
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
 					
-					var yieldedType = macro:StdTypes.Dynamic;
+					var yieldedType = macro:Any;
 					
 					#if (haxe_ver < 4.000)
 					f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$yieldedType; var iterator(default, never):Void->Iterator<$yieldedType>; };
