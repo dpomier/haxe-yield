@@ -119,7 +119,7 @@ class EForParser extends BaseParser {
 						
 						var opVars:Array<Var> = [{
 							name: opIdentName,
-							type: macro:StdTypes.Dynamic,
+							type: macro:StdTypes.Iterator<StdTypes.Dynamic>,
 							expr: lexprOp
 						}];
 						
