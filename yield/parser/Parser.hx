@@ -107,8 +107,6 @@ class Parser {
 					recursive = true;
 				}
 				
-				trace("include", filter);
-
 				haxe.macro.Compiler.addGlobalMetadata(filter, "@:build(yield.parser.Parser.run())", recursive, true, false);
 
 			}
