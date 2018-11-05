@@ -3,7 +3,7 @@ yield
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.md)
 [![TravisCI Build Status](https://travis-ci.org/dpomier/haxe-yield.svg?branch=master)](https://travis-ci.org/dpomier/haxe-yield)
 
-*Supports Haxe `3.4.2` and higher*
+*Supports Haxe `3.4.2` and higher, supports Haxe `4.0.0-preview.5`*
 
 This library adds the `yield` metadata, which is similar to the `yield` keyword in C#.
 
@@ -83,9 +83,7 @@ counter.next(); // n
 Advanced usage
 -----
 
-You can compile with some options or pass several `yield.YieldOption` into the `:yield` metadata.
-
-Available options are:
+You can compile with some haxe compilation parameters (or pass several `yield.YieldOption` into the `:yield` metadata):
 
  - `yield-extend`
 		If the option is enabled, all extending classes will be able to use yield statements. If this option affects an interface, all implementing classes and all extending interfaces will be able to use yield statements. This is disabled by default.
@@ -96,6 +94,9 @@ Available options are:
  - `yield-keyword`
 		Use a custom keyword instead of "yield".
 		Compile with `-D yield-keyword=myCustomMetaName`.
+ - `yield-parsing`
+		Specifies packages or classpaths to include in the yield parser. All the impacted classes will no longer need to be annotated with `:yield` to be able to use the yield statements. This can be recursive using the `*` wildcard.
+		Compile with `-D yield-parsing= my.package.one, my.packages.*, my.class.Foo`.
 
 `@yield return` statements can be located in `try` blocks. This will duplicate the `catch` expressions as many times as there are iterator blocks.
 
@@ -112,6 +113,8 @@ Development Builds
 2. To tell haxelib where your development copy is installed, use `haxelib dev yield my/repositories/haxe-yield`
 
 To return to release builds use `haxelib dev yield`
+
+To help to debug a specific function, you can use the haxe compilation parameter `-D yield-debug= myFunctionName` to see the result after the parsing is done.
 
 Alternatives
 -----
