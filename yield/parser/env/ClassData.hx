@@ -30,8 +30,8 @@ import yield.parser.tools.ImportTools;
 
 class ClassData {
 
-    public var module           (default, null):Array<Type>;
-    public var localClass       (default, null):ClassType;
+	public var module           (default, null):Array<Type>;
+	public var localClass       (default, null):ClassType;
 	public var localType        (default, null):Type;
 	public var localComplexType (default, null):ComplexType;
 	public var isPrivate        (default, null):Bool;
@@ -42,16 +42,16 @@ class ClassData {
 	public var importedFields   (default, null):Array<String>;
 	public var importedEnums    (default, null):Array<EnumType>;
 
-    private inline function new () {
+	private inline function new () {
 
-    }
+	}
 
-    public static function of (ct:ClassType, t:Type):ClassData {
-        
-        var data = new ClassData();
+	public static function of (ct:ClassType, t:Type):ClassData {
 
-        data.module = Context.getModule(Context.getLocalModule());
-        data.localClass = ct;
+		var data = new ClassData();
+
+		data.module = Context.getModule(Context.getLocalModule());
+		data.localClass = ct;
 		data.localType  = t;
 		data.localComplexType = Context.toComplexType(t);
 
@@ -69,10 +69,10 @@ class ClassData {
 		data.classFields    = Context.getBuildFields();
 		data.imports        = Context.getLocalImports();
 		data.importedFields = ImportTools.getFieldShorthands(data.imports);
-        data.importedEnums  = ImportTools.getEnumConstructors(data.imports, data.module);
+		data.importedEnums  = ImportTools.getEnumConstructors(data.imports, data.module);
 
-        return data;
-    }
+		return data;
+	}
 
 }
 
