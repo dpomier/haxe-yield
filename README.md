@@ -89,13 +89,13 @@ Available options are:
 
  - `yield-extend`
 		If the option is enabled, all extending classes will be able to use yield statements. If this option affects an interface, all implementing classes and all extending interfaces will be able to use yield statements. This is disabled by default.
-		Compile with `-D yieldExtend`.
+		Compile with `-D yield-extend`.
  - `yield-explicit`
 		If the option is enabled, the return type of iterative functions needs to be explicitly specified. This is disabled by default.
-		Compile with `-D yieldExplicit`.
+		Compile with `-D yield-explicit`.
  - `yield-keyword`
 		Use a custom keyword instead of "yield".
-		Compile with `-D yieldKeyword=myCustomMetaName`.
+		Compile with `-D yield-keyword=myCustomMetaName`.
 
 `@yield return` statements can be located in `try` blocks. This will duplicate the `catch` expressions as many times as there are iterator blocks.
 
