@@ -148,12 +148,12 @@ class DefaultGenerator {
 		typeDefinitionStack = new Array<TypeDefinition>();
 	}
 	
-	private static function addProperty (bd:BuildingData, name:String, access:Array<Access>, type:ComplexType, pos:Position): Void {
+	private static function addProperty (bd:BuildingData, name:String, access:Array<Access>, type:Null<ComplexType>, pos:Position): Void {
 		
 		bd.typeDefinition.fields.push({
 			name:   name,
 			access: access,
-			kind:   FVar( type, null ),
+			kind:   FVar( type != null ? type : macro:StdTypes.Dynamic, null ),
 			pos:    pos,
 			doc:    null,
 			meta:   null
@@ -381,7 +381,7 @@ class DefaultGenerator {
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCursor()}	 = -1);
 		
-		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultYieldedType});
+		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultYieldedValue});
 		bd.constructorBlock.push(macro $i{NameController.fieldIsConsumed()} = true);
 		bd.constructorBlock.push(macro $i{NameController.fieldCompleted()}  = false);
 	}
@@ -394,7 +394,7 @@ class DefaultGenerator {
 			expr: { expr: ExprDef.ECall({ expr: EConst(CIdent(NameController.iterativeFunction(i))), pos: pos}, []), pos: pos }
 		}];
 		
-		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultYieldedType}), pos: pos };
+		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultYieldedValue}), pos: pos };
 		
 		// public function hasNext():Bool
 		
@@ -417,7 +417,7 @@ class DefaultGenerator {
 		
 		var body:Expr = {
 			expr: EBlock([
-				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultYieldedType}; },
+				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultYieldedValue}; },
 				macro $i{NameController.fieldIsConsumed()} = true,
 				macro return $i{NameController.fieldCurrent()}
 			]), 
@@ -429,7 +429,7 @@ class DefaultGenerator {
 		// public inline function iterator():Iterator<???>
 		
 		switch (env.functionReturnKind) {
-			case ITERABLE(yieldedType) | BOTH(yieldedType):
+			case ITERABLE(yieldedType) | BOTH(yieldedType) | UNKNOWN(yieldedType, _):
 				
 				var body:Expr = {
 					expr: EBlock([
@@ -443,6 +443,8 @@ class DefaultGenerator {
 					params: null,
 					pos:    pos
 				}];
+
+				if (yieldedType == null) yieldedType = macro:StdTypes.Dynamic;
 				
 				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$yieldedType>, body, pos, metadata);
 				
@@ -533,7 +535,7 @@ class DefaultGenerator {
 			
 			aBreak.e.expr = EBlock([
 				macro $i{NameController.fieldCompleted()} = true,
-				macro return ${env.defaultYieldedType}
+				macro return ${env.defaultYieldedValue}
 			]);
 		}
 	}

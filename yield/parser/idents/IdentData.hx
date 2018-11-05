@@ -43,7 +43,7 @@ typedef IdentData = {
 	/**
 	 * If identType is `Accession` it is ensure that types.length is equal to 1
 	 */
-	var types:Array<ComplexType>;
+	var types:Array<Null<ComplexType>>;
 	
 	var ident:IdentRef;
 	

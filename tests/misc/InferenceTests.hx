@@ -16,7 +16,7 @@ class InferenceTests extends utest.Test {
 		Assert.isFalse(it.hasNext());
 	}
 	
-	function fromConsts () {
+	function fromConsts ():Iterator<Dynamic> {
 		
 		var a = 3;
 		@yield return a;
@@ -41,7 +41,7 @@ class InferenceTests extends utest.Test {
 		Assert.isFalse(it.hasNext());
 	}
 	
-	function fromIdents () {
+	function fromIdents ():Iterator<Dynamic> {
 		
 		var a:Int;
 		var b:String;
@@ -75,7 +75,7 @@ class InferenceTests extends utest.Test {
 		Assert.isFalse(it.hasNext());
 	}
 	
-	function fromIdentsFromConsts () {
+	function fromIdentsFromConsts ():Iterator<Dynamic> {
 		
 		var a = 3;
 		var b = "";
@@ -105,7 +105,7 @@ class InferenceTests extends utest.Test {
 		Assert.isFalse(it.hasNext());
 	}
 	
-	function fromArgs (a:Int, b:String, c:Float, d:EReg) {
+	function fromArgs (a:Int, b:String, c:Float, d:EReg):Iterator<Dynamic> {
 		
 		var v1 = a;
 		@yield return v1;
@@ -129,7 +129,7 @@ class InferenceTests extends utest.Test {
 		Assert.isFalse(it.hasNext());
 	}
 	
-	function fromArgsFromConsts (a = 3, b = "", c = 3.4) {
+	function fromArgsFromConsts (a = 3, b = "", c = 3.4):Iterator<Dynamic> {
 		
 		var v1 = a;
 		@yield return v1;
@@ -151,12 +151,20 @@ class InferenceTests extends utest.Test {
 		var i = 0;
 		var len = 4;
 
-		// var a:Void->Iterator<String> = function () { // TODO: should throw a `Int should be String` error
+		var a:Void->Int = function () return len;
+		// var o = {
+		// 	a:a
+		// };
+		function toto () return a();
+
+		@yield return toto();
+
+		// var a:Void->Iterator<String> = function () {
 		// 	@yield return i;
 		// 	@yield return i*2;
 		// };
 
-		// var b:Array<Void->Iterator<String>> = [while (++i < len) { // TODO: should throw a `Int should be String` error
+		// var b:Array<Void->Iterator<String>> = [while (++i < len) {
 		// 	function () {
 		// 		@yield return i;
 		// 		@yield return i*2;

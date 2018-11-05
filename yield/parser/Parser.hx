@@ -389,16 +389,7 @@ class Parser {
 				if (env.yieldExplicit) {
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 				} else {
-					
-					var yieldedType = macro:Any;
-					
-					#if (haxe_ver < 4.000)
-					f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$yieldedType; var iterator(default, never):Void->Iterator<$yieldedType>; };
-					#else
-					f.ret = ComplexType.TIntersection([macro:Iterator<$yieldedType>, macro:Iterable<$yieldedType>]);
-					#end
-					
-					returnKind = ReturnKind.BOTH(yieldedType);
+					returnKind = ReturnKind.UNKNOWN(null, []);
 				}
 				
 			} else {
@@ -427,6 +418,27 @@ class Parser {
 		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
 		
 		// Generate type
+
+		switch (returnKind) {
+			case UNKNOWN(t, returns):
+
+				// TODO: could be improved
+
+				var resolved:ComplexType = TypeTools.toComplexType(TypeInferencer.getBaseType(returns, f.expr.pos));
+
+				resolved = switch (resolved) {
+					case (macro:StdTypes.Void): macro:StdTypes.Dynamic;
+					case _: resolved;
+				};
+
+				#if (haxe_ver < 4.000)
+				f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$resolved; var iterator(default, never):Void->Iterator<$resolved>; };
+				#else
+				f.ret = ComplexType.TIntersection([macro:Iterator<$resolved>, macro:Iterable<$resolved>]);
+				#end
+
+			case _:
+		}
 
 		#if (yield_debug_no_display || !display && !yield_debug_display)
 		if (env.yieldMode || env.requiredBySubEnv) {

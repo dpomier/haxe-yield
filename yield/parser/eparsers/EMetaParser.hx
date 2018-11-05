@@ -28,6 +28,10 @@ import haxe.macro.Expr;
 import yield.parser.eactions.Action;
 import yield.parser.eactions.ActionParser;
 import yield.parser.idents.IdentChannel;
+import yield.parser.tools.IdentCategory;
+import haxe.macro.ComplexTypeTools;
+import haxe.macro.ExprTools;
+import yield.parser.checks.TypeInferencer;
 
 class EMetaParser extends BaseParser {
 	
@@ -79,6 +83,12 @@ class EMetaParser extends BaseParser {
 				#if (!yield_debug_no_display && (display || yield_debug_display))
 				m_ys.addDisplayDummy(e); // TODO parse __e to know the type when inferred typing
 				#else
+				switch (m_we.functionReturnKind) {
+					case UNKNOWN(t, returns): 
+						var rt = __e != null ? TypeInferencer.tryInferExpr(__e, m_we, IdentChannel.Normal) : macro:StdTypes.Void;
+						returns.push(rt != null ? ComplexTypeTools.toType(rt) : null);
+					case _:
+				}
 				m_ys.parse(__e, true);
 				#end
 			case EBreak:

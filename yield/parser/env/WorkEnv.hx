@@ -56,6 +56,7 @@ enum ReturnKind {
 	ITERABLE(t:ComplexType);
 	ITERATOR(t:ComplexType);
 	BOTH(t:ComplexType);
+	UNKNOWN(t:ComplexType, returns:Array<Type>);
 }
 
 /**
@@ -76,9 +77,9 @@ class WorkEnv {
 	public var classField         (default, null):Field;
 	public var classFunction      (default, null):Function;
 	public var functionReturnKind (default, null):ReturnKind;
-	public var functionReturnType (default, null):ComplexType;
-	public var yieldedType        (default, null):ComplexType;
-	public var defaultYieldedType (default, null):Expr;
+	public var functionReturnType (default, null):Null<ComplexType>;
+	public var yieldedType        (default, null):Null<ComplexType>;
+	public var defaultYieldedValue (default, null):Expr;
 	
 	/**
 	 * [ClassName, FunctionName, FunctionName1, ... FunctionNameN] where FunctionNameN is the parent of the current parsed function.
@@ -170,12 +171,12 @@ class WorkEnv {
 		// set data
 		fieldName = name;
 		functionReturnKind = returnKind;
-		functionReturnType = f.ret != null ? f.ret : (macro:StdTypes.Dynamic);
+		functionReturnType = f.ret;
 		yieldedType = switch (returnKind) {
-			case ITERABLE(t), ITERATOR(t), BOTH(t): t;
+			case ITERABLE(t), ITERATOR(t), BOTH(t), UNKNOWN(t, _): t;
 		};
 		
-		defaultYieldedType = WorkEnv.getDefaultValue(yieldedType);
+		defaultYieldedValue = WorkEnv.getDefaultValue(yieldedType);
 		
 		// set arguments
 		addConstructorArgs(f.args, pos);
@@ -403,7 +404,7 @@ class WorkEnv {
 		currentScope.localIdentStack.push(Statement.Accession(data, defIdent));
 	}
 	
-	public function addInstanceAccession (field:Null<String>, type:ComplexType, ident:IdentRef, ic:IdentChannel, pos:Position): Void {
+	public function addInstanceAccession (field:Null<String>, type:Null<ComplexType>, ident:IdentRef, ic:IdentChannel, pos:Position): Void {
 		
 		var data:IdentData = {
 			names:       field == null ? null : [field], 
@@ -530,9 +531,9 @@ class WorkEnv {
 			|| Context.defined("flash8");
 	}
 	
-	public static function getDefaultValue (type:ComplexType): Expr {
+	public static function getDefaultValue (type:Null<ComplexType>): Expr {
 		
-		if (isDynamicTarget())
+		if (isDynamicTarget() || type == null)
 			return macro null;
 		
 		switch (type) {

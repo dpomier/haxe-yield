@@ -61,9 +61,7 @@ class EConstParser extends BaseParser {
 						
 						case IdentCategory.InstanceField(_t):
 							
-							var type:ComplexType = _t != null ? _t : macro:StdTypes.Dynamic; 
-							
-							m_we.addInstanceAccession(_s, type, IdentRef.IEConst(e), ic, e.pos);
+							m_we.addInstanceAccession(_s, _t, IdentRef.IEConst(e), ic, e.pos);
 							
 						case IdentCategory.LocalVar(__definition):
 							

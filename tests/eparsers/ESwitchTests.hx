@@ -239,7 +239,7 @@ class ESwitchTests extends utest.Test {
 		
 	}
 	
-	function nestedReturnedValue (data:Data) {
+	function nestedReturnedValue (data:Data):Iterator<Dynamic> {
 		
 		@yield return switch (data) {
 			case Data.None: 10;
@@ -281,13 +281,13 @@ class ESwitchTests extends utest.Test {
 		
 	}
 	
-	function nestedReturnedValue2 (data:Data, data2:Data) {
+	function nestedReturnedValue2 (data:Data, data2:Data):Iterator<Dynamic> {
 		
 		@yield return switch (data) {
 			case Data.None: 10;
 			case Data.WrappedMessages(_.get() => s, _.get() => v): 
 				
-				function () {
+				function ():Iterator<Dynamic> {
 					@yield return switch (data2) {
 						case Data.None: 10;
 						case Data.Messages(s, v2): 

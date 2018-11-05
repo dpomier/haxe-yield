@@ -186,7 +186,7 @@ class YieldSplitter {
 	
 	private function processDisplayDummy (emptyDummy:Expr): Void {
 		
-		var ft = m_env.functionReturnType;
+		var ft = m_env.functionReturnType != null ? m_env.functionReturnType : macro:StdTypes.Dynamic;
 		emptyDummy.expr = EReturn(macro (null:$ft));
 	}
 	

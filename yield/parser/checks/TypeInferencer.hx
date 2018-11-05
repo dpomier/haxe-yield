@@ -48,6 +48,10 @@ class TypeInferencer {
 		if (resolvedType != null) {
 			
 			var retType:Type = TypeTools.followWithAbstracts(resolvedType);
+
+			if (retType == null) {
+				throw "here";
+			}
 			
 			switch (retType) {
 					
@@ -61,7 +65,7 @@ class TypeInferencer {
 					var isIterable = false;
 					var iteratorYieldedType:Null<ComplexType>;
 					var iterableYieldedType:Null<ComplexType>;
-
+					
 					if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterator<Dynamic>))) {
 						
 						isIterator = true;
@@ -120,6 +124,44 @@ class TypeInferencer {
 		}
 	}
 
+	public static function getBaseType (types:Array<Null<Type>>, pos):Type {
+
+		var result:Null<Type>;
+
+		var typeCount:Int = types.length;
+
+		if (typeCount == 0) {
+			return ComplexTypeTools.toType(macro:StdTypes.Void);
+		} else if (typeCount == 1) {
+			result = types[0];
+		} else {
+			var unify:Bool;
+			for (i in 0...typeCount) {
+				
+				unify = true;
+				
+				if (types[i] == null) {
+					unify = false;
+				} else {
+					for (j in 0...typeCount) {
+						if (types[j] == null || i != j && !Context.unify(types[i], types[j])) {
+							unify = false;
+							break;
+						}
+					}
+				}
+
+				if (unify) {
+					result = types[i];
+					break;
+				}
+			}
+		}
+		
+		return (result == null) ? ComplexTypeTools.toType(macro:Dynamic) : result;
+
+	}
+
 	public static function getLowerType (t1:Type, t2:Type):Type {
 
 		return if (Context.unify(t1, t2)) {
@@ -168,7 +210,7 @@ class TypeInferencer {
 									return null;
 								} else {
 									
-									if (ic == null) throw "ident channel needs to be specified when env does";
+									if (ic == null) ic = IdentChannel.Normal;
 									
 									var identCat:IdentCategory = env.getIdentCategoryOf(__s, ic);
 									
@@ -202,7 +244,7 @@ class TypeInferencer {
 						var t:ComplexType;
 						
 						if (larg.type == null) {
-							t = tryInferExpr(larg.value, env);
+							t = tryInferExpr(larg.value, env, ic);
 							if (t == null) {
 								allTyped = false;
 								break;
@@ -235,7 +277,7 @@ class TypeInferencer {
 				
 				for (_field in _fields) {
 					
-					var lt:Null<ComplexType> = tryInferExpr(_field.expr, env);
+					var lt:Null<ComplexType> = tryInferExpr(_field.expr, env, ic);
 					
 					if (lt == null) {
 						return null;
@@ -254,6 +296,19 @@ class TypeInferencer {
 				}
 				
 				return ComplexType.TAnonymous(lfields);
+
+			case ECall(e, params):
+				
+				var t:Null<ComplexType> = tryInferExpr(e, env, ic);
+
+				if (t != null) {
+					return switch (t) {
+						case TFunction(args, ret): ret;
+						case _: null;
+					}
+				} else {
+					return null;
+				}
 				
 			default:
 				return null;
