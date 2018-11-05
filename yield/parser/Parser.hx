@@ -431,6 +431,8 @@ class Parser {
 					case _: resolved;
 				};
 
+				env.updateDefaultYieldedValue(resolved);
+
 				#if (haxe_ver < 4.000)
 				f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$resolved; var iterator(default, never):Void->Iterator<$resolved>; };
 				#else

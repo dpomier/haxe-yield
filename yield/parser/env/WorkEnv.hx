@@ -185,6 +185,11 @@ class WorkEnv {
 		generatedIteratorClass      = DefaultGenerator.makeTypeDefinition(this);
 		generatedIteratorClass.pack = getExtraTypePath().pack;
 	}
+
+	public function updateDefaultYieldedValue (type:ComplexType):Void {
+
+		defaultYieldedValue.expr = WorkEnv.getDefaultValue(type).expr;
+	}
 	
 	private function addConstructorArgs (args:Array<FunctionArg>, pos:Position): Void {
 		
