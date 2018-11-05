@@ -99,7 +99,7 @@ class EWhileParser extends BaseParser {
 			
 		} else {
 			
-			#if (!display && !yield_debug_display) 
+			#if (yield_debug_no_display || !display && !yield_debug_display) 
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
 			
 			var posLastWhilePart:Int = m_ys.cursor;

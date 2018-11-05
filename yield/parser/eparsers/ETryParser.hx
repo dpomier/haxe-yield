@@ -68,7 +68,7 @@ class ETryParser extends BaseParser {
 			previousCatchScope = parseCatch(lcatch, lgotoPost, previousCatchScope);
 		}
 		
-		#if (!display && !yield_debug_display) 
+		#if (yield_debug_no_display || !display && !yield_debug_display) 
 		
 		// Parse try block
 		
@@ -136,7 +136,7 @@ class ETryParser extends BaseParser {
 		m_ys.parse(c.expr, false);
 		
 		// Replace the body with Goto action to the first catch sub-expressions
-		#if (!display && !yield_debug_display) 
+		#if (yield_debug_no_display || !display && !yield_debug_display) 
 		var lgotoNext:Expr   = { expr: null, pos: c.expr.pos };
 		c.expr = {expr:EBlock([ldefinition, lgotoNext]), pos:c.expr.pos};
 		m_ys.registerGotoAction(lgotoNext, posFirst);

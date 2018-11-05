@@ -415,7 +415,7 @@ class Parser {
 			
 		}
 		
-		#if (display || yield_debug_display)
+		#if (!yield_debug_no_display && (display || yield_debug_display))
 		env.classField.access.remove(AInline);
 		#end
 		
@@ -427,8 +427,8 @@ class Parser {
 		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
 		
 		// Generate type
-		
-		#if (!display && !yield_debug_display)
+
+		#if (yield_debug_no_display || !display && !yield_debug_display)
 		if (env.yieldMode || env.requiredBySubEnv) {
 			f.expr = DefaultGenerator.add(ibd, f.expr.pos, env);
 		}

@@ -107,7 +107,7 @@ class YieldSplitter {
 		var yieldBreak:Expr = { expr: null, pos: f.expr.pos };
 		registerBreakAction(yieldBreak);
 		
-		#if (!display && !yield_debug_display)
+		#if (yield_debug_no_display || !display && !yield_debug_display)
 		addIntoBlock(yieldBreak);
 		#else
 		ExpressionTools.checkIsInEBlock(f.expr).push(yieldBreak);
@@ -123,14 +123,14 @@ class YieldSplitter {
 	//{ ITERATOR OPERATIONS
 	
 	public function moveCursor (): Void {
-		#if (!display && !yield_debug_display)
+		#if (yield_debug_no_display || !display && !yield_debug_display)
 		if (iteratorBlocks[++cursor] == null)
 			iteratorBlocks[cursor] = new IteratorBlock();
 		#end
 	}
 	
 	public function addIntoBlock (e:Expr, ?pos:Int): Void {
-		#if (!display && !yield_debug_display)
+		#if (yield_debug_no_display || !display && !yield_debug_display)
 		if (m_env.untypedMode) {
 			e = { expr: EUntyped(e), pos: e.pos };
 		}
@@ -139,7 +139,7 @@ class YieldSplitter {
 	}
 	
 	public function spliceIteratorBlocks (pos:Int, len:Int): Void {
-		#if (!display && !yield_debug_display)
+		#if (yield_debug_no_display || !display && !yield_debug_display)
 		if (pos < 0) {
 			len += pos;
 			pos = 0;
@@ -151,7 +151,7 @@ class YieldSplitter {
 		#end
 	}
 	
-	#if (!display && !yield_debug_display)
+	#if (yield_debug_no_display || !display && !yield_debug_display)
 	public function registerGotoAction (emptyExpr:Expr, toPos:Int): Void {
 		
 		var lp:LinkedPosition = { e: emptyExpr, pos: toPos };
@@ -169,7 +169,7 @@ class YieldSplitter {
 	
 	public function registerBreakAction (emptyExpr:Expr): Void {
 		
-		#if (display || yield_debug_display)
+		#if (!yield_debug_no_display && (display || yield_debug_display))
 		addDisplayDummy(emptyExpr);
 		#else
 		var lp:LinkedPosition = { e: emptyExpr, pos: null };
@@ -209,7 +209,7 @@ class YieldSplitter {
 		spliceIteratorBlocks(initialPos + 1, cursor - initialPos);
 		
 		if (returnValue && yieldCount != 0) {
-			#if (!display && !yield_debug_display)
+			#if (yield_debug_no_display || !display && !yield_debug_display)
 			Context.fatalError("Missing return " + returnedType, e.pos);
 			#end
 		}
@@ -222,7 +222,7 @@ class YieldSplitter {
 	 */
 	public function parse (e:Expr, subParsing:Bool, ?ic:IdentChannel, inlined = false): Int {
 		
-		#if (display || yield_debug_display)
+		#if (!yield_debug_no_display && (display || yield_debug_display))
 		subParsing = true;
 		#end
 		

@@ -31,7 +31,7 @@ class YieldSplitterOptimizer {
 	
 	public static function optimizeAll (ys:YieldSplitter, pm:PositionManager, env:WorkEnv, pos:Position): Void {
 		
-		#if (!display && !yield_debug_display)
+		#if (yield_debug_no_display || !display && !yield_debug_display)
 		
 		var pass:Int = 0;
 		var subpass:Int = 0;

@@ -115,7 +115,7 @@ class ESwitchParser extends BaseParser {
 				var lnewExprs:Array<Expr> = m_ys.iteratorBlocks[posFirstSub];
 				
 				// Goto first sub-expression
-				#if (!display && !yield_debug_display) 
+				#if (yield_debug_no_display || !display && !yield_debug_display) 
 				var ldefineNextSubExpr:Expr  = { expr: null, pos: _e.pos };
 				m_ys.registerSetAction(ldefineNextSubExpr, posFirstSub+1);
 				lnewExprs.unshift(ldefineNextSubExpr);
@@ -139,7 +139,7 @@ class ESwitchParser extends BaseParser {
 			
 		} else {
 			
-			#if (!display && !yield_debug_display)
+			#if (yield_debug_no_display || !display && !yield_debug_display)
 			if (subParsing) Context.fatalError("Missing return value", e.pos);
 			
 			for (lcase in _cases) {
