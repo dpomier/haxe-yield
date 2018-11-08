@@ -9,6 +9,7 @@ import pack.pack1.MoreMiscFunctions.UppercaseFunction;
 import pack.pack1.MoreMiscFunctions.MoreMiscFunctions3.*;
 import pack.pack3.SomeFunctions.*;
 import pack.pack2.*;
+import haxe.ds.GenericStack; // import a generic type
 
 @:yield
 @:access(pack.pack1.MoreMiscFunctions.priv)
