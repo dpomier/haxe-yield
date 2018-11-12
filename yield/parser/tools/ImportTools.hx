@@ -71,14 +71,23 @@ class ImportTools {
 			switch (iexpr.mode) {
 				case INormal, IAsName(_):
 
-					if (~/^_?[A-Z][A-Za-z0-9_$]*$/.match(iexpr.path[iexpr.path.length - 1].name)) {
+					var module:String = iexpr.path[0].name;
 
-						var path:String = [for (p in iexpr.path) p.name].join(".");
-						
-						var type:Null<Type> = try Context.getType(path) catch (_:Dynamic) null;
-
-						if (type != null) extractEnum(type, enums);
+					var name:String;
+					for (i in 1...iexpr.path.length) {
+						name = iexpr.path[i].name;
+						module += "." + name;
+						if (name.charAt(0) != name.charAt(0).toLowerCase()) {
+							break;
+						}
 					}
+
+					var modules:Array<Type> = Context.getModule(module);
+
+					if (modules != null)
+						for (type in modules)
+							if (type != null)
+								extractEnum(type, enums);
 					
 				case IAll:
 					// TODO
