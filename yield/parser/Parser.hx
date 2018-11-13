@@ -113,7 +113,6 @@ class Parser {
 			
 		}
 
-
 		haxe.macro.Compiler.addGlobalMetadata("", "@:build(yield.parser.Parser.autoRun())", true, true, false);
 	}
 	
@@ -132,16 +131,22 @@ class Parser {
 				var hasAutoBuild:Bool = false;
 				
 				var options:Array<Expr> = null;
+
+				var meta:MetaAccess = switch (ct.kind) {
+					case KAbstractImpl(a): a.get().meta;
+					case _: ct.meta;
+				};
 				
-				for (md in ct.meta.get())
+				for (md in meta.get()) {
 					if (md.name == ":yield") {
 						hasYieldMeta = true;
 						options = md.params != null ? md.params : [];
-					}
-					else if (isBuildMeta(":build", md))
+					} else if (isBuildMeta(":build", md)) {
 						return null;
-					else if (isBuildMeta(":autoBuild", md))
+					} else if (isBuildMeta(":autoBuild", md)) {
 						hasAutoBuild = true;
+					}
+				}
 				
 				if (!hasYieldMeta)
 					return null;

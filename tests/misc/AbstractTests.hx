@@ -109,10 +109,25 @@ class AbstractTests extends utest.Test {
 		// MyForward has no field strNumbers
 		//myForward.strNumbers();
 	}
+
+	function testGenericType () {
+		var g = new GenericTest<Int>(4);
+		var it = g.getMore();
+		Assert.equals("4", it.next());
+		Assert.equals("44", it.next());
+		Assert.equals("444", it.next());
+	}
+
+	function testAbstractGenericType () {
+		var g = new AbstractGenericTest<Int>(8);
+		var it = g.getMore();
+		Assert.equals("88", it.next());
+		Assert.equals("8888", it.next());
+	}
 }
 
 #if (!cs && !java) // error CS1004 repeated modifier
-@:build(yield.parser.Parser.run())
+@:yield
 abstract OperatorOverloading(String) {
 	public inline function new(s:String) {
 		this = s;
@@ -154,7 +169,7 @@ abstract Wrapper(OperatorOverloading) {
 #end
 
 #if (!cs && !java) // error CS1004 repeated modifier
-@:build(yield.parser.Parser.run())
+@:yield
 abstract SelectiveFunctions<T>(T) from T {
 	public function new(t:T) this = t;
 
@@ -245,4 +260,42 @@ class MyForwardedClass {
 	public function strNumbers () {
 		for (i in 0...3) @yield return Std.string(i);
 	}
+}
+
+@:yield
+@:generic
+class GenericTest <T> {
+
+	var value:T;
+
+	public function new (v:T) {
+		value = v;
+	}
+	
+	public function getMore () {
+		var s = "";
+		while (true) {
+			s += value;
+			@yield return s;
+		}
+	}
+
+}
+
+@:yield
+@:generic
+abstract AbstractGenericTest <T> (String) {
+
+	public function new (v:T) {
+		this = Std.string(v);
+	}
+	
+	public function getMore () {
+		// var s = "";
+		while (true) {
+			this += this;
+			@yield return this;
+		}
+	}
+
 }
