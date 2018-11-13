@@ -137,7 +137,7 @@ class AccessionTests extends misc.packs.Parent {
 		@yield return bIterator.next();
 	}
 	
-	#if (!cs && !java) // error: repeated modifier
+	#if (!cs && !java || haxe_ver >= 4.000) // error: repeated modifier
 	#if !lua // error Lua 5.2.3 / luarocks 2.4.3: attempt to call global '_iterator' (a nil value)
 	function testAbstractAccessions () {
 		var a = new MyAbstract();
@@ -242,7 +242,7 @@ class AccessionTests extends misc.packs.Parent {
 	#end
 }
 
-#if (!cs && !java) // error: repeated modifier
+#if (!cs && !java || haxe_ver >= 4.000) // error: repeated modifier
 #if !lua // error Lua 5.2.3 / luarocks 2.4.3: attempt to call global '_iterator' (a nil value)
 @:build(yield.parser.Parser.run())
 @:access(misc.packs.Parent)

@@ -6,7 +6,7 @@ import yield.parser.Parser;
 
 class AbstractTests extends utest.Test {
 	
-	#if (!cs && !java)
+	#if (!cs && !java || haxe_ver >= 4.000)
 	function testOperatorOverloading () {
 		var a = new OperatorOverloading("foo");
 		var it = a * 3;
@@ -19,7 +19,7 @@ class AbstractTests extends utest.Test {
 	}
 	#end
 	
-	#if (!cs && !java)
+	#if (!cs && !java || haxe_ver >= 4.000)
 	function testOperatorOverloadingWrapper () {
 		var a = new Wrapper(new OperatorOverloading("foo"));
 		var it = a.getSource();
@@ -35,7 +35,7 @@ class AbstractTests extends utest.Test {
 	}
 	#end
 	
-	#if (!cs && !java)
+	#if (!cs && !java || haxe_ver >= 4.000)
 	function testOperatorOverloading2 () {
 		var a = new OperatorOverloading2("bar");
 		var it = a / 3;
@@ -48,7 +48,7 @@ class AbstractTests extends utest.Test {
 	}
 	#end
 	
-	#if (!cs && !java)
+	#if (!cs && !java || haxe_ver >= 4.000)
 	function testSelectiveFunctions () {
 		var a = new SelectiveFunctions("foo");
 		var b = new SelectiveFunctions(1);
@@ -60,7 +60,7 @@ class AbstractTests extends utest.Test {
 	}
 	#end
 	
-	#if (!cs && !java) 
+	#if (!cs && !java || haxe_ver >= 4.000) 
 	// Warning : Type String is being cast to the unrelated type misc.SFWrapper.T
 	function testSelectiveFunctionsWrapper () {
 		var a = new SFWrapper(new SelectiveFunctions("bar"));
@@ -86,7 +86,7 @@ class AbstractTests extends utest.Test {
 		//Statics.testConstraints([3]); // Constraint check failure
 	}
 	
-	#if (!cs && !java)
+	#if (!cs && !java || haxe_ver >= 4.000)
 	function testFunctionTypeParams () {
 		
 		var a = new AbstractWithConstraints(["5"]);
@@ -124,9 +124,10 @@ class AbstractTests extends utest.Test {
 		Assert.equals("88", it.next());
 		Assert.equals("8888", it.next());
 	}
+	
 }
 
-#if (!cs && !java) // error CS1004 repeated modifier
+#if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
 @:yield
 abstract OperatorOverloading(String) {
 	public inline function new(s:String) {
@@ -144,7 +145,7 @@ abstract OperatorOverloading(String) {
 }
 #end
 
-#if (!cs && !java) // error CS1004 repeated modifier
+#if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
 @:build(yield.parser.Parser.run())
 abstract Wrapper(OperatorOverloading) {
 	public inline function new(s:OperatorOverloading) {
@@ -168,7 +169,7 @@ abstract Wrapper(OperatorOverloading) {
 }
 #end
 
-#if (!cs && !java) // error CS1004 repeated modifier
+#if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
 @:yield
 abstract SelectiveFunctions<T>(T) from T {
 	public function new(t:T) this = t;
@@ -184,7 +185,7 @@ abstract SelectiveFunctions<T>(T) from T {
 }
 #end
 
-#if (!cs && !java) // build failed
+#if (!cs && !java || haxe_ver >= 4.000) // build failed
 @:build(yield.parser.Parser.run())
 abstract SFWrapper<T>(T) from T {
 	public function new(t:T) this = t;
@@ -220,7 +221,7 @@ typedef Measurable = {
   public var length(default, null):Int;
 }
 
-#if (!cs && !java) // build failed
+#if (!cs && !java || haxe_ver >= 4.000) // build failed
 @:build(yield.parser.Parser.run())
 #if (haxe_ver < 4.000)
 abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
@@ -282,6 +283,7 @@ class GenericTest <T> {
 
 }
 
+#if (!cs && !java || haxe_ver >= 4.000)
 @:yield
 @:generic
 abstract AbstractGenericTest <T> (String) {
@@ -291,7 +293,6 @@ abstract AbstractGenericTest <T> (String) {
 	}
 	
 	public function getMore () {
-		// var s = "";
 		while (true) {
 			this += this;
 			@yield return this;
@@ -299,3 +300,4 @@ abstract AbstractGenericTest <T> (String) {
 	}
 
 }
+#end

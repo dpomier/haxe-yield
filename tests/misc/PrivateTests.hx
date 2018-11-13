@@ -14,7 +14,7 @@ class PrivateTests extends utest.Test {
 		Assert.isTrue(it.next());
 	}
 	
-	#if (!cs && !java) // build failed
+	#if (!cs && !java || haxe_ver >= 4.000) // build failed
 	function testAbstract () {
 		Assert.isTrue(new Abstract().getIt().next());
 	}
@@ -53,7 +53,7 @@ private class NestedClass {
 	}
 }
 
-#if (!cs && !java) // build failed
+#if (!cs && !java || haxe_ver >= 4.000) // build failed
 @:build(yield.parser.Parser.run())
 abstract Abstract (Int) {
 	
