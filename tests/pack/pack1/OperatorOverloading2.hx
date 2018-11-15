@@ -6,7 +6,7 @@ import yield.parser.Parser;
 #end
 abstract OperatorOverloading2(String) {
 
-	#if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
+	#if (!cs && !java || haxe_ver >= 4.000)
 
 	public inline function new(s:String) {
 		this = s;

@@ -60,8 +60,7 @@ class AbstractTests extends utest.Test {
 	}
 	#end
 	
-	#if (!cs && !java || haxe_ver >= 4.000) 
-	// Warning : Type String is being cast to the unrelated type misc.SFWrapper.T
+	#if (!cs && !java) 
 	function testSelectiveFunctionsWrapper () {
 		var a = new SFWrapper(new SelectiveFunctions("bar"));
 		var b = new SFWrapper(1);
@@ -86,7 +85,7 @@ class AbstractTests extends utest.Test {
 		//Statics.testConstraints([3]); // Constraint check failure
 	}
 	
-	#if (!cs && !java || haxe_ver >= 4.000)
+	#if (!cs && !java)
 	function testFunctionTypeParams () {
 		
 		var a = new AbstractWithConstraints(["5"]);
@@ -118,13 +117,14 @@ class AbstractTests extends utest.Test {
 		Assert.equals("444", it.next());
 	}
 
+	#if (!cs && !java || haxe_ver >= 4.000)
 	function testAbstractGenericType () {
 		var g = new AbstractGenericTest<Int>(8);
 		var it = g.getMore();
 		Assert.equals("88", it.next());
 		Assert.equals("8888", it.next());
 	}
-	
+	#end
 }
 
 #if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
@@ -185,7 +185,7 @@ abstract SelectiveFunctions<T>(T) from T {
 }
 #end
 
-#if (!cs && !java || haxe_ver >= 4.000) // build failed
+#if (!cs && !java) // error CS0246: The type or namespace name 'T' could not be found
 @:build(yield.parser.Parser.run())
 abstract SFWrapper<T>(T) from T {
 	public function new(t:T) this = t;
@@ -221,7 +221,7 @@ typedef Measurable = {
   public var length(default, null):Int;
 }
 
-#if (!cs && !java || haxe_ver >= 4.000) // build failed
+#if (!cs && !java) // error CS0246: The type or namespace name 'T' could not be found
 @:build(yield.parser.Parser.run())
 #if (haxe_ver < 4.000)
 abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
