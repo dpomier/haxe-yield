@@ -21,7 +21,6 @@ class MyClass {
     // ...
 }
 ```
-When dealing with abstracts, use `@:build(yield.parser.Parser.run())` instead of `@:yield`.
 
 The following example shows the two forms of the `yield` metadata:
 ```haxe
