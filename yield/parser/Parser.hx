@@ -118,7 +118,7 @@ class Parser {
 	
 	private static macro function autoRun (): Array<Field> {
 		
-		var t:Type = Context.getLocalType();
+		var t:Type = try Context.getLocalType() catch (_:Dynamic) null;
 		
 		switch (t) {
 			case null: return null;
@@ -133,8 +133,10 @@ class Parser {
 				var options:Array<Expr> = null;
 
 				var meta:MetaAccess = switch (ct.kind) {
-					case KAbstractImpl(a): a.get().meta;
-					case _: ct.meta;
+					case KAbstractImpl(a) if (!ct.isExtern && !ct.isInterface): 
+						a.get().meta;
+					case _: 
+						ct.meta;
 				};
 				
 				for (md in meta.get()) {
