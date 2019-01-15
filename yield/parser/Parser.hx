@@ -311,13 +311,15 @@ class Parser {
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
 
+		var modified:Bool = false;
+
 		for (field in env.classData.classFields)
-			parseField(field, env);
+			if (parseField(field, env)) modified = true;
 		
-		return env.classData.classFields;
+		return modified ? env.classData.classFields : null;
 	}
 	
-	private static function parseField (field:Field, env:WorkEnv): Void {
+	private static function parseField (field:Field, env:WorkEnv): Bool {
 		
 		var func:Function;
 		var alternativeRetType:ComplexType;
@@ -342,7 +344,7 @@ class Parser {
 					};
 					
 				} else {
-					return;
+					return false;
 				}
 		}
 		
@@ -353,10 +355,12 @@ class Parser {
 		env.setFieldData(field, func);
 		
 		var success:Bool = parseFunction(field.name, func, field.pos, env);
-		
+
 		if (success) {
 			DefaultGenerator.run(env);
 		}
+
+		return success;
 	}
 	
 	/**
