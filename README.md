@@ -40,9 +40,12 @@ Exemple
 
 Here’s an example of the `yield` metadata usage:
 ```haxe
-function sayHello (name:String):Iterator<String> {
-    @yield return “Hello”;
-    @yield return name + “!”;
+@:yield
+class Test {
+    function sayHello (name:String):Iterator<String> {
+        @yield return “Hello”;
+        @yield return name + “!”;
+    }
 }
 ```
 
