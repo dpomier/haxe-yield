@@ -96,5 +96,54 @@ class ImportTools {
 
 		return enums;
 	}
+
+	public static function isImported (type:Array<String>, ?localImports:Array<ImportExpr>):Bool {
+
+		if (localImports == null) {
+			localImports = Context.getLocalImports();
+		}
+
+		var imported = false;
+
+		for (localImport in localImports) {
+
+			var isAll:Bool = switch (localImport.mode) {
+				case INormal, IAsName(_): false;
+				case IAll:
+
+					var	firstLetter:String = {
+						var lastPart:String = localImport.path[localImport.path.length - 1].name;
+						var i = 0;
+						while (lastPart.charAt(i) == "_") {
+							i++;
+						}
+						lastPart.charAt(i);
+					};
+					
+					if (firstLetter != "" && firstLetter == firstLetter.toUpperCase()) {
+						true;
+					} else {
+						false;
+					};
+			};
+
+			if (localImport.path.length == type.length || isAll && localImport.path.length == type.length - 1) {
+				
+				var i = localImport.path.length;
+				while (--i >= 0) {
+					if (localImport.path[i].name != type[i]) {
+						break;
+					}
+				}
+				if (i < 0) {
+					imported = true;
+					break;
+				}
+
+			}
+		}
+
+		return imported;
+	}
 }
 #end

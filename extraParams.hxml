@@ -1,1 +1,2 @@
 --macro yield.parser.Parser.auto()
+--macro yield.parser.Parser.parseOnImport("misc.EmptyImport", "yield")

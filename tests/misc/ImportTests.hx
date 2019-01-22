@@ -10,8 +10,8 @@ import pack.pack1.MoreMiscFunctions.MoreMiscFunctions3.*;
 import pack.pack3.SomeFunctions.*;
 import pack.pack2.*;
 import haxe.ds.GenericStack; // import a generic type
+import misc.EmptyImport; // import a type that trigger the parsing of the module classes
 
-@:yield
 @:access(pack.pack1.MoreMiscFunctions.priv)
 class ImportTests extends utest.Test {
 	

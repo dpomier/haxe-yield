@@ -35,6 +35,7 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.MetaTools;
 import yield.parser.tools.MetaTools.MetaToolsOption;
 import yield.parser.checks.TypeInferencer;
+import yield.parser.tools.ImportTools;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
@@ -86,6 +87,29 @@ class Parser {
 	}
 	
 	#if (macro || display)
+
+	/**
+	 * Automatically parse every module that imports the type identified by `type`.
+	 * This function is meant to be invoked via `--macro yield.parser.Parser.parseWhenImported("any.package.MyClass")`.
+	 * See https://haxe.org/manual/macro-initialization.html for more details on Initialization Macros.
+	 * @param type
+	 */
+	private static function parseOnImport (type:String, ?keyword:String, ?explicit:Bool, ?extend:Bool): Void {
+
+		if (type != null) {
+
+			var options:Array<Expr> = [];
+
+			if (keyword != null) options.push(macro Keyword($v{keyword}));
+			if (explicit != null) options.push(macro Explicit($v{explicit}));
+			if (extend != null) options.push(macro Extend($v{extend}));
+
+			parsingImports.push({ path: type.split("."), options: options });
+		}
+
+	}
+
+	private static var parsingImports:Array<{ path:Array<String>, options:Array<Expr> }> = [];
 	
 	private static function auto (): Void {
 
@@ -149,9 +173,34 @@ class Parser {
 						hasAutoBuild = true;
 					}
 				}
-				
-				if (!hasYieldMeta)
-					return null;
+
+				if (!hasYieldMeta) {
+
+					// Check imports
+
+					if (parsingImports.length == 0) {
+						return null;
+					}
+
+					var localImports:Array<ImportExpr> = Context.getLocalImports();
+					var hasParsingImport:Bool = false;
+
+					for (parsingImport in parsingImports) {
+
+						if (@:inline ImportTools.isImported(parsingImport.path, localImports)) {
+
+							hasParsingImport = true;
+							options = parsingImport.options;
+							break;
+
+						}
+
+					}
+
+					if (!hasParsingImport) {
+						return null;
+					}
+				}
 				
 				var env = createEnv(ct, t, options, hasAutoBuild);
 				

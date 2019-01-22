@@ -1,0 +1,5 @@
+package misc;
+
+class EmptyImport {
+
+}
