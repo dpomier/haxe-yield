@@ -285,23 +285,6 @@ class Parser {
 		var yieldExplicit:Bool = Context.defined("yield-explicit") ? parseDirectiveBool(Context.definedValue("yield-explicit")) : false;
 		var yieldExtend:Bool = Context.defined("yield-extend") ? parseDirectiveBool(Context.definedValue("yield-extend")) : false;
 		
-		#if (yield >= "2.0.1")
-		#error "The depricated directives should be removed"
-		#else
-		if (Context.defined("yieldKeyword")) {
-			Context.warning("The directive yieldKeyword is deprecated. Please use yield-keyword instead", Context.currentPos());
-			yieldKeyword = parseDirectiveStr(Context.definedValue("yieldKeyword"));
-		}
-		if (Context.defined("yieldExplicit")) {
-			Context.warning("The directive yieldExplicit is deprecated. Please use yield-explicit instead", Context.currentPos());
-			yieldExplicit = parseDirectiveBool(Context.definedValue("yieldExplicit"));
-		}
-		if (Context.defined("yieldExtend")) {
-			Context.warning("The directive yieldExtend is deprecated. Please use yield-extend instead", Context.currentPos());
-			yieldExtend = parseDirectiveBool(Context.definedValue("yieldExtend"));
-		}
-		#end
-		
 		function throwInvalidOpt (pos:Position)
 			Context.fatalError("Invalid option", pos);
 		
