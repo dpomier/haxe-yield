@@ -14,7 +14,7 @@ When defining an iterator with `yield` statements, an extra class is implicitly 
 Usage
 -----
 
-Any `@yield` statements are available for classes that are annotated with the `:yield` metadata, or available for all classes that extend classes annotated with `:yield(Extend)`.
+Any `@yield` expressions are available for classes that are annotated with the `:yield` metadata, or available for all classes that extend classes annotated with `:yield(Extend)`.
 ```haxe
 @:yield
 class MyClass {
@@ -28,10 +28,10 @@ The following example shows the two forms of the `yield` metadata:
 @yield break;
 ```
 
-Use a `@yield return` statement to return each element one at a time.<br/>
-Use a `@yield break` statement to end the iteration.
+Use `@yield return` to return each element one at a time.<br/>
+Use `@yield break` to end the iteration.
 
-Iterator methods can be run through using a `for` expression or [Lambda](https://haxe.org/manual/std-Lambda.html) functions. When a `yield return` statement is reached in the iterator method, `expression` is returned. Execution is restarted from that location the next time that the iterator function is called.
+Iterator methods can be run through using a `for` expression or [Lambda](https://haxe.org/manual/std-Lambda.html) functions. When `@yield return` is reached in the iterator method, `expression` is returned. Execution is restarted from that location the next time that the iterator function is called.
 
 The return type must be [Iterator&lt;T&gt;](http://api.haxe.org/Iterator.html) or [Iterable&lt;T&gt;](http://api.haxe.org/Iterable.html). If no return type is defined, the type will be [Dynamic](https://haxe.org/manual/types-dynamic.html), and can be unified to both Iterator or Iterable.
 
@@ -59,8 +59,8 @@ for (word in sayHello(“World”)) {
 
 Call the sayHello method returns an Iterator&lt;String&gt;. The body of the method is not executed yet. 
 <br/>The `for` loop iterates over the iterator while the `Iterator<String>.hasNext` method returns true. 
-<br/>The method `Iterator<String>.hasNext` executes only once the body of sayHello until the next `@yield` statement is reached. 
-In case of a `@yield return` statement, `Iterator<String>.hasNext` will return true, and the result of the execution can be get once by calling `Iterator<String>.next`.
+<br/>The method `Iterator<String>.hasNext` executes only once the body of sayHello until the next `@yield` expression is reached. 
+In case of a `@yield return`, `Iterator<String>.hasNext` will return true, and the result of the execution can be get once by calling `Iterator<String>.next`.
 
 The `Iterator<String>.next` method can also be used without calling `Iterator<String>.hasNext`. If the end of sayHello is reached, `Iterator<String>.next` returns the default value of the return type.
 
@@ -88,7 +88,7 @@ Advanced usage
 You can compile with some haxe compilation parameters (or pass several `yield.YieldOption` into the `:yield` metadata):
 
  - `yield-extend`
-		If the option is enabled, all extending classes will be able to use yield statements. If this option affects an interface, all implementing classes and all extending interfaces will be able to use yield statements. This is disabled by default.
+		If the option is enabled, all extending classes will be able to use `@yield` expressions. If this option affects an interface, all implementing classes and all extending interfaces will be able to use `@yield` expressions. This is disabled by default.
 		Compile with `-D yield-extend`.
  - `yield-explicit`
 		If the option is enabled, the return type of iterative functions needs to be explicitly specified. This is disabled by default.
@@ -97,10 +97,8 @@ You can compile with some haxe compilation parameters (or pass several `yield.Yi
 		Use a custom keyword instead of "yield".
 		Compile with `-D yield-keyword=myCustomMetaName`.
  - `yield-parsing`
-		Specifies packages or classpaths to include in the yield parser. All the impacted classes will no longer need to be annotated with `:yield` to be able to use the yield statements. This can be recursive using the `*` wildcard.
+		Specifies packages or classpaths to include in the yield parser. All the impacted classes will no longer need to be annotated with `:yield` to be able to use the `@yield` expressions. This can be recursive using the `*` wildcard.
 		Compile with `-D yield-parsing= my.package.one, my.packages.*, my.class.Foo`.
-
-`@yield return` statements can be located in `try` blocks. This will duplicate the `catch` expressions as many times as there are iterator blocks.
 
 Install
 -----
