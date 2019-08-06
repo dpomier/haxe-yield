@@ -13,6 +13,7 @@ import misc.ScopeTests;
 import misc.UsingTests;
 import misc.YieldTests;
 import misc.InheritanceTests;
+import misc.OnTypeYieldedTests;
 import eparsers.EForTests;
 import eparsers.EFunctionTests;
 import eparsers.ETryTests;
@@ -52,6 +53,7 @@ class Tests
 		r.addCase(new InferenceTests());
 		r.addCase(new InheritanceTests());
 		r.addCase(new PrivateTests());
+		r.addCase(new OnTypeYieldedTests());
 		
 		// options tests
 		r.addCase(new ExtendTests());
