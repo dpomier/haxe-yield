@@ -22,7 +22,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 package yield.parser;
-import haxe.macro.Expr;
 #if (macro || display)
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
@@ -37,6 +36,7 @@ import yield.parser.tools.MetaTools.MetaToolsOption;
 import yield.parser.checks.TypeInferencer;
 import yield.parser.tools.ImportTools;
 import haxe.macro.ExprTools;
+import haxe.macro.Expr;
 import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
 import haxe.macro.Type.Ref;
