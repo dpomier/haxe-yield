@@ -37,27 +37,27 @@ import yield.parser.tools.IdentCategory;
 
 class TypeInferencer {
 
-	public static function resolveYieldedType (yieldableType:Null<ComplexType>, pos:Position):ReturnKind {
+	public static function resolveReturnType (?returnType:Null<Type>, ?returnComplexType:Null<ComplexType>, pos:Position):ReturnType {
 		
-		var resolvedType:Null<Type> = try {
-			ComplexTypeTools.toType(yieldableType);
-		} catch (err:Dynamic) {
-			null;
-		};
+		if (returnType == null) {
+			returnType = try {
+				ComplexTypeTools.toType(returnComplexType);
+			} catch (err:Dynamic) {
+				null;
+			};
+		} else {
+			returnComplexType = TypeTools.toComplexType(returnType);
+		}
 		
-		if (resolvedType != null) {
+		if (returnType != null) {
 			
-			var retType:Type = TypeTools.followWithAbstracts(resolvedType);
-
-			if (retType == null) {
-				throw "here";
-			}
+			var retType:Type = TypeTools.follow(returnType);
 			
 			switch (retType) {
 					
 				case TDynamic(_):
 					
-					return ReturnKind.BOTH(macro:StdTypes.Dynamic);
+					return ReturnType.BOTH(macro:StdTypes.Dynamic);
 				
 				case Type.TAnonymous(_.get() => at):
 					
@@ -65,61 +65,75 @@ class TypeInferencer {
 					var isIterable = false;
 					var iteratorYieldedType:Null<ComplexType>;
 					var iterableYieldedType:Null<ComplexType>;
-					
-					if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterator<Dynamic>))) {
-						
-						isIterator = true;
-						
-						for (field in at.fields) if (field.name == "next") {
 
-							iteratorYieldedType = switch (field.type) {
-								case TFun(args, ret): ret != null ? TypeTools.toComplexType(ret) : macro:StdTypes.Dynamic;
-								case _: throw "unexpected result";
-							};
+					var hasNext = false,
+						nextRet:ComplexType;
+					var hasHasNext = false;
+					var hasIterator = false,
+						iteratorRet:ComplexType;
 
-							break;
+					// TODO: workaround for https://github.com/HaxeFoundation/haxe/issues/7657
+					for (field in at.fields) if (field.name == "hasNext" && field.params.length == 0) {
+						
+						switch field.type {
+							case TFun([], TAbstract(_.get() => { name: "Bool", pack: [] },[])):
+								hasHasNext = true;
+							case _:
+						}
+
+					} else if (field.name == "next" && field.params.length == 0) {
+						
+						switch field.type {
+							case TFun([], ret):
+								hasNext = true;
+								nextRet = TypeTools.toComplexType(ret);
+							case _:
+						}
+
+					} else if (field.name == "iterator" && field.params.length == 0) {
+						
+						switch field.type {
+							case TFun([], ret):
+								hasIterator = true;
+								iteratorRet = TypeTools.toComplexType(ret);
+							case _:
 						}
 					}
 
-					if (Context.unify(retType, ComplexTypeTools.toType(macro:Iterable<Dynamic>))) {
+					if (hasHasNext && hasNext) {
+						isIterator = true;
+						iteratorYieldedType = nextRet;
+					}
+
+					if (hasIterator) {
 						
-						isIterable = true;
-						
-						for (field in at.fields) if (field.name == "iterator") {
-
-							var iteratorType:ComplexType = switch (field.type) {
-								case TFun(args, ret): ret != null ? TypeTools.toComplexType(ret) : macro:StdTypes.Dynamic;
-								case _: throw "unexpected result";
-							};
-
-							iterableYieldedType = switch (resolveYieldedType(iteratorType, pos)) {
-								case ITERATOR(p): p;
-								case _: throw "unexpected result";
-							}
-
-							break;
+						switch resolveReturnType(iteratorRet, pos) {
+							case ITERATOR(p):
+								isIterable = true;
+								iterableYieldedType = p;
+							case _:
 						}
 					}
 
 					return if (isIterator && isIterable) {
-						ReturnKind.BOTH(getLowerComplexType(iteratorYieldedType, iterableYieldedType));
+						ReturnType.BOTH(getLowerComplexType(iteratorYieldedType, iterableYieldedType));
 					} else if (isIterator) {
-						ReturnKind.ITERATOR(iteratorYieldedType);
+						ReturnType.ITERATOR(iteratorYieldedType);
 					} else if (isIterable) {
-						ReturnKind.ITERABLE(iterableYieldedType);
+						ReturnType.ITERABLE(iterableYieldedType);
 					} else {
-						Context.fatalError(ComplexTypeTools.toString(yieldableType) + " should be Iterator or Iterable", pos);
+						Context.fatalError(ComplexTypeTools.toString(returnComplexType) + " should be Iterator or Iterable", pos);
 					};
 					
 				case _:
 					
-					return Context.fatalError(ComplexTypeTools.toString(yieldableType) + " should be Iterator or Iterable", pos);
+					return Context.fatalError(ComplexTypeTools.toString(returnComplexType) + " should be Iterator or Iterable", pos);
 					
 			}
 			
 		} else {
 			
-			return ReturnKind.BOTH(macro:StdTypes.Dynamic);
+			return ReturnType.BOTH(macro:StdTypes.Dynamic);
 			
 		}
 	}
