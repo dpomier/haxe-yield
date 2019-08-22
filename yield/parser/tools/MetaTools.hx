@@ -445,6 +445,47 @@ class MetaTools {
 	private static function throwUnexpectedMeta (name:String): Void {
 		if (onlyInBody) Context.fatalError("Unexpected " + name, selectedPos);
 	}
+
+	public static function resolveMetaType (expr:Expr):Type {
+
+		return extractFromMeta(expr, "yield", function (s:MetadataEntry, e:Expr) {
+
+			return switch (e.expr) {
+				case EReturn(_e) if (_e != null): 
+
+					try {
+						Context.typeof(_e);
+					} catch (_:Dynamic) {
+						null;
+					};
+
+				case _: null;
+			}
+
+		});
+	}
+
+	static function extractFromMeta<T> (expr:Expr, meta:String, f:MetadataEntry->Expr->Null<T>):Null<T> {
+
+		var selection:Null<T> = null;
+
+		function browse (e:Expr) {
+			switch(e.expr) {
+				case EMeta(s, e) if (s.name == "yield"):
+					selection = f(s, e);
+					if (selection == null) {
+						e.iter(browse);
+					}
+				case _:
+					e.iter(browse);
+			}
+		}
+
+		browse(expr);
+
+		return selection;
+
+	}
 	
 }
 #end

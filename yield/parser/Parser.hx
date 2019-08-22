@@ -27,7 +27,7 @@ import haxe.macro.Expr;
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
 import yield.parser.env.WorkEnv;
-import yield.parser.env.WorkEnv.ReturnKind;
+import yield.parser.env.WorkEnv.ReturnType;
 import yield.parser.YieldSplitter;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.generators.DefaultGenerator;
@@ -419,25 +419,35 @@ class Parser {
 		}
 		
 		var yieldedType:ComplexType;
-		var returnKind:ReturnKind;
+		var returnType:ReturnType;
 		
 		// Typing
 		
 		if (f == MetaTools.selectedFunc) {
-			
+
 			env.yieldMode = true;
 			
 			if (f.ret == null) {
-				
+
 				if (env.yieldExplicit) {
+
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
+
 				} else {
-					returnKind = ReturnKind.UNKNOWN(null, []);
+
+					var resolvedType:Null<Type> = MetaTools.resolveMetaType(f.expr);
+
+					returnType = if (resolvedType != null) {
+						ReturnType.UNKNOWN(null, [resolvedType]);
+					} else {
+						ReturnType.UNKNOWN(null, []);
+					};
+
 				}
 				
 			} else {
 				
-				returnKind = TypeInferencer.resolveYieldedType(f.ret, pos);
+				returnType = TypeInferencer.resolveReturnType(f.ret, pos);
 
 			}
 			
@@ -445,7 +455,7 @@ class Parser {
 			
 			env.yieldMode = false;
 			
-			returnKind = ReturnKind.BOTH(macro:StdTypes.Dynamic);
+			returnType = ReturnType.BOTH(macro:StdTypes.Dynamic);
 			
 		}
 		
@@ -455,14 +465,14 @@ class Parser {
 		
 		// Parse
 		
-		env.setFunctionData(name, f, returnKind, f.expr.pos);
+		env.setFunctionData(name, f, returnType, f.expr.pos);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
 		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
 		
 		// Generate type
 
-		switch (returnKind) {
+		switch (returnType) {
 			case UNKNOWN(t, returns):
 
 				// TODO: could be improved

@@ -52,7 +52,7 @@ typedef Scope = {
 	var defaultCondition:Bool;
 }
 
-enum ReturnKind {
+enum ReturnType {
 	ITERABLE(t:ComplexType);
 	ITERATOR(t:ComplexType);
 	BOTH(t:ComplexType);
@@ -76,7 +76,7 @@ class WorkEnv {
 	public var fieldName          (default, null):String;
 	public var classField         (default, null):Field;
 	public var classFunction      (default, null):Function;
-	public var functionReturnKind (default, null):ReturnKind;
+	public var functionReturnKind (default, null):ReturnType;
 	public var functionReturnType (default, null):Null<ComplexType>;
 	public var yieldedType        (default, null):Null<ComplexType>;
 	public var defaultYieldedValue (default, null):Expr;
@@ -156,7 +156,7 @@ class WorkEnv {
 		requiresInstance = false;
 	}
 	
-	public function setFunctionData (name:String, f:Function, returnKind:ReturnKind, pos:Position): Void {
+	public function setFunctionData (name:String, f:Function, returnKind:ReturnType, pos:Position): Void {
 		
 		// reset
 		localStack    = new Array<Statement>();
