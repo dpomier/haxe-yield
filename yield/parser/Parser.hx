@@ -89,6 +89,21 @@ class Parser {
 	#if (macro || display)
 
 	/**
+	 * Adds a callback function `f` which allow transforming each yielded expression.
+	 * The callback receives the expression and its type, then returns a transformed expression.
+	 * 
+	 * If the returned expression is null, the callback have no effect.
+	 * 
+	 * It is possible to define new types in the callback and to yield new expressions in the returned expression.
+	 * @param f 
+	 */
+	public static function onYield (f:Expr->Null<ComplexType>->Null<Expr>): Void {
+
+		onYieldListeners.push(f);
+
+	}
+
+	/**
 	 * Automatically parse every module that imports the type identified by `type`.
 	 * This function is meant to be invoked via `--macro yield.parser.Parser.parseWhenImported("any.package.MyClass")`.
 	 * See https://haxe.org/manual/macro-initialization.html for more details on Initialization Macros.
@@ -110,6 +125,8 @@ class Parser {
 	}
 
 	private static var parsingImports:Array<{ path:Array<String>, options:Array<Expr> }> = [];
+	
+	private static var onYieldListeners:Array<Expr->Null<ComplexType>->Null<Expr>> = [];
 	
 	private static function auto (): Void {
 
@@ -502,6 +519,20 @@ class Parser {
 		#end
 		
 		return true;
+	}
+
+	@:noCompletion
+	public static function applyYieldModifications (e:Expr, ?t:ComplexType):Null<Expr> {
+
+		if (onYieldListeners.length > 0) {
+			for (onYield in onYieldListeners) {
+				var r = onYield(e, t);
+				if (r != null)
+					e = r;
+			}
+		}
+
+		return e;
 	}
 	
 	#end

@@ -109,7 +109,11 @@ class EMetaParser extends BaseParser {
 
 				};
 
-				_e.expr = EReturn( m_ys.applyYieldModifications(__e, knownRetType) );
+				var ereturn:Expr = Parser.applyYieldModifications(__e, knownRetType);
+
+				m_ys.parse(ereturn, true);
+
+				_e.expr = EReturn( ereturn );
 
 				#end
 			case EBreak:
