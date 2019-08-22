@@ -85,23 +85,28 @@ class FieldTools {
 	/**
 	 * Determine the nature of the identifier `e`.
 	 */
-	public static function resolveIdent (s:String, classType:ClassType, classFields:Array<Field>, importedFields:Array<String>): IdentCategory {
+	public static function resolveIdent (s:String, classData:yield.parser.env.ClassData): IdentCategory {
 		
 		var lcat:Null<IdentCategory>;
 		
 		// Members
 		
-		lcat = getInstanceField(classFields, classType, s);
+		lcat = getInstanceField(classData.classFields, classData.localClass, s);
 		if (lcat != null) return lcat;
 		
 		// Statics
 		
-		lcat = getStaticField(classFields, classType, s);
+		lcat = getStaticField(classData.classFields, classData.localClass, s);
 		if (lcat != null) return lcat;
 		
 		// Imported fields
 		
-		lcat = getImportedField(importedFields, s);
+		lcat = getImportedField(classData.importedFields, s);
+		if (lcat != null) return lcat;
+		
+		// Used fields
+		
+		lcat = getUsedField(classData.usings, s);
 		if (lcat != null) return lcat;
 		
 		return IdentCategory.Unknown;
@@ -134,6 +139,20 @@ class FieldTools {
 		
 		var i:Int = importedFields.indexOf(name);
 		return i != -1 ? IdentCategory.ImportedField(null) : null;
+	}
+
+	private static function getUsedField (usings:Array<Ref<ClassType>>, name:String): Null<IdentCategory> {
+
+		for (ref in usings) {
+			var ct = ref.get();
+			for (field in ct.statics.get()) {
+				if (field.name == name) {
+					return IdentCategory.ImportedField(null);
+				}
+			}
+		}
+
+		return null;
 	}
 	
 	public static function toString (field:Field): String {

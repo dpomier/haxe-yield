@@ -41,6 +41,7 @@ class ClassData {
 	public var imports          (default, null):Array<ImportExpr>;
 	public var importedFields   (default, null):Array<String>;
 	public var importedEnums    (default, null):Array<EnumType>;
+	public var usings           (default, null):Array<Ref<ClassType>>;
 
 	private inline function new () {
 
@@ -70,6 +71,7 @@ class ClassData {
 		data.imports        = Context.getLocalImports();
 		data.importedFields = ImportTools.getFieldShorthands(data.imports);
 		data.importedEnums  = ImportTools.getEnumConstructors(data.imports, data.module);
+		data.usings         = Context.getLocalUsing();
 
 		return data;
 	}

@@ -520,7 +520,7 @@ class WorkEnv {
 		if (data != null) {
 			return IdentCategory.LocalVar(data);
 		} else {
-			return FieldTools.resolveIdent(name, classData.localClass, classData.classFields, classData.importedFields);
+			return FieldTools.resolveIdent(name, classData);
 		}
 	}
 	
