@@ -427,7 +427,7 @@ class Parser {
 		
 		MetaTools.option = MetaToolsOption.None;
 		
-		if (!MetaTools.hasMeta(env.yieldKeywork, f, true)) {
+		if (!MetaTools.hasMeta(env.yieldKeywork, f, true/*, f.ret == null*/)) {
 			return false;
 		}
 		
