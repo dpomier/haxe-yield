@@ -4,8 +4,7 @@
   "license": "MIT",
   "tags": [ "cross", "utility" ],
   "description": "Implements iterator patterns through the `yield` metadata",
-  "version": "2.0.0",
-  "releasenote": "bugfixes and minor enhancements",
-  "releasenote": "many enhancements and bugfixes",
+  "version": "2.1.0",
+  "releasenote": "added parsing on import and yield callbacks",
   "contributors": ["dpomier"]
 }
