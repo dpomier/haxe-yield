@@ -25,6 +25,10 @@
 package yield.parser.tools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.Type;
+import haxe.macro.TypeTools;
+import haxe.macro.ComplexTypeTools;
+using haxe.macro.ExprTools;
 
 enum MetaToolsOption {
 	None;
@@ -35,20 +39,36 @@ class MetaTools {
 	
 	private static var functionStack:Array<Function> = [];
 	private static var onlyInBody:Bool = false;
+	private static var resolveType:Bool = false;
 	
-	public static var selectedFunc (default, null):Function;
-	public static var selectedExpr (default, null):Expr;
-	public static var selectedPos  (default, null):Position;
+	public static var selectedFunc (default, set):Null<Function>;
+	public static var selectedExpr (default, set):Null<Expr>;
+	public static var selectedPos  (default, set):Null<Position>;
+	public static var resolvedType (default, null):Null<Type>;
+	public static var metaFound    (default, null):Bool = false;
+
+	private static function set_selectedFunc (v:Function):Function {
+		return selectedFunc = (!resolveType || resolvedType == null) ? v : selectedFunc;
+	}
+	private static function set_selectedExpr (v:Expr):Expr {
+		return selectedExpr = (!resolveType || resolvedType == null) ? v : selectedExpr;
+	}
+	private static function set_selectedPos (v:Position):Position {
+		return selectedPos = (!resolveType || resolvedType == null) ? v : selectedPos;
+	}
 	
 	public static var option:MetaToolsOption;
 	
-	public static function hasMeta (name:String, ?f:Function, ?e:Expr, onlyInBody:Bool = false): Bool {
+	public static function hasMeta (name:String, ?f:Function, ?e:Expr, onlyInBody = false, resolveType = false): Bool {
 		
 		MetaTools.onlyInBody = onlyInBody;
+		MetaTools.resolveType = resolveType;
 		
 		selectedExpr = null;
 		selectedFunc = null;
 		selectedPos  = null;
+		resolvedType = null;
+		metaFound    = false;
 		
 		if (f == null && e == null) return false;
 		
@@ -56,7 +76,7 @@ class MetaTools {
 		
 		functionStack = [f];
 		
-		while (functionStack.length != 0) {
+		while (functionStack.length != 0 && !metaFound) {
 			
 			selectedFunc = functionStack.pop();
 			
@@ -65,11 +85,13 @@ class MetaTools {
 				runExpr = false;
 				hasMetaExpr(name, e);
 				
-			} else if (hasMetaFun(name, selectedFunc)) {
+			} else if (hasMetaFun(name, selectedFunc) || metaFound) {
+				if (selectedFunc == null) throw "should nevre be null here";
 				return true;
 			}
 		}
-		return false;
+		if (metaFound && selectedFunc == null) throw "should nevre be null here";
+		return metaFound;
 	}
 	
 	public static function hasMetaExpr (name:String, e:Expr, ?onlyFunctionBody:Bool): Bool {
@@ -180,7 +202,14 @@ class MetaTools {
 				return hasMetaExpr(name, _e) || hasMetaCT(name, _t);
 				
 			case EMeta(_s, _e):
-				return hasMetaME(name, _s) || hasMetaExpr(name, _e);
+
+				if (resolveType) {
+					return hasMetaME(name, _s) && typeResolution(_e) || hasMetaExpr(name, _e);
+				} else {
+					return metaFound || hasMetaME(name, _s) || hasMetaExpr(name, _e);
+				}
+
+				
 		}
 		
 		return false;
@@ -200,12 +229,18 @@ class MetaTools {
 		
 		selectedPos = s.pos;
 		
-		if (s.name == name) return true;
+		if (s.name == name) {
+			metaFound = true;
+			return true;
+		}
 		
 		if (s.params != null) {
 			
 			for (lexpr in s.params) {
-				if (hasMetaExpr(name, lexpr)) return true;
+				if (hasMetaExpr(name, lexpr)) {
+					metaFound = true;
+					return true;
+				}
 			}
 		}
 		
@@ -440,6 +475,67 @@ class MetaTools {
 	private static function hasMetaCatch (name:String, c:Catch): Bool {
 		
 		return hasMetaCT(name, c.type) || hasMetaExpr(name, c.expr);
+	}
+
+	private static function typeResolution (e:Null<Expr>):Bool {
+
+		if (!resolveType || resolvedType != null) {
+			return true;
+		}
+
+		if (e != null) {
+			
+			e = switch (e.expr) {
+				// case EConst(c):
+				// case EArray(e1, e2):
+				// case EBinop(op, e1, e2):
+				// case EField(e, field):
+				// case EParenthesis(e):
+				// case EObjectDecl(fields):
+				// case EArrayDecl(values):
+				// case ECall(e, params):
+				// case ENew(t, params):
+				// case EUnop(op, postFix, e):
+				case EVars(vars): null;
+				// case EFunction(name, f):
+				// case EBlock(exprs):
+				case EFor(it, expr): null;
+				// case EIf(econd, eif, eelse):
+				case EWhile(econd, e, normalWhile): null;
+				// case ESwitch(e, cases, edef):
+				// case ETry(e, catches):
+				case EReturn(_e): _e;
+				case EBreak: null;
+				case EContinue: null;
+				case EUntyped(e): null;
+				case EThrow(e): null;
+				// case ECast(e, t):
+				case EDisplay(e, displayKind): null;
+				case EDisplayNew(t): null;
+				// case ETernary(econd, eif, eelse):
+				// case ECheckType(e, t):
+				case EMeta(s, _e): _e;
+				case _: e;
+			};
+
+			if (e == null) return false;
+
+			try {
+				resolvedType = Context.typeof(e);
+			} catch (_:Dynamic) {
+				resolvedType = null;
+			}
+			
+			if (resolvedType != null) {
+				resolvedType = switch (resolvedType) {
+					case TDynamic(null): null;
+					case _: resolvedType;
+				};
+			}
+			
+		}
+		
+		return resolvedType != null;
 	}
 	
 	private static function throwUnexpectedMeta (name:String): Void {
