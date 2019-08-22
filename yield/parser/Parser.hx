@@ -109,7 +109,7 @@ class Parser {
 	 * See https://haxe.org/manual/macro-initialization.html for more details on Initialization Macros.
 	 * @param type
 	 */
-	private static function parseOnImport (type:String, ?keyword:String, ?explicit:Bool, ?extend:Bool): Void {
+	public static function parseOnImport (type:String, ?keyword:String, ?explicit:Bool, ?extend:Bool): Void {
 
 		if (type != null) {
 
