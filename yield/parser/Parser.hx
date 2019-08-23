@@ -109,34 +109,33 @@ class Parser {
 	 * See https://haxe.org/manual/macro-initialization.html for more details on Initialization Macros.
 	 * @param type
 	 */
-	public static function parseOnImport (type:String, ?keyword:String, ?explicit:Bool, ?extend:Bool): Void {
+	public static function parseOnImport (type:String): Void {
 
-		if (type != null) {
-
-			var options:Array<Expr> = [];
-
-			if (keyword != null) options.push(macro Keyword($v{keyword}));
-			if (explicit != null) options.push(macro Explicit($v{explicit}));
-			if (extend != null) options.push(macro Extend($v{extend}));
-
-			parsingImports.push({ path: type.split("."), options: options });
-		}
+		parsingImports.push(type.split("."));
 
 	}
 
-	private static var parsingImports:Array<{ path:Array<String>, options:Array<Expr> }> = [];
+	private static var parsingImports:Array<Array<String>> = [];
 	
 	private static var onYieldListeners:Array<Expr->Null<ComplexType>->Null<Expr>> = [];
 	
 	private static function auto (): Void {
 
-		var yieldParse:Null<String> = Context.definedValue("yield-parsing");
+		if (Context.defined("yield-types")) {
+
+			var yieldTypes:String = Context.definedValue("yield-types");
+
+			if (yieldTypes != "1")
+				for (type in yieldTypes.split(","))
+					parseOnImport(StringTools.trim(type));
+
+		}
+
+		var yieldParse:Null<String> = Context.defined("yield-parse") ? Context.definedValue("yield-parse") : Context.definedValue("yield-parsing");
 
 		if (yieldParse != null && yieldParse != "1") {
 
-			var filters:Array<String> = yieldParse.split(",");
-
-			for (filter in filters) {
+			for (filter in yieldParse.split(",")) {
 
 				filter = StringTools.trim(filter);
 
@@ -171,7 +170,7 @@ class Parser {
 				var hasYieldMeta:Bool = false;
 				var hasAutoBuild:Bool = false;
 				
-				var options:Array<Expr> = null;
+				var options:Array<Expr>;
 
 				var meta:MetaAccess = switch (ct.kind) {
 					case KAbstractImpl(a) if (!ct.isExtern && !ct.isInterface): 
@@ -204,10 +203,9 @@ class Parser {
 
 					for (parsingImport in parsingImports) {
 
-						if (@:inline ImportTools.isImported(parsingImport.path, localImports)) {
+						if (@:inline ImportTools.isImported(parsingImport, localImports)) {
 
 							hasParsingImport = true;
-							options = parsingImport.options;
 							break;
 
 						}
@@ -219,7 +217,7 @@ class Parser {
 					}
 				}
 				
-				var env = createEnv(ct, t, options, hasAutoBuild);
+				var env = createEnv(ct, t, options == null ? [] : options, hasAutoBuild);
 				
 				return parseClass(env);
 				
