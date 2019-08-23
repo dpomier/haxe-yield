@@ -3,6 +3,6 @@
 -main Tests
 -dce no
 -D travis
--D yield-parsing= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
+-D yield-parse= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
 -D yield-types= misc.EmptyImport
 --macro misc.OnTypeYieldedTestMacro.init()
