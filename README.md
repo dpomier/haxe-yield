@@ -96,9 +96,9 @@ You can compile with some haxe compilation parameters (or pass several `yield.Yi
  - `yield-keyword`
 		Use a custom keyword instead of "yield".
 		Compile with `-D yield-keyword=myCustomMetaName`.
- - `yield-parsing`
+ - `yield-parse`
 		Specifies packages or classpaths to include in the yield parser. All the impacted classes will no longer need to be annotated with `:yield` to be able to use the `@yield` expressions. This can be recursive using the `*` wildcard.
-		Compile with `-D yield-parsing= my.package.one, my.packages.*, my.class.Foo`.
+		Compile with `-D yield-parse= my.package.one, my.packages.*, my.class.Foo`.
 
 Install
 -----
