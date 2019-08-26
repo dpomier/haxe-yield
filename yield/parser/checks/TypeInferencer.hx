@@ -51,7 +51,7 @@ class TypeInferencer {
 		
 		if (returnType != null) {
 			
-			var retType:Type = TypeTools.follow(returnType);
+			var retType:Type = TypeTools.followWithAbstracts(returnType);
 			
 			switch (retType) {
 					

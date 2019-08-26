@@ -848,13 +848,8 @@ class DefaultGenerator {
 			pos:  pos
 		};
 		
-		var ereturn:Expr = {
-			expr: EReturn(enew),
-			pos:  pos
-		};
-		
 		bd.instanceFunctionBody = {
-			expr: EBlock([ereturn]),
+			expr: EBlock([macro return cast $enew]),
 			pos:  pos
 		};
 	}

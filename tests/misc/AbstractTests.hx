@@ -5,6 +5,11 @@ import pack.pack1.OperatorOverloading2;
 import yield.parser.Parser;
 
 class AbstractTests extends utest.Test {
+
+	function testAbstractReturnType () {
+		var it = AbstractIntIterator.test();
+		Assert.equals(3, it.next());
+	}
 	
 	#if (!cs && !java || haxe_ver >= 4.000)
 	function testOperatorOverloading () {
@@ -125,6 +130,14 @@ class AbstractTests extends utest.Test {
 		Assert.equals("8888", it.next());
 	}
 	#end
+}
+
+@:yield
+@:forward
+abstract AbstractIntIterator (Iterator<Int>) {
+	public static function test ():AbstractIntIterator {
+		@yield return 3;
+	}
 }
 
 #if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
