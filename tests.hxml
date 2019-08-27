@@ -1,7 +1,7 @@
 -cp tests
 -lib utest
 -main Tests
--dce no
+-dce full
 -D travis
 -D yield-parse= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
 -D yield-types= misc.EmptyImport

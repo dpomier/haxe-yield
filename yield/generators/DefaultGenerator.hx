@@ -387,6 +387,8 @@ class DefaultGenerator {
 	}
 	
 	private static function initIteratorMethods (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
+
+		var iterationMetadata:Metadata = [{ name: ":keep", params: [], pos: pos }];
 		
 		var lcase:Array<Case> = [for (i in 0...bd.lastSequence + 1) {
 			values : [{ expr: EConst(CInt(Std.string(i))), pos: pos }],
@@ -411,7 +413,7 @@ class DefaultGenerator {
 			pos: pos
 		};
 		
-		addMethod(bd, "hasNext", [APublic], [], macro:StdTypes.Bool, body, pos);
+		addMethod(bd, "hasNext", [APublic], [], macro:StdTypes.Bool, body, pos, iterationMetadata);
 		
 		// public function next():???
 		
@@ -424,7 +426,7 @@ class DefaultGenerator {
 			pos: pos
 		};
 		
-		addMethod(bd, "next", [APublic], [], env.yieldedType, body, pos);
+		addMethod(bd, "next", [APublic], [], env.yieldedType, body, pos, iterationMetadata);
 		
 		// public inline function iterator():Iterator<???>
 		
@@ -437,16 +439,10 @@ class DefaultGenerator {
 					]), 
 					pos: pos
 				};
-				
-				var metadata:Metadata = [{
-					name: ":keep",
-					params: null,
-					pos:    pos
-				}];
 
 				if (yieldedType == null) yieldedType = macro:StdTypes.Dynamic;
 				
-				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$yieldedType>, body, pos, metadata);
+				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$yieldedType>, body, pos, iterationMetadata);
 				
 			case ITERATOR(yieldedType):
 		}
