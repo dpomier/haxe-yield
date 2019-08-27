@@ -7,7 +7,7 @@ import yield.parser.Parser;
 class AbstractTests extends utest.Test {
 
 	function testAbstractReturnType () {
-		var it = AbstractIntIterator.test();
+		var it = TestAbstractReturnType.test();
 		Assert.equals(3, it.next());
 	}
 	
@@ -133,12 +133,13 @@ class AbstractTests extends utest.Test {
 }
 
 @:yield
-@:forward
-abstract AbstractIntIterator (Iterator<Int>) {
+class TestAbstractReturnType {
 	public static function test ():AbstractIntIterator {
 		@yield return 3;
 	}
 }
+@:forward
+abstract AbstractIntIterator (Iterator<Int>) { }
 
 #if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
 @:yield
