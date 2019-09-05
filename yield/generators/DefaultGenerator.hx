@@ -797,8 +797,11 @@ class DefaultGenerator {
 									bd.typeDefinition.fields.push( lfieldDecl );
 									
 								} else {
+
+									var name:String = newNames[_data.names[0]];
+
+									eRef.expr = EFunction(#if (haxe_ver >= 4.000) FNamed(name, _inlined) #else name #end, _f);
 									
-									eRef.expr = EFunction(newNames[_data.names[0]], _f);
 								}
 								
 							default:

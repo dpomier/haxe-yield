@@ -247,8 +247,20 @@ class YieldSplitter {
 			case EVars(_vars): 
 				evarsParser.run(e, subParsing, _vars, ic);
 				
-			case EFunction(_name, _f): 
-				efunctionParser.run(e, subParsing, _name, _f, inlined);
+			case EFunction(_fkind, _f): 
+				var name:String = #if (haxe_ver >= 4.000)
+					switch _fkind {
+						case FNamed(__name, __inlined):
+							if (__inlined != null && __inlined)
+								inlined = true;
+							__name;
+						case _:
+							null;
+					}
+				#else
+					_fkind;
+				#end
+				efunctionParser.run(e, subParsing, name, _f, inlined);
 				
 			case ECall(_e, _params):
 				for (i in 0..._params.length) parse(_params[i], true, ic);
