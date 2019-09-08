@@ -2,7 +2,7 @@
   "name": "yield",
   "url" : "https://github.com/dpomier/haxe-yield/",
   "license": "MIT",
-  "tags": [ "cross", "utility" ],
+  "tags": [ "cross", "utility", "macro" ],
   "description": "Implements iterator patterns through the `yield` metadata",
   "version": "2.1.0",
   "releasenote": "added parsing on import and yield callbacks",
