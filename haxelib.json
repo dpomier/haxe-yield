@@ -3,8 +3,8 @@
   "url" : "https://github.com/dpomier/haxe-yield/",
   "license": "MIT",
   "tags": [ "cross", "utility", "macro" ],
-  "description": "Implements iterator patterns through the `yield` metadata",
-  "version": "2.1.0",
-  "releasenote": "added parsing on import and yield callbacks",
+  "description": "Cross platform C#-like `yield` generator for Haxe",
+  "version": "3.0.0",
+  "releasenote": "updated for haxe 4.0.0-rc.5, added yield macro callbacks, many enhancements",
   "contributors": ["dpomier"]
 }
