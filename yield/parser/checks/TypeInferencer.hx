@@ -323,6 +323,9 @@ class TypeInferencer {
 				} else {
 					return null;
 				}
+			
+			case ECheckType(e, t):
+				return t;
 				
 			default:
 				return null;
