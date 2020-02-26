@@ -186,9 +186,16 @@ class WorkEnv {
 		generatedIteratorClass.pack = getExtraTypePath().pack;
 	}
 
-	public function updateDefaultYieldedValue (type:ComplexType):Void {
+	public function updateYieldedType (type:ComplexType):Void {
 
 		defaultYieldedValue.expr = WorkEnv.getDefaultValue(type).expr;
+
+		functionReturnKind = switch functionReturnKind {
+			case UNKNOWN(_, returns): UNKNOWN(type, returns);
+			case ITERATOR(_): ITERATOR(type);
+			case ITERABLE(_): ITERABLE(type);
+			case BOTH(_): BOTH(type);
+		}
 	}
 	
 	private function addConstructorArgs (args:Array<FunctionArg>, pos:Position): Void {

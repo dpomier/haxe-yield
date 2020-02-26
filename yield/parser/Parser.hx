@@ -499,7 +499,7 @@ class Parser {
 					case _: resolved;
 				};
 
-				env.updateDefaultYieldedValue(resolved);
+				env.updateYieldedType(resolved);
 
 				#if (haxe_ver < 4.000)
 				f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$resolved; var iterator(default, never):Void->Iterator<$resolved>; };
@@ -522,12 +522,10 @@ class Parser {
 	@:noCompletion
 	public static function applyYieldModifications (e:Expr, ?t:ComplexType):Null<Expr> {
 
-		if (onYieldListeners.length > 0) {
-			for (onYield in onYieldListeners) {
-				var r = onYield(e, t);
-				if (r != null)
-					e = r;
-			}
+		for (onYield in onYieldListeners) {
+			var r = onYield(e, t);
+			if (r != null)
+				e = r;
 		}
 
 		return e;
