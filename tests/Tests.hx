@@ -2,31 +2,6 @@ package;
 import utest.Runner;
 import utest.ui.Report;
 import utest.ui.common.HeaderDisplayMode;
-import misc.InferenceTests;
-import misc.AccessionTests;
-import eparsers.ESwitchTests;
-import misc.ImportTests;
-import misc.IterationTests;
-import misc.AbstractTests;
-import misc.PrivateTests;
-import misc.ScopeTests;
-import misc.UsingTests;
-import misc.YieldTests;
-import misc.InheritanceTests;
-import misc.OnTypeYieldedTests;
-import eparsers.EForTests;
-import eparsers.EFunctionTests;
-import eparsers.ETryTests;
-import eparsers.EWhileTests;
-import eparsers.EIfTests;
-import options.ExplicitTests;
-import options.ExtendTests;
-import options.KeywordTests;
-import options.parsing.ParsingTests;
-import options.parsing.subparsing.SubParsingTests;
-import options.parsing.subparsing.unparsed.UnparsedTests;
-import options.parsing.recursive.RecursiveParsingTests;
-import options.parsing.recursive.parsed.RecursiveSubParsingTests;
 
 class Tests
 {
@@ -35,35 +10,35 @@ class Tests
 		var r:Runner = new Runner();
 		
 		// parsers
-		r.addCase(new EIfTests());
-		r.addCase(new EWhileTests());
-		r.addCase(new EForTests());
-		r.addCase(new ETryTests());
-		r.addCase(new EFunctionTests());
-		r.addCase(new ESwitchTests());
+		r.addCase(new eparsers.EIfTests());
+		r.addCase(new eparsers.EWhileTests());
+		r.addCase(new eparsers.EForTests());
+		r.addCase(new eparsers.ETryTests());
+		r.addCase(new eparsers.EFunctionTests());
+		r.addCase(new eparsers.ESwitchTests());
 		
 		// general tests
-		r.addCase(new ScopeTests());
-		r.addCase(new ImportTests());
-		r.addCase(new UsingTests());
-		r.addCase(new YieldTests());
-		r.addCase(new IterationTests());
-		r.addCase(new AbstractTests());
-		r.addCase(new AccessionTests());
-		r.addCase(new InferenceTests());
-		r.addCase(new InheritanceTests());
-		r.addCase(new PrivateTests());
-		r.addCase(new OnTypeYieldedTests());
+		r.addCase(new misc.ScopeTests());
+		r.addCase(new misc.ImportTests());
+		r.addCase(new misc.UsingTests());
+		r.addCase(new misc.YieldTests());
+		r.addCase(new misc.IterationTests());
+		r.addCase(new misc.AbstractTests());
+		r.addCase(new misc.AccessionTests());
+		r.addCase(new misc.InferenceTests());
+		r.addCase(new misc.InheritanceTests());
+		r.addCase(new misc.PrivateTests());
+		r.addCase(new misc.OnTypeYieldedTests());
 		
 		// options tests
-		r.addCase(new ExtendTests());
-		r.addCase(new KeywordTests());
-		r.addCase(new ExplicitTests());
-		r.addCase(new ParsingTests());
-		r.addCase(new SubParsingTests());
-		r.addCase(new UnparsedTests());
-		r.addCase(new RecursiveParsingTests());
-		r.addCase(new RecursiveSubParsingTests());
+		r.addCase(new options.ExtendTests());
+		r.addCase(new options.KeywordTests());
+		r.addCase(new options.ExplicitTests());
+		r.addCase(new options.parsing.ParsingTests());
+		r.addCase(new options.parsing.subparsing.SubParsingTests());
+		r.addCase(new options.parsing.subparsing.unparsed.UnparsedTests());
+		r.addCase(new options.parsing.recursive.RecursiveParsingTests());
+		r.addCase(new options.parsing.recursive.parsed.RecursiveSubParsingTests());
 		
 		Report.create(r);
 
