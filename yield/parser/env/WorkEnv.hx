@@ -465,7 +465,7 @@ class WorkEnv {
 				}
 				
 				case IdentRef.IEFunction(eRef): switch (eRef.expr) {
-					case EFunction(#if (haxe_ver >= 4.000) FNamed(_name, _) #else _name #end, _f): 
+					case EFunction(#if (haxe_ver >= 4.000 && haxe != "4.0.0-rc.3") FNamed(_name, _) #else _name #end, _f): 
 						lname = _name;
 						lpos  = eRef.pos;
 					default: continue;

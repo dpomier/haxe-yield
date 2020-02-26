@@ -800,7 +800,7 @@ class DefaultGenerator {
 
 									var name:String = newNames[_data.names[0]];
 
-									eRef.expr = EFunction(#if (haxe_ver >= 4.000) FNamed(name, _inlined) #else name #end, _f);
+									eRef.expr = EFunction(#if (haxe_ver >= 4.000 && haxe != "4.0.0-rc.3") FNamed(name, _inlined) #else name #end, _f);
 									
 								}
 								
