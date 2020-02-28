@@ -399,7 +399,7 @@ class Parser {
 			func.ret = alternativeRetType;
 		}
 		
-		env.setFieldData(field, func);
+		env.setFieldData(field);
 		
 		var success:Bool = parseFunction(field.name, func, field.pos, env);
 

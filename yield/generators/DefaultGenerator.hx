@@ -486,7 +486,7 @@ class DefaultGenerator {
 		
 		addTypeParameters(env.classData.localClass.params);
 		
-		for (param in env.classFunction.params) {
+		for (param in env.functionDefinition.params) {
 			
 			if (ids.indexOf(param.name) != -1) continue;
 			

@@ -73,11 +73,10 @@ class WorkEnv {
 	
 	public var classData (default, null):ClassData;
 	
-	public var fieldName          (default, null):String;
+	public var functionName       (default, null):String;
 	public var classField         (default, null):Field;
-	public var classFunction      (default, null):Function;
+	public var functionDefinition (default, null):Function;
 	public var functionReturnKind (default, null):ReturnType;
-	public var functionReturnType (default, null):Null<ComplexType>;
 	public var yieldedType        (default, null):Null<ComplexType>;
 	public var defaultYieldedValue (default, null):Expr;
 	
@@ -136,10 +135,9 @@ class WorkEnv {
 		functionsPack = [classData.localClass.name];
 	}
 	
-	public function setFieldData (f:Field, fun:Function): Void {
+	public function setFieldData (field:Field): Void {
 		
-		classField    = f;
-		classFunction = fun;
+		classField = field;
 		currentScope  = {
 			id    : 0,
 			level : 0,
@@ -169,9 +167,9 @@ class WorkEnv {
 		functionArguments = new Array<ArgIdentData>();
 		
 		// set data
-		fieldName = name;
+		functionName = name;
+		functionDefinition = f;
 		functionReturnKind = returnKind;
-		functionReturnType = f.ret;
 		yieldedType = switch (returnKind) {
 			case ITERABLE(t), ITERATOR(t), BOTH(t), UNKNOWN(t, _): t;
 		};
@@ -226,11 +224,10 @@ class WorkEnv {
 		we.classData = classData;
 		
 		we.functionsPack = functionsPack.copy();
-		we.functionsPack.push( fieldName );
+		we.functionsPack.push( functionName );
 
 		we.parent        = this;
 		we.classField    = classField;
-		we.classFunction = classFunction;
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
 		we.scopeCounter  = 0;

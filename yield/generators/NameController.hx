@@ -44,7 +44,7 @@ class NameController {
 	 * Name of the extra-type generated when using yield statements.
 	 */
 	public static function extraTypeName (env:WorkEnv, number:UInt): String {
-		return env.functionsPack.join("_") + "_" + env.fieldName + "__I" + number;
+		return env.functionsPack.join("_") + "_" + env.functionName + "__I" + number;
 	}
 	
 	/**

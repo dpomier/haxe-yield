@@ -52,7 +52,7 @@ class YieldSplitterOptimizer {
 
 		#if yield_debug
 		if (env.debug) {
-			trace('"${env.fieldName}" optimazed in $pass pass');
+			trace('"${env.functionName}" optimazed in $pass pass');
 		}
 		#end
 		
