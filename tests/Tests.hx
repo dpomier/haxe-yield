@@ -24,6 +24,7 @@ class Tests
 		r.addCase(new misc.YieldTests());
 		r.addCase(new misc.IterationTests());
 		r.addCase(new misc.AbstractTests());
+		r.addCase(new misc.GenericTests());
 		r.addCase(new misc.AccessionTests());
 		r.addCase(new misc.InferenceTests());
 		r.addCase(new misc.InheritanceTests());

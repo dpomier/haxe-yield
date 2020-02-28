@@ -53,53 +53,6 @@ class AbstractTests extends utest.Test {
 	}
 	#end
 	
-	#if (!cs && !java || haxe_ver >= 4.000)
-	function testSelectiveFunctions () {
-		var a = new SelectiveFunctions("foo");
-		var b = new SelectiveFunctions(1);
-		
-		var it = a.getString();
-		Assert.isTrue(it.hasNext());
-		for (j in 0...10) Assert.equals("foo", it.next());
-		Assert.isTrue(it.hasNext());
-	}
-	#end
-	
-	#if (!cs && !java) 
-	function testSelectiveFunctionsWrapper () {
-		var a = new SFWrapper(new SelectiveFunctions("bar"));
-		var b = new SFWrapper(1);
-		
-		var it = a.getSource();
-		Assert.isTrue(it.hasNext());
-		Assert.equals(new SelectiveFunctions("bar"), it.next());
-		Assert.equals("bar", it.next().getString().next());
-		Assert.equals(new SelectiveFunctions("bar"), it.next());
-		Assert.isTrue(it.hasNext());
-	}
-	#end
-	
-	function testFunctionStaticTypeParams () {
-		
-		var it = Statics.makeSource("foobar");
-		Assert.isTrue(it.hasNext());
-		for (j in 0...10) Assert.equals("foobar", it.next());
-		Assert.isTrue(it.hasNext());
-		
-		var it = Statics.testConstraints(["3"]);
-		//Statics.testConstraints([3]); // Constraint check failure
-	}
-	
-	#if (!cs && !java)
-	function testFunctionTypeParams () {
-		
-		var a = new AbstractWithConstraints(["5"]);
-		//new AbstractWithConstraints([5]); // Constraint check failure
-		
-		Assert.isTrue(true);
-	}
-	#end	
-	
 	function testForwardAbstract () {
 		var myForward = new MyForward();
 		var it = myForward.numbers();
@@ -113,23 +66,6 @@ class AbstractTests extends utest.Test {
 		// MyForward has no field strNumbers
 		//myForward.strNumbers();
 	}
-
-	function testGenericType () {
-		var g = new GenericTest<Int>(4);
-		var it = g.getMore();
-		Assert.equals("4", it.next());
-		Assert.equals("44", it.next());
-		Assert.equals("444", it.next());
-	}
-
-	#if (!cs && !java || haxe_ver >= 4.000)
-	function testAbstractGenericType () {
-		var g = new AbstractGenericTest<Int>(8);
-		var it = g.getMore();
-		Assert.equals("88", it.next());
-		Assert.equals("8888", it.next());
-	}
-	#end
 }
 
 @:yield
@@ -183,79 +119,6 @@ abstract Wrapper(OperatorOverloading) {
 }
 #end
 
-#if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
-@:yield
-abstract SelectiveFunctions<T>(T) from T {
-	public function new(t:T) this = t;
-
-	function get() return this;
-
-	@:impl
-	static public function getString(v:SelectiveFunctions<String>):Iterator<String> {
-		while (true) {
-			@yield return v.get();
-		}
-	}
-}
-#end
-
-#if (!cs && !java) // error CS0246: The type or namespace name 'T' could not be found
-@:build(yield.parser.Parser.run())
-abstract SFWrapper<T>(T) from T {
-	public function new(t:T) this = t;
-
-	function get() return this;
-
-	@:impl
-	static public function getSource(v:SFWrapper<T>):Iterator<T> {
-		while (true) {
-			@yield return v.get();
-		}
-	}
-}
-#end
-
-@:yield
-class Statics {
-	public static function makeSource<T>(i:T):Iterator<T> {
-		while (true) @yield return i;
-	}
-	
-	#if (haxe_ver < 4.000)
-	public static function testConstraints<T:(Iterable<String>, Measurable)>(a:T) {
-	#else
-	public static function testConstraints<T:Iterable<String> & Measurable>(a:T) {
-	#end
-		if (a.length == 0) @yield break;
-		@yield return a.iterator();
-	}
-}
-
-typedef Measurable = {
-  public var length(default, null):Int;
-}
-
-#if (!cs && !java) // error CS0246: The type or namespace name 'T' could not be found
-@:build(yield.parser.Parser.run())
-#if (haxe_ver < 4.000)
-abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
-#else
-abstract AbstractWithConstraints<T:Iterable<String> & Measurable>(T) from T {
-#end
-	public function new(t:T) this = t;
-
-	function get() return this;
-	
-
-	@:impl
-	static public function getSource(v:AbstractWithConstraints<T>):Iterator<T> {
-		while (true) {
-			@yield return v.get();
-		}
-	}
-}
-#end
-
 @:forward(numbers)
 abstract MyForward(MyForwardedClass) {
 	public inline function new() {
@@ -276,42 +139,3 @@ class MyForwardedClass {
 		for (i in 0...3) @yield return Std.string(i);
 	}
 }
-
-@:yield
-@:generic
-class GenericTest <T> {
-
-	var value:T;
-
-	public function new (v:T) {
-		value = v;
-	}
-	
-	public function getMore () {
-		var s = "";
-		while (true) {
-			s += value;
-			@yield return s;
-		}
-	}
-
-}
-
-#if (!cs && !java || haxe_ver >= 4.000)
-@:yield
-@:generic
-abstract AbstractGenericTest <T> (String) {
-
-	public function new (v:T) {
-		this = Std.string(v);
-	}
-	
-	public function getMore () {
-		while (true) {
-			this += this;
-			@yield return this;
-		}
-	}
-
-}
-#end

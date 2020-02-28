@@ -786,11 +786,11 @@ class DefaultGenerator {
 										lfieldDecl = FieldTools.makeFunctionField(newNames[_data.names[0]], [APublic, AInline], _f, eRef.pos);
 										
 									} else {
-										
-										lfieldDecl = FieldTools.makeField(newNames[_data.names[0]], [APublic], {expr:EConst(CIdent("null")), pos: eRef.pos}, eRef.pos);
-										
+
+										lfieldDecl = FieldTools.makeFunctionField(newNames[_data.names[0]], [APublic], _f, eRef.pos);
+
 										// transform function declaration into field assignment
-										eRef.expr = FieldTools.makeFieldAssignation(newNames[_data.names[0]], {expr:EFunction(null, _f), pos: eRef.pos}).expr;
+										eRef.expr = EConst(CIdent(newNames[_data.names[0]]));
 										
 									}
 									

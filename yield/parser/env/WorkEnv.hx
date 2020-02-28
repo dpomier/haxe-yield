@@ -77,6 +77,7 @@ class WorkEnv {
 	public var classField         (default, null):Field;
 	public var functionDefinition (default, null):Function;
 	public var functionReturnKind (default, null):ReturnType;
+	public var isLocalFunction    (default, null):Bool;
 	public var yieldedType        (default, null):Null<ComplexType>;
 	public var defaultYieldedValue (default, null):Expr;
 	
@@ -137,6 +138,7 @@ class WorkEnv {
 	
 	public function setFieldData (field:Field): Void {
 		
+		isLocalFunction = false;
 		classField = field;
 		currentScope  = {
 			id    : 0,
@@ -227,6 +229,7 @@ class WorkEnv {
 		we.functionsPack.push( functionName );
 
 		we.parent        = this;
+		we.isLocalFunction = true;
 		we.classField    = classField;
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
