@@ -24,6 +24,7 @@
 #if (macro || display)
 package yield.generators;
 import haxe.macro.ExprTools;
+import haxe.macro.MacroStringTools;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
@@ -69,8 +70,8 @@ class DefaultGenerator {
 	 * Generate the extra-type representing the iterator blocks, then add it into the queue of type definition.
 	 * @return Returns the expression which instantiates the generated extra-type.
 	 */
-	public static function add (ibd:IteratorBlockData, pos:Position, env:WorkEnv): Expr {
-		
+	public static function add (ibd:IteratorBlockData, pos:Position, env:WorkEnv, eager:Bool): Expr {
+
 		var bd:BuildingData = new BuildingData(env.generatedIteratorClass, env.getExtraTypePath(), ibd);
 		
 		initTypeMetas(bd, pos);
@@ -91,16 +92,19 @@ class DefaultGenerator {
 		
 		initVariableFields(bd, env);
 		initIterativeFunctions(bd, env, ibd);
-		
-		typeDefinitionStack.push( bd.typeDefinition );
-		
-		initInstanceFunctionBody(bd, pos);
 
 		#if yield_debug
 		if (env.debug) {
 			trace(new Printer().printTypeDefinition( bd.typeDefinition ));
 		}
 		#end
+
+		if (eager) 
+			Context.defineType( bd.typeDefinition );
+		else
+			typeDefinitionStack.push( bd.typeDefinition );
+		
+		initInstanceFunctionBody(bd, pos);
 
 		return bd.instanceFunctionBody;
 	}
@@ -431,7 +435,7 @@ class DefaultGenerator {
 		// public inline function iterator():Iterator<???>
 		
 		switch (env.functionReturnKind) {
-			case ITERABLE(yieldedType) | BOTH(yieldedType) | UNKNOWN(yieldedType, _):
+			case ITERABLE(_,_) | BOTH(_,_) | UNKNOWN(_, _):
 				
 				var body:Expr = {
 					expr: EBlock([
@@ -440,11 +444,11 @@ class DefaultGenerator {
 					pos: pos
 				};
 
-				if (yieldedType == null) yieldedType = macro:StdTypes.Dynamic;
+				var yieldedType = env.yieldedType != null ? env.yieldedType : macro:StdTypes.Dynamic;
 				
 				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$yieldedType>, body, pos, iterationMetadata);
 				
-			case ITERATOR(yieldedType):
+			case ITERATOR(_,_):
 		}
 	}
 	

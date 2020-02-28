@@ -32,6 +32,7 @@ import haxe.macro.Expr.Function;
 import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
 import haxe.macro.Type.AbstractType;
+import haxe.macro.ComplexTypeTools;
 import yield.generators.DefaultGenerator;
 import yield.parser.PositionManager.LinkedPosition;
 import yield.parser.checks.InitializationChecker;
@@ -53,10 +54,10 @@ typedef Scope = {
 }
 
 enum ReturnType {
-	ITERABLE(t:ComplexType);
-	ITERATOR(t:ComplexType);
-	BOTH(t:ComplexType);
-	UNKNOWN(t:ComplexType, returns:Array<Type>);
+	ITERABLE(t:ComplexType, returns:Array<Expr>);
+	ITERATOR(t:ComplexType, returns:Array<Expr>);
+	BOTH(t:ComplexType, returns:Array<Expr>);
+	UNKNOWN(t:ComplexType, returns:Array<{ expr:Expr, type:Type }>);
 }
 
 /**
@@ -173,7 +174,7 @@ class WorkEnv {
 		functionDefinition = f;
 		functionReturnKind = returnKind;
 		yieldedType = switch (returnKind) {
-			case ITERABLE(t), ITERATOR(t), BOTH(t), UNKNOWN(t, _): t;
+			case ITERABLE(t,_), ITERATOR(t,_), BOTH(t,_), UNKNOWN(t, _): t;
 		};
 		
 		defaultYieldedValue = WorkEnv.getDefaultValue(yieldedType);
@@ -186,16 +187,63 @@ class WorkEnv {
 		generatedIteratorClass.pack = getExtraTypePath().pack;
 	}
 
-	public function updateYieldedType (type:ComplexType):Void {
+	public function updateYieldedType (t:ComplexType):Void {
 
-		defaultYieldedValue.expr = WorkEnv.getDefaultValue(type).expr;
+		if (t == null) throw "yielded type must not be null";
+
+		yieldedType = t;
+
+		defaultYieldedValue.expr = WorkEnv.getDefaultValue(t).expr;
 
 		functionReturnKind = switch functionReturnKind {
-			case UNKNOWN(_, returns): UNKNOWN(type, returns);
-			case ITERATOR(_): ITERATOR(type);
-			case ITERABLE(_): ITERABLE(type);
-			case BOTH(_): BOTH(type);
+			case UNKNOWN(_, returns):
+				functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
+				// #if (haxe_ver < 4.000)
+				// functionDefinition.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$t; var iterator(default, never):Void->Iterator<$t>; };
+				// #else
+				// functionDefinition.ret = ComplexType.TIntersection([macro:Iterator<$t>, macro:Iterable<$t>]);
+				// #end
+				UNKNOWN(t, returns);
+			case ITERATOR(_, returns):
+				functionDefinition.ret = macro:Iterator<$t>;
+				ITERATOR(t, returns);
+			case ITERABLE(_, returns):
+				functionDefinition.ret = macro:Iterable<$t>;
+				ITERABLE(t, returns);
+			case BOTH(_, returns):
+				// functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
+				#if (haxe_ver < 4.000)
+				functionDefinition.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$t; var iterator(default, never):Void->Iterator<$t>; };
+				#else
+				functionDefinition.ret = ComplexType.TIntersection([macro:Iterator<$t>, macro:Iterable<$t>]);
+				#end
+				BOTH(t, returns);
 		}
+	}
+
+	public static function enableYieldRegistration () {
+		registerYieldImpl = registerYieldExpr;
+	}
+
+	public function registerYield (e:Expr):Void {
+		registerYieldImpl(this, e);
+	}
+
+	dynamic static function registerYieldImpl (env:WorkEnv, e:Expr):Void {}
+
+	private static function registerYieldExpr (env:WorkEnv, e:Expr):Void {
+		
+		switch env.functionReturnKind {
+
+			case UNKNOWN(t, returns): 
+
+				returns.push({ type: null, expr: e });
+
+			case ITERABLE(t, returns), ITERATOR(t, returns), BOTH(t, returns):
+				
+				returns.push(e);
+
+		};
 	}
 	
 	private function addConstructorArgs (args:Array<FunctionArg>, pos:Position): Void {

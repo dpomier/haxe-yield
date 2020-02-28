@@ -24,11 +24,23 @@ class OnTypeYieldedTestMacro {
         };
 
         return switch followed {
-            case "misc.OnTypeYieldedTests.SimpleModificationType": macro null;
+            case "misc.OnTypeYieldedTests.SimpleModificationType": macro 3;
             case "misc.OnTypeYieldedTests.ReparsingType": macro function () {
                 @yield return 1;
                 @yield return 2;
             };
+            case "misc.OnTypeYieldedTests.ReEntranceType": macro new misc.OnTypeYieldedTests.SimpleModificationType();
+            case "misc.OnTypeYieldedTests.LoopType": 
+                switch e {
+                    case (macro @coroutine_test_loop($v) $expr):
+                        var loopCount = switch v.expr { case EConst(CInt(v)): Std.parseInt(v); case _: throw "wrong loop count"; };
+                        if (loopCount == 4)
+                            macro "done";
+                        else
+                            macro @coroutine_test_loop($v{loopCount + 1}) $expr;
+                    case _:
+                        macro @coroutine_test_loop(0) $e;
+                }
             case _: null;
         }
 

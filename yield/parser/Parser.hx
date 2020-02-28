@@ -99,6 +99,8 @@ class Parser {
 	 */
 	public static function onYield (f:Expr->Null<ComplexType>->Null<Expr>): Void {
 
+		WorkEnv.enableYieldRegistration();
+
 		onYieldListeners.push(f);
 
 	}
@@ -358,6 +360,11 @@ class Parser {
 	
 	private static function parseClass (env:WorkEnv): Array<Field> {
 
+		if (env.classData.localClass.meta.has(":yield_parsed"))
+			return null;
+		else
+			env.classData.localClass.meta.add(":yield_parsed", [], env.classData.localClass.pos);
+
 		var modified:Bool = false;
 
 		for (field in env.classData.classFields)
@@ -367,6 +374,13 @@ class Parser {
 	}
 	
 	private static function parseField (field:Field, env:WorkEnv): Bool {
+
+		for (m in field.meta) {
+			if (m.name == ":yield_parsed")
+				return false;
+		}
+
+		field.meta.push({ name: ":yield_parsed", params: null, pos: field.pos });
 		
 		var func:Function;
 		var alternativeRetType:ComplexType;
@@ -409,6 +423,8 @@ class Parser {
 
 		return success;
 	}
+
+	static var EAGER = false;
 	
 	/**
 	 * @return `true` is returned if the function defines iterator blocks and was successfully parsed.
@@ -434,11 +450,10 @@ class Parser {
 		}
 		
 		var yieldedType:ComplexType;
-		var returnType:ReturnType;
-		
+				
 		// Typing
 		
-		if (f == MetaTools.selectedFunc) {
+		var returnType:ReturnType = if (f == MetaTools.selectedFunc) {
 
 			env.yieldMode = true;
 			
@@ -450,19 +465,13 @@ class Parser {
 
 				} else {
 
-					var resolvedType:Null<Type> = MetaTools.resolveMetaType(f.expr);
-
-					returnType = if (resolvedType != null) {
-						ReturnType.UNKNOWN(null, [resolvedType]);
-					} else {
-						ReturnType.UNKNOWN(null, []);
-					};
+					ReturnType.UNKNOWN(null, []);
 
 				}
 				
 			} else {
 				
-				returnType = TypeInferencer.resolveReturnType(f.ret, pos);
+				TypeInferencer.resolveReturnType(f.ret, pos);
 
 			}
 			
@@ -470,7 +479,7 @@ class Parser {
 			
 			env.yieldMode = false;
 			
-			returnType = ReturnType.BOTH(macro:StdTypes.Dynamic);
+			ReturnType.BOTH(macro:StdTypes.Dynamic, []);
 			
 		}
 		
@@ -487,32 +496,86 @@ class Parser {
 		
 		// Generate type
 
-		switch (returnType) {
-			case UNKNOWN(t, returns):
+		function yieldOverride () {
 
-				// TODO: could be improved
+			var yieldreturns;
+			var yieldtype;
 
-				var resolved:ComplexType = TypeTools.toComplexType(TypeInferencer.getBaseType(returns, f.expr.pos));
+			switch env.functionReturnKind {
 
-				resolved = switch (resolved) {
-					case (macro:StdTypes.Void): macro:StdTypes.Dynamic;
-					case _: resolved;
-				};
+				case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
 
-				env.updateYieldedType(resolved);
+					if (t == null)
+						return;
+					yieldtype = t;
+					yieldreturns = returns;
 
-				#if (haxe_ver < 4.000)
-				f.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$resolved; var iterator(default, never):Void->Iterator<$resolved>; };
-				#else
-				f.ret = ComplexType.TIntersection([macro:Iterator<$resolved>, macro:Iterable<$resolved>]);
-				#end
+				case UNKNOWN(t, returns):
 
-			case _:
+					var params:Array<TypeParamDecl> = [];
+					
+					var types = [for (r in returns) {
+						var t = TypeInferencer.tryInferExpr(r.expr, env, yield.parser.idents.IdentChannel.Normal);
+						if (t == null)
+							try Context.typeof(r.expr) catch (_:Any) null;
+						else
+							switch t { 
+								case TPath(tp): 
+									var isGeneric = false;
+									for (p in env.functionDefinition.params) {
+										if (p.name == tp.name) {
+											isGeneric = true;
+											params.push(p);
+											break;
+										}
+									}
+									if (isGeneric)
+										null;
+									else
+										ComplexTypeTools.toType(t);
+								case _:
+									ComplexTypeTools.toType(t);
+							}
+					}];
+					
+					yieldreturns = [for(r in returns) r.expr];
+					yieldtype = switch TypeInferencer.getBaseType(types, f.expr.pos) {
+						case TMono(_): 
+							macro:StdTypes.Dynamic;
+							return;
+						case TypeTools.toComplexType(_) => baseType:
+							if (baseType != null) {
+								if (!env.isLocalFunction)
+									for (param in params)
+										param.constraints.push(baseType);
+								baseType;
+							} else {
+								return;
+							}
+					}
+
+					env.updateYieldedType(yieldtype);
+			}
+
+			if (applyYieldModifications(yieldreturns, yieldtype, yieldSplitter)) {
+				
+				switch env.functionReturnKind {
+					case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
+						var overrodeType = TypeInferencer.resolveComplexType(returns[0], env);
+						if (overrodeType != null)
+						env.updateYieldedType( overrodeType );
+					case UNKNOWN(_,_):
+				}
+
+				yieldOverride();
+			}
 		}
+
+		yieldOverride();
 
 		#if (yield_debug_no_display || !display && !yield_debug_display)
 		if (env.yieldMode || env.requiredBySubEnv) {
-			f.expr = DefaultGenerator.add(ibd, f.expr.pos, env);
+			f.expr = DefaultGenerator.add(ibd, f.expr.pos, env, EAGER);
 		}
 		#end
 		
@@ -520,15 +583,29 @@ class Parser {
 	}
 
 	@:noCompletion
-	public static function applyYieldModifications (e:Expr, ?t:ComplexType):Null<Expr> {
+	public static function applyYieldModifications (returns:Array<Expr>, baseType:ComplexType, yieldSplitter:YieldSplitter):Bool {
+		
+		var modified = false;
 
-		for (onYield in onYieldListeners) {
-			var r = onYield(e, t);
-			if (r != null)
-				e = r;
+		for (e in returns) {
+
+			for (onYield in onYieldListeners) {
+				var r = onYield(e, baseType);
+				if (r != null) {
+					e.expr = r.expr;
+					e.pos = r.pos;
+
+					var old = EAGER;
+					EAGER = true;
+					yieldSplitter.parse(e, true);
+					EAGER = old;
+
+					modified = true;
+				}
+			}
 		}
 
-		return e;
+		return modified;
 	}
 	
 	#end

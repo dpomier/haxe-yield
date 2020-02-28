@@ -57,7 +57,7 @@ class TypeInferencer {
 					
 				case TDynamic(_):
 					
-					return ReturnType.BOTH(macro:StdTypes.Dynamic);
+					return ReturnType.BOTH(macro:StdTypes.Dynamic, []);
 				
 				case Type.TAnonymous(_.get() => at):
 					
@@ -105,10 +105,9 @@ class TypeInferencer {
 						iteratorYieldedType = nextRet;
 					}
 
-					if (hasIterator) {
-						
+					if (hasIterator) {						
 						switch resolveReturnType(iteratorRet, pos) {
-							case ITERATOR(p):
+							case ITERATOR(p, _):
 								isIterable = true;
 								iterableYieldedType = p;
 							case _:
@@ -116,24 +115,24 @@ class TypeInferencer {
 					}
 
 					return if (isIterator && isIterable) {
-						ReturnType.BOTH(getLowerComplexType(iteratorYieldedType, iterableYieldedType));
+						ReturnType.BOTH(getLowerComplexType(iteratorYieldedType, iterableYieldedType), []);
 					} else if (isIterator) {
-						ReturnType.ITERATOR(iteratorYieldedType);
+						ReturnType.ITERATOR(iteratorYieldedType, []);
 					} else if (isIterable) {
-						ReturnType.ITERABLE(iterableYieldedType);
+						ReturnType.ITERABLE(iterableYieldedType, []);
 					} else {
 						Context.fatalError(ComplexTypeTools.toString(returnComplexType) + " should be Iterator or Iterable", pos);
 					};
 					
-				case _:
-					
+				case retType:
+
 					return Context.fatalError(ComplexTypeTools.toString(returnComplexType) + " should be Iterator or Iterable", pos);
 					
 			}
 			
 		} else {
 			
-			return ReturnType.BOTH(macro:StdTypes.Dynamic);
+			return ReturnType.BOTH(macro:StdTypes.Dynamic, []);
 			
 		}
 	}
@@ -144,36 +143,41 @@ class TypeInferencer {
 
 		var typeCount:Int = types.length;
 
+		inline function unifyable (t:Null<Type>):Bool {
+			return switch t {
+				case null | TMono(_): false;
+				case _: true;
+			}
+		}
+
 		if (typeCount == 0) {
 			return ComplexTypeTools.toType(macro:StdTypes.Void);
 		} else if (typeCount == 1) {
 			result = types[0];
 		} else {
-			var unify:Bool;
+			
 			for (i in 0...typeCount) {
-				
-				unify = true;
-				
-				if (types[i] == null) {
-					unify = false;
-				} else {
+				if (unifyable(types[i])) {
+					switch types[i] {
+						case TMono(_): continue;
+						case _:
+					}
+					var unify = true;
 					for (j in 0...typeCount) {
-						if (types[j] == null || i != j && !Context.unify(types[i], types[j])) {
+						if (i != j && types[j] != null && unifyable(types[i]) && !Context.unify(types[i], types[i])) {
 							unify = false;
 							break;
 						}
 					}
-				}
-
-				if (unify) {
-					result = types[i];
-					break;
+					if (unify) {
+						result = types[i];
+						break;
+					}
 				}
 			}
 		}
 		
-		return (result == null) ? ComplexTypeTools.toType(macro:Dynamic) : result;
-
+		return result == null ? ComplexTypeTools.toType(macro:Dynamic) : result;
 	}
 
 	public static function getLowerType (t1:Type, t2:Type):Type {
@@ -190,6 +194,13 @@ class TypeInferencer {
 	public static inline function getLowerComplexType (t1:ComplexType, t2:ComplexType):ComplexType {
 
 		return TypeTools.toComplexType(getLowerType(ComplexTypeTools.toType(t1), ComplexTypeTools.toType(t2)));
+	}
+
+	public static function resolveComplexType (expr:Null<Expr>, env:WorkEnv):Null<ComplexType> {
+		return switch TypeInferencer.tryInferExpr(expr, env, IdentChannel.Normal) {
+			case null: TypeTools.toComplexType(Context.typeof(expr));
+			case t: t;
+		}
 	}
 	
 	/**

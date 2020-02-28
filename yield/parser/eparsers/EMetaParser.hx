@@ -86,36 +86,12 @@ class EMetaParser extends BaseParser {
 				#if (!yield_debug_no_display && (display || yield_debug_display))
 				m_ys.addDisplayDummy(e); // TODO parse __e to know the type when inferred typing
 				#else
-
-				var knownRetType:Null<ComplexType> = switch m_we.functionReturnKind {
-
-					case UNKNOWN(t, returns): 
-
-						var rt:Null<ComplexType> = __e != null ? TypeInferencer.tryInferExpr(__e, m_we, IdentChannel.Normal) : macro:StdTypes.Void;
-						
-						returns.push(rt != null ? rt.toType() : null);
-
-						if (rt != null) {
-							rt;
-						} else if (returns[0] != null) {
-							returns[0].toComplexType();
-						} else {
-							null;
-						};
-
-					case ITERABLE(t), ITERATOR(t), BOTH(t):
-
-						t;
-
-				};
-
-				var ereturn:Expr = Parser.applyYieldModifications(__e, knownRetType);
-
-				m_ys.parse(ereturn, true);
-
-				_e.expr = EReturn( ereturn );
-
+				if (__e != null) {
+					m_we.registerYield(__e);
+					m_ys.parse(__e, true);
+				}
 				#end
+				
 			case EBreak:
 				m_ys.registerBreakAction(e);
 			default:
