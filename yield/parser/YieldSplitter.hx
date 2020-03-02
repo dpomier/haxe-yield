@@ -248,7 +248,7 @@ class YieldSplitter {
 				evarsParser.run(e, subParsing, _vars, ic);
 				
 			case EFunction(_fkind, _f): 
-				var name:String = #if (haxe_ver >= 4.000 && haxe != "4.0.0-rc.3")
+				var name:String = #if (haxe_ver >= 4.000) #if (haxe != "4.0.0-rc.3")
 					switch _fkind {
 						case FNamed(__name, __inlined):
 							if (__inlined != null && __inlined)
@@ -257,6 +257,9 @@ class YieldSplitter {
 						case _:
 							null;
 					}
+					#else
+					_fkind;
+					#end
 				#else
 					_fkind;
 				#end
