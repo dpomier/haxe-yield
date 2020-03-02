@@ -196,11 +196,6 @@ class WorkEnv {
 		functionReturnKind = switch functionReturnKind {
 			case UNKNOWN(_, returns):
 				functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
-				// #if (haxe_ver < 4.000)
-				// functionDefinition.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$t; var iterator(default, never):Void->Iterator<$t>; };
-				// #else
-				// functionDefinition.ret = ComplexType.TIntersection([macro:Iterator<$t>, macro:Iterable<$t>]);
-				// #end
 				UNKNOWN(t, returns);
 			case ITERATOR(_, returns):
 				functionDefinition.ret = macro:Iterator<$t>;
@@ -209,12 +204,7 @@ class WorkEnv {
 				functionDefinition.ret = macro:Iterable<$t>;
 				ITERABLE(t, returns);
 			case BOTH(_, returns):
-				// functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
-				#if (haxe_ver < 4.000)
-				functionDefinition.ret = macro:{ var hasNext(default, never):Void->Bool; var next(default, never):Void->$t; var iterator(default, never):Void->Iterator<$t>; };
-				#else
-				functionDefinition.ret = ComplexType.TIntersection([macro:Iterator<$t>, macro:Iterable<$t>]);
-				#end
+				functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
 				BOTH(t, returns);
 		}
 	}
@@ -518,7 +508,7 @@ class WorkEnv {
 				}
 				
 				case IdentRef.IEFunction(eRef): switch (eRef.expr) {
-					case EFunction(#if (haxe_ver >= 4.000 && haxe != "4.0.0-rc.3") FNamed(_name, _) #else _name #end, _f): 
+					case EFunction(#if (haxe_ver >= 4.000) #if (haxe != "4.0.0-rc.3") FNamed(_name, _) #else _name #end #else _name #end, _f): 
 						lname = _name;
 						lpos  = eRef.pos;
 					default: continue;
