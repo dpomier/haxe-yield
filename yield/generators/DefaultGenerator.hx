@@ -326,13 +326,21 @@ class DefaultGenerator {
 			}
 		}
 	}
+
+	private static function isVoid (t:ComplexType):Bool {
+		return switch t {
+			case (macro:StdTypes.Void): true;
+			case _: false;
+		}
+	}
 	
 	private static function initIteratorInitialisations (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData, pos:Position): Void {
 		
 		var nextMethodType:ComplexType = ComplexType.TFunction([macro:Void], env.yieldedType);
 		
 		addProperty(bd, NameController.fieldCursor(), [APrivate], macro:StdTypes.Int, pos);
-		addProperty(bd, NameController.fieldCurrent(), [APrivate], env.yieldedType, pos);
+		if (!isVoid(env.yieldedType))
+			addProperty(bd, NameController.fieldCurrent(), [APrivate], env.yieldedType, pos);
 		addProperty(bd, NameController.fieldIsConsumed(), [APrivate], macro:StdTypes.Bool, pos); 
 		addProperty(bd, NameController.fieldCompleted(), [APrivate], macro:StdTypes.Bool, pos); 
 		
@@ -384,8 +392,9 @@ class DefaultGenerator {
 		}
 		
 		bd.constructorBlock.push(macro $i{NameController.fieldCursor()}	 = -1);
-		
-		bd.constructorBlock.push(macro $i{NameController.fieldCurrent()}	= $e{env.defaultYieldedValue});
+
+		if (!isVoid(env.yieldedType))
+			bd.constructorBlock.push(macro $i{NameController.fieldCurrent()} = $e{env.defaultYieldedValue});
 		bd.constructorBlock.push(macro $i{NameController.fieldIsConsumed()} = true);
 		bd.constructorBlock.push(macro $i{NameController.fieldCompleted()}  = false);
 	}
@@ -402,13 +411,19 @@ class DefaultGenerator {
 		
 		var lswitch:Expr = { expr: ExprDef.ESwitch(macro (++$i{NameController.fieldCursor()}), lcase, macro ${env.defaultYieldedValue}), pos: pos };
 		
+		var lsetCurrent = if (!isVoid(env.yieldedType)) {
+			macro $i{NameController.fieldCurrent()} = $lswitch;
+		} else {
+			lswitch;
+		}
+
 		// public function hasNext():Bool
-		
+
 		var body:Expr = {
 			expr: EBlock([
 			  macro if (!$i{NameController.fieldIsConsumed()}) return true;
 					else if ($i{NameController.fieldCursor()} < $v{bd.lastSequence}) {
-						$i{NameController.fieldCurrent()} = $lswitch;
+						$lsetCurrent;
 						if (!$i{NameController.fieldCompleted()}) { $i{NameController.fieldIsConsumed()} = false; return true; }
 						else return false;
 					},
@@ -420,12 +435,24 @@ class DefaultGenerator {
 		addMethod(bd, "hasNext", [APublic], [], macro:StdTypes.Bool, body, pos, iterationMetadata);
 		
 		// public function next():???
+
+		var returnDefault = if (isVoid(env.yieldedType)) {
+			macro return;
+		} else {
+			macro return $e{env.defaultYieldedValue};
+		}
+
+		var returnValue = if (isVoid(env.yieldedType)) {
+			macro return;
+		} else {
+			macro return $i{NameController.fieldCurrent()};
+		}
 		
 		var body:Expr = {
 			expr: EBlock([
-				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) { return $e{env.defaultYieldedValue}; },
+				macro if ($i{NameController.fieldIsConsumed()} && !hasNext()) $returnDefault,
 				macro $i{NameController.fieldIsConsumed()} = true,
-				macro return $i{NameController.fieldCurrent()}
+				returnValue
 			]), 
 			pos: pos
 		};

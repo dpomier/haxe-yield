@@ -542,7 +542,6 @@ class Parser {
 					yieldtype = switch TypeInferencer.getBaseType(types, f.expr.pos) {
 						case TMono(_): 
 							macro:StdTypes.Dynamic;
-							return;
 						case TypeTools.toComplexType(_) => baseType:
 							if (baseType != null) {
 								if (!env.isLocalFunction)
@@ -550,7 +549,7 @@ class Parser {
 										param.constraints.push(baseType);
 								baseType;
 							} else {
-								return;
+								macro:StdTypes.Dynamic;
 							}
 					}
 
@@ -561,9 +560,15 @@ class Parser {
 				
 				switch env.functionReturnKind {
 					case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
-						var overrodeType = TypeInferencer.resolveComplexType(returns[0], env);
-						if (overrodeType != null)
-						env.updateYieldedType( overrodeType );
+						if (returns.length == 0) {
+							env.updateYieldedType( macro:StdTypes.Void );
+						} else {
+							var overrodeType = TypeInferencer.resolveComplexType(returns[0], env);
+							if (overrodeType == null)
+								env.updateYieldedType( macro:StdTypes.Void );
+							else
+								env.updateYieldedType( overrodeType );
+						}
 					case UNKNOWN(_,_):
 				}
 

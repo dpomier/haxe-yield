@@ -189,8 +189,6 @@ class WorkEnv {
 
 	public function updateYieldedType (t:ComplexType):Void {
 
-		if (t == null) throw "yielded type must not be null";
-
 		yieldedType = t;
 
 		defaultYieldedValue.expr = WorkEnv.getDefaultValue(t).expr;
