@@ -13,11 +13,13 @@ class GenericTests extends utest.Test {
 		for (j in 0...10) Assert.equals("foo", it.next());
 		Assert.isTrue(it.hasNext());
 		
+		#if (!cs && !java)
 		var b = new SelectiveFunctions(13);
 		var it = b.getAny();
 		Assert.isTrue(it.hasNext());
 		for (j in 0...10) Assert.equals(13, it.next());
 		Assert.isTrue(it.hasNext());
+		#end
 	}
 	#end
 	
@@ -136,12 +138,14 @@ abstract SelectiveFunctions<T>(T) from T {
 		}
 	}
 
+	#if (!cs && !java) // error CS0246: `T' could not be found (https://github.com/HaxeFoundation/haxe/issues/8573)
 	@:impl
 	static public function getAny(v:SelectiveFunctions<T>):Iterator<T> {
 		while (true) {
 			@yield return v.get();
 		}
 	}
+	#end
 }
 #end
 
