@@ -306,6 +306,7 @@ class EForTests extends utest.Test {
 		@yield return null;
 	}
 	
+	#if !cs // https://github.com/HaxeFoundation/haxe/issues/6474
 	function testArrayComprehension () {
 		var it = arrayComprehension();
 		Assert.isTrue(it.hasNext());
@@ -319,6 +320,7 @@ class EForTests extends utest.Test {
 		@yield return a;
 		@yield return [for (i in 0...5) i];
 	}
+	#end
 	
 	function testArrayComprehensionAsVarAccession () {
 		var it = arrayComprehensionAsVarAccession();
