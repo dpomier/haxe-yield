@@ -37,7 +37,7 @@ import yield.parser.tools.IdentCategory;
 
 class TypeInferencer {
 
-	public static function resolveReturnType (?returnType:Null<Type>, ?returnComplexType:Null<ComplexType>, pos:Position):ReturnType {
+	public static function resolveReturnType (?returnType:Null<Type>, ?returnComplexType:Null<ComplexType>, pos:Position):ReturnKind {
 		
 		if (returnType == null) {
 			returnType = try {
@@ -57,7 +57,7 @@ class TypeInferencer {
 					
 				case TDynamic(_):
 					
-					return ReturnType.BOTH(macro:StdTypes.Dynamic, []);
+					return RBoth(macro:StdTypes.Dynamic);
 				
 				case Type.TAnonymous(_.get() => at):
 					
@@ -107,7 +107,7 @@ class TypeInferencer {
 
 					if (hasIterator) {						
 						switch resolveReturnType(iteratorRet, pos) {
-							case ITERATOR(p, _):
+							case RIterator(p):
 								isIterable = true;
 								iterableYieldedType = p;
 							case _:
@@ -115,11 +115,11 @@ class TypeInferencer {
 					}
 
 					return if (isIterator && isIterable) {
-						ReturnType.BOTH(getLowerComplexType(iteratorYieldedType, iterableYieldedType), []);
+						RBoth(getLowerComplexType(iteratorYieldedType, iterableYieldedType));
 					} else if (isIterator) {
-						ReturnType.ITERATOR(iteratorYieldedType, []);
+						RIterator(iteratorYieldedType);
 					} else if (isIterable) {
-						ReturnType.ITERABLE(iterableYieldedType, []);
+						RIterable(iterableYieldedType);
 					} else {
 						Context.fatalError(ComplexTypeTools.toString(returnComplexType) + " should be Iterator or Iterable", pos);
 					};
@@ -132,7 +132,7 @@ class TypeInferencer {
 			
 		} else {
 			
-			return ReturnType.BOTH(macro:StdTypes.Dynamic, []);
+			return RBoth(macro:StdTypes.Dynamic);
 			
 		}
 	}

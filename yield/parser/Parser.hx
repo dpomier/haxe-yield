@@ -26,7 +26,6 @@ package yield.parser;
 import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
 import yield.parser.env.WorkEnv;
-import yield.parser.env.WorkEnv.ReturnType;
 import yield.parser.YieldSplitter;
 import yield.parser.YieldSplitter.IteratorBlockData;
 import yield.generators.DefaultGenerator;
@@ -453,21 +452,16 @@ class Parser {
 				
 		// Typing
 		
-		var returnType:ReturnType = if (f == MetaTools.selectedFunc) {
+		var returnKind:ReturnKind = if (f == MetaTools.selectedFunc) {
 
 			env.yieldMode = true;
 			
 			if (f.ret == null) {
 
-				if (env.yieldExplicit) {
-
+				if (env.yieldExplicit)
 					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
 
-				} else {
-
-					ReturnType.UNKNOWN(null, []);
-
-				}
+				RUnknown(null);
 				
 			} else {
 				
@@ -479,7 +473,7 @@ class Parser {
 			
 			env.yieldMode = false;
 			
-			ReturnType.BOTH(macro:StdTypes.Dynamic, []);
+			RBoth(macro:StdTypes.Dynamic);
 			
 		}
 		
@@ -489,7 +483,7 @@ class Parser {
 		
 		// Parse
 		
-		env.setFunctionData(name, f, returnType, f.expr.pos);
+		env.setFunctionData(name, f, returnKind);
 		
 		var yieldSplitter:YieldSplitter = new YieldSplitter( env );
 		var ibd:IteratorBlockData = yieldSplitter.split(f, f.expr.pos);
@@ -498,24 +492,20 @@ class Parser {
 
 		function yieldOverride () {
 
-			var yieldreturns;
-			var yieldtype;
+			var yieldtype = switch env.functionKind {
 
-			switch env.functionReturnKind {
+				case RIterator(t) | RIterable(t) | RBoth(t):
 
-				case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
+					t;
 
-					yieldtype = t;
-					yieldreturns = returns;
-
-				case UNKNOWN(t, returns):
+				case RUnknown(t):
 
 					var params:Array<TypeParamDecl> = [];
 					
-					var types = [for (r in returns) {
-						var t = TypeInferencer.tryInferExpr(r.expr, env, yield.parser.idents.IdentChannel.Normal);
+					var types = [for (r in env.functionReturns) {
+						var t = TypeInferencer.tryInferExpr(r, env, yield.parser.idents.IdentChannel.Normal);
 						if (t == null)
-							try Context.typeof(r.expr) catch (_:Any) null;
+							try Context.typeof(r) catch (_:Any) null;
 						else
 							switch t { 
 								case TPath(tp): 
@@ -536,8 +526,7 @@ class Parser {
 							}
 					}];
 					
-					yieldreturns = [for(r in returns) r.expr];
-					yieldtype = switch TypeInferencer.getBaseType(types, f.expr.pos) {
+					var yieldtype = switch TypeInferencer.getBaseType(types, f.expr.pos) {
 						case TMono(_): 
 							macro:StdTypes.Dynamic;
 						case TypeTools.toComplexType(_) => baseType:
@@ -552,9 +541,11 @@ class Parser {
 					}
 
 					env.updateYieldedType(yieldtype);
+
+					yieldtype;
 			}
 
-			if (applyYieldModifications(env, yieldreturns, yieldtype, yieldSplitter)) {
+			if (applyYieldModifications(env, yieldtype, yieldSplitter)) {
 				yieldOverride();
 			}
 		}
@@ -571,12 +562,12 @@ class Parser {
 	}
 
 	@:noCompletion
-	public static function applyYieldModifications (env:WorkEnv, returns:Array<Expr>, baseType:ComplexType, yieldSplitter:YieldSplitter):Bool {
+	public static function applyYieldModifications (env:WorkEnv, baseType:ComplexType, yieldSplitter:YieldSplitter):Bool {
 		
 		var modified = false;
 		var overrode:ComplexType = null;
 
-		for (e in returns) {
+		for (e in env.functionReturns) {
 
 			for (onYield in onYieldListeners) {
 				var r = onYield(e, baseType);
@@ -600,18 +591,18 @@ class Parser {
 		if (overrode != null) {
 			env.updateYieldedType(overrode);
 		} else if (modified) {
-			switch env.functionReturnKind {
-				case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
-					if (returns.length == 0) {
+			switch env.functionKind {
+				case RIterator(t) | RIterable(t) | RBoth(t):
+					if (env.functionReturns.length == 0) {
 						env.updateYieldedType( macro:StdTypes.Void );
 					} else {
-						var overrodeType = TypeInferencer.resolveComplexType(returns[0], env);
+						var overrodeType = TypeInferencer.resolveComplexType(env.functionReturns[0], env);
 						if (overrodeType == null)
 							env.updateYieldedType( macro:StdTypes.Void );
 						else
 							env.updateYieldedType( overrodeType );
 					}
-				case UNKNOWN(_,_):
+				case RUnknown(_):
 			}
 		}
 

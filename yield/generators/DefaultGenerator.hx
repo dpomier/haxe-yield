@@ -461,8 +461,8 @@ class DefaultGenerator {
 		
 		// public inline function iterator():Iterator<???>
 		
-		switch (env.functionReturnKind) {
-			case ITERABLE(_,_) | BOTH(_,_) | UNKNOWN(_, _):
+		switch (env.functionKind) {
+			case RIterable(t) | RBoth(t) | RUnknown(t):
 				
 				var body:Expr = {
 					expr: EBlock([
@@ -475,7 +475,7 @@ class DefaultGenerator {
 				
 				addMethod(bd, "iterator", [APublic, AInline], [], macro:StdTypes.Iterator<$yieldedType>, body, pos, iterationMetadata);
 				
-			case ITERATOR(_,_):
+			case RIterator(_):
 		}
 	}
 	

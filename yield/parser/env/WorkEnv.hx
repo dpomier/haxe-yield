@@ -53,11 +53,11 @@ typedef Scope = {
 	var defaultCondition:Bool;
 }
 
-enum ReturnType {
-	ITERABLE(t:ComplexType, returns:Array<Expr>);
-	ITERATOR(t:ComplexType, returns:Array<Expr>);
-	BOTH(t:ComplexType, returns:Array<Expr>);
-	UNKNOWN(t:ComplexType, returns:Array<{ expr:Expr, type:Type }>);
+enum ReturnKind {
+	RIterator(t:ComplexType);
+	RIterable(t:ComplexType);
+	RBoth(t:ComplexType);
+	RUnknown(t:Null<ComplexType>);
 }
 
 /**
@@ -77,7 +77,8 @@ class WorkEnv {
 	public var functionName       (default, null):String;
 	public var classField         (default, null):Field;
 	public var functionDefinition (default, null):Function;
-	public var functionReturnKind (default, null):ReturnType;
+	public var functionKind       (default, null):ReturnKind;
+	public var functionReturns    (default, null):Array<Expr>;
 	public var isLocalFunction    (default, null):Bool;
 	public var yieldedType        (default, null):Null<ComplexType>;
 	public var defaultYieldedValue (default, null):Expr;
@@ -157,7 +158,7 @@ class WorkEnv {
 		requiresInstance = false;
 	}
 	
-	public function setFunctionData (name:String, f:Function, returnKind:ReturnType, pos:Position): Void {
+	public function setFunctionData (name:String, f:Function, r:ReturnKind): Void {
 		
 		// reset
 		localStack    = new Array<Statement>();
@@ -172,15 +173,16 @@ class WorkEnv {
 		// set data
 		functionName = name;
 		functionDefinition = f;
-		functionReturnKind = returnKind;
-		yieldedType = switch (returnKind) {
-			case ITERABLE(t,_), ITERATOR(t,_), BOTH(t,_), UNKNOWN(t, _): t;
-		};
+		functionKind = r;
+		functionReturns = [];
+		yieldedType = switch functionKind {
+			case RIterator(t), RIterable(t), RBoth(t), RUnknown(t): t;
+		}
 		
 		defaultYieldedValue = WorkEnv.getDefaultValue(yieldedType);
 		
 		// set arguments
-		addConstructorArgs(f.args, pos);
+		addConstructorArgs(f.args, f.expr.pos);
 		
 		// init type definition
 		generatedIteratorClass      = DefaultGenerator.makeTypeDefinition(this);
@@ -193,19 +195,19 @@ class WorkEnv {
 
 		defaultYieldedValue.expr = WorkEnv.getDefaultValue(t).expr;
 
-		functionReturnKind = switch functionReturnKind {
-			case UNKNOWN(_, returns):
+		functionKind = switch functionKind {
+			case RUnknown(_):
 				functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
-				UNKNOWN(t, returns);
-			case ITERATOR(_, returns):
+				RUnknown(t);
+			case RBoth(_):
+				functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
+				RBoth(t);
+			case RIterator(_):
 				functionDefinition.ret = macro:Iterator<$t>;
-				ITERATOR(t, returns);
-			case ITERABLE(_, returns):
+				RIterator(t);
+			case RIterable(_):
 				functionDefinition.ret = macro:Iterable<$t>;
-				ITERABLE(t, returns);
-			case BOTH(_, returns):
-				functionDefinition.ret = macro:{ var hasNext:Void->Bool; var next:Void->$t; var iterator:Void->Iterator<$t>; };
-				BOTH(t, returns);
+				RIterable(t);
 		}
 	}
 
@@ -220,18 +222,7 @@ class WorkEnv {
 	dynamic static function registerYieldImpl (env:WorkEnv, e:Expr):Void {}
 
 	private static function registerYieldExpr (env:WorkEnv, e:Expr):Void {
-		
-		switch env.functionReturnKind {
-
-			case UNKNOWN(t, returns): 
-
-				returns.push({ type: null, expr: e });
-
-			case ITERABLE(t, returns), ITERATOR(t, returns), BOTH(t, returns):
-				
-				returns.push(e);
-
-		};
+		env.functionReturns.push(e);
 	}
 	
 	private function addConstructorArgs (args:Array<FunctionArg>, pos:Position): Void {
