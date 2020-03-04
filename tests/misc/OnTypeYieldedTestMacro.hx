@@ -5,15 +5,16 @@ import haxe.macro.Context;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.ExprTools;
 import haxe.macro.TypeTools;
+import yield.parser.Parser;
 
 class OnTypeYieldedTestMacro {
 
     #if (macro && yield)
     private static function init () {
-        yield.parser.Parser.onYield(onYield);
+        Parser.onYield(onYield);
     }
 
-    static function onYield (e:Expr, ?t:ComplexType):Null<Expr> {
+    static function onYield (e:Expr, ?t:ComplexType):Null<YieldedExpr> {
 
         var followed:Null<String> = if (t != null) {
             ComplexTypeTools.toString(t);

@@ -97,7 +97,7 @@ class Parser {
 	 * It is possible to define new types in the callback and to yield new expressions in the returned expression.
 	 * @param f 
 	 */
-	public static function onYield (f:Expr->Null<ComplexType>->Null<Expr>): Void {
+	public static function onYield (f:Expr->Null<ComplexType>->Null<YieldedExpr>): Void {
 
 		WorkEnv.enableYieldRegistration();
 
@@ -119,7 +119,7 @@ class Parser {
 
 	private static var parsingImports:Array<Array<String>> = [];
 	
-	private static var onYieldListeners:Array<Expr->Null<ComplexType>->Null<Expr>> = [];
+	private static var onYieldListeners:Array<Expr->Null<ComplexType>->Null<YieldedExpr>> = [];
 	
 	private static function auto (): Void {
 
@@ -505,8 +505,6 @@ class Parser {
 
 				case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
 
-					if (t == null)
-						return;
 					yieldtype = t;
 					yieldreturns = returns;
 
@@ -556,22 +554,7 @@ class Parser {
 					env.updateYieldedType(yieldtype);
 			}
 
-			if (applyYieldModifications(yieldreturns, yieldtype, yieldSplitter)) {
-				
-				switch env.functionReturnKind {
-					case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
-						if (returns.length == 0) {
-							env.updateYieldedType( macro:StdTypes.Void );
-						} else {
-							var overrodeType = TypeInferencer.resolveComplexType(returns[0], env);
-							if (overrodeType == null)
-								env.updateYieldedType( macro:StdTypes.Void );
-							else
-								env.updateYieldedType( overrodeType );
-						}
-					case UNKNOWN(_,_):
-				}
-
+			if (applyYieldModifications(env, yieldreturns, yieldtype, yieldSplitter)) {
 				yieldOverride();
 			}
 		}
@@ -588,25 +571,47 @@ class Parser {
 	}
 
 	@:noCompletion
-	public static function applyYieldModifications (returns:Array<Expr>, baseType:ComplexType, yieldSplitter:YieldSplitter):Bool {
+	public static function applyYieldModifications (env:WorkEnv, returns:Array<Expr>, baseType:ComplexType, yieldSplitter:YieldSplitter):Bool {
 		
 		var modified = false;
+		var overrode:ComplexType = null;
 
 		for (e in returns) {
 
 			for (onYield in onYieldListeners) {
 				var r = onYield(e, baseType);
 				if (r != null) {
-					e.expr = r.expr;
-					e.pos = r.pos;
-
-					var old = EAGER;
-					EAGER = true;
-					yieldSplitter.parse(e, true);
-					EAGER = old;
-
-					modified = true;
+					if (r.expr != null) {
+						e.expr = r.expr;
+						modified = true;
+						var old = EAGER;
+						EAGER = true;
+						yieldSplitter.parse(e, true);
+						EAGER = old;
+					}
+					if (r.pos != null)
+						e.pos = r.pos;
+					if (overrode == null && r.type != null)
+						overrode = r.type;
 				}
+			}
+		}
+
+		if (overrode != null) {
+			env.updateYieldedType(overrode);
+		} else if (modified) {
+			switch env.functionReturnKind {
+				case ITERATOR(t, returns) | ITERABLE(t, returns) | BOTH(t, returns):
+					if (returns.length == 0) {
+						env.updateYieldedType( macro:StdTypes.Void );
+					} else {
+						var overrodeType = TypeInferencer.resolveComplexType(returns[0], env);
+						if (overrodeType == null)
+							env.updateYieldedType( macro:StdTypes.Void );
+						else
+							env.updateYieldedType( overrodeType );
+					}
+				case UNKNOWN(_,_):
 			}
 		}
 
@@ -621,3 +626,30 @@ private typedef Options = {
 	yieldExplicit:Bool, 
 	yieldExtend:Bool
 }
+
+#if macro
+@:forward abstract YieldedExpr (YieldedExprData) from YieldedExprData {
+
+	@:from static function fromExpr (e:Expr):YieldedExpr {
+		return { expr: e.expr, pos: e.pos, type: null }
+	}
+	
+}
+
+private typedef YieldedExprData = {
+	/**
+		The expression kind.
+	**/
+	@:optional var expr:Null<ExprDef>;
+
+	/**
+		The position of the expression.
+	**/
+	@:optional var pos:Null<Position>;
+
+	/**
+		The position of the expression.
+	**/
+	@:optional var type:ComplexType;
+}
+#end
