@@ -562,7 +562,11 @@ class DefaultGenerator {
 			
 			aBreak.e.expr = EBlock([
 				macro $i{NameController.fieldCompleted()} = true,
-				macro return ${env.defaultYieldedValue}
+				if (isVoid(env.yieldedType)) {
+					macro return;
+				} else {	
+					macro return ${env.defaultYieldedValue}
+				}
 			]);
 		}
 	}
