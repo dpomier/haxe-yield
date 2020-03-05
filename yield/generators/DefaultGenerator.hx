@@ -59,8 +59,14 @@ class DefaultGenerator {
 		
 		var iteratorClassName:String = NameController.extraTypeName(env, ++extraTypeCounter);
 		
-		var c  = macro class $iteratorClassName { };
-		c.pos  = env.classData.localClass.pos;
+		var c = macro class $iteratorClassName {
+			#if debug
+			function toString ():String {
+				return "function" + $v{new Printer().printFunction(env.functionDefinition)};
+			}
+			#end
+		}
+		c.pos = env.classData.localClass.pos;
 		c.meta = env.classData.localClass.meta.get().copy();
 		
 		return c;
