@@ -326,6 +326,9 @@ class TypeInferencer {
 			
 			case ECheckType(e, t):
 				return t;
+			
+			case ENew(p, _):
+				return TPath(p);
 				
 			default:
 				return null;
