@@ -123,5 +123,6 @@ Other libraries addressing generators:
 
 * https://github.com/RealyUniqueName/Coro - Haxe compiler plugin which adds generic coroutines implementation (including built-in async/await and generators)
 * https://lib.haxe.org/p/tink_await/ - Adds async/await for [tink_core](https://github.com/haxetink/tink_core) futures
+* https://github.com/haxe-continuation/haxe-continuation - Adds async/await
 * https://lib.haxe.org/p/moon-core/ - Utility library which includes generator functions, fibers, yield and await
 
