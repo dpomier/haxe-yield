@@ -33,6 +33,7 @@ import haxe.macro.Type;
 import haxe.macro.Type.ClassType;
 import haxe.macro.Type.AbstractType;
 import haxe.macro.ComplexTypeTools;
+import haxe.macro.TypeTools;
 import yield.generators.DefaultGenerator;
 import yield.parser.PositionManager.LinkedPosition;
 import yield.parser.checks.InitializationChecker;
@@ -591,10 +592,15 @@ class WorkEnv {
 			case (macro:Bool) | (macro:StdTypes.Bool):
 				
 				return macro false;
-				
+
 			default:
-				
-				return macro null;
+
+				return switch (try ComplexTypeTools.toType(type) catch(_:Dynamic) null) {
+					case null:
+						macro null;
+					case TypeTools.toComplexType(TypeTools.followWithAbstracts(_)) => t:
+						macro cast ${getDefaultValue(t)};
+				}
 		}
 	}
 	
