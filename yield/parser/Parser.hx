@@ -639,7 +639,7 @@ private typedef YieldedExprData = {
 	@:optional var pos:Null<Position>;
 
 	/**
-		The position of the expression.
+		The type of the expression.
 	**/
 	@:optional var type:ComplexType;
 }
