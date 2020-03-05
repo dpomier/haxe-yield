@@ -571,12 +571,12 @@ class WorkEnv {
 			|| Context.defined("flash8");
 	}
 	
-	public static function getDefaultValue (type:Null<ComplexType>): Expr {
-		
-		if (isDynamicTarget() || type == null)
+	public static function getDefaultValue (t:Null<ComplexType>): Expr {
+
+		if (isDynamicTarget() || t == null)
 			return macro null;
 		
-		switch (type) {
+		switch t {
 			
 			case (macro:Int) | (macro:StdTypes.Int):
 				
@@ -595,12 +595,7 @@ class WorkEnv {
 
 			default:
 
-				return switch (try ComplexTypeTools.toType(type) catch(_:Dynamic) null) {
-					case null:
-						macro null;
-					case TypeTools.toComplexType(TypeTools.followWithAbstracts(_)) => t:
-						macro cast ${getDefaultValue(t)};
-				}
+				return macro ((null:Null<$t>):$t);
 		}
 	}
 	
