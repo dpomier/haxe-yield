@@ -234,13 +234,13 @@ class YieldSplitter {
 				eblockParser.run(e, subParsing, _exprs);
 				
 			case EMeta(_s, _e):
-				if (_s.name == m_env.yieldKeywork && (_s.params == null || _s.params.length == 0))
+				if (_s.name == m_env.yieldKeyword && (_s.params == null || _s.params.length == 0))
 					m_yieldMetaCounter += 1;
 				emetaParser.run(e, subParsing, _s, _e);
 				
 			case EReturn(_e):
 				if (yieldedScope && m_env.yieldMode)
-					Context.fatalError( "Cannot return a value from an iterator. Use the " + m_env.yieldKeywork + " return expression to return a value, or " + m_env.yieldKeywork + " break to end the iteration", e.pos );
+					Context.fatalError( "Cannot return a value from an iterator. Use the " + m_env.yieldKeyword + " return expression to return a value, or " + m_env.yieldKeyword + " break to end the iteration", e.pos );
 				else if (_e != null)
 					parse(_e, true, ic);
 				

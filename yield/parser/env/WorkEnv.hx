@@ -66,7 +66,7 @@ enum ReturnKind {
  */
 class WorkEnv {
 	
-	public var yieldKeywork  (default, null):String;
+	public var yieldKeyword  (default, null):String;
 	public var yieldExplicit (default, null):Bool;
 	public var yieldExtend   (default, null):Bool;
 	
@@ -127,7 +127,7 @@ class WorkEnv {
 	
 	public function setOptions (keywork:String, explicit:Bool, extend:Bool): Void {
 		
-		yieldKeywork  = keywork;
+		yieldKeyword  = keywork;
 		yieldExplicit = explicit;
 		yieldExtend   = extend;
 	}
@@ -262,7 +262,7 @@ class WorkEnv {
 		we.currentScope  = currentScope;
 		we.untypedMode   = untypedMode;
 		we.scopeCounter  = 0;
-		we.setOptions(yieldKeywork, yieldExplicit, yieldExtend);
+		we.setOptions(yieldKeyword, yieldExplicit, yieldExtend);
 		
 		#if yield_debug
 		we.debug = debug;

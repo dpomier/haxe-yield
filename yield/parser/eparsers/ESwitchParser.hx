@@ -80,7 +80,7 @@ class ESwitchParser extends BaseParser {
 				
 				MetaTools.option = MetaToolsOption.SkipNestedFunctions;
 				
-				if (MetaTools.hasMetaExpr(m_we.yieldKeywork, lcase.expr)) {
+				if (MetaTools.hasMetaExpr(m_we.yieldKeyword, lcase.expr)) {
 					for (econst in paramNames) {
 						
 						predefineNativeVars.push({ ref: IdentRef.IEConst(econst), type: macro:StdTypes.Dynamic });

@@ -41,7 +41,7 @@ class ActionParser extends BaseParser {
 		var lexpr = e.expr;
 		
 		e.expr = EMeta({
-			name: env.yieldKeywork, 
+			name: env.yieldKeyword, 
 			params: [{ expr:EConst(CString( ls.toString() )), pos:e.pos }], 
 			pos:e.pos
 		},{

@@ -395,7 +395,7 @@ class Parser {
 				
 				MetaTools.option = MetaToolsOption.None;
 				
-				if (MetaTools.hasMeta(env.yieldKeywork, _e)) {
+				if (MetaTools.hasMeta(env.yieldKeyword, _e)) {
 					
 					func               = MetaTools.selectedFunc;
 					alternativeRetType = switch (_t) {
@@ -440,7 +440,7 @@ class Parser {
 		
 		MetaTools.option = MetaToolsOption.None;
 		
-		if (!MetaTools.hasMeta(env.yieldKeywork, f, true/*, f.ret == null*/)) {
+		if (!MetaTools.hasMeta(env.yieldKeyword, f, true/*, f.ret == null*/)) {
 			return false;
 		}
 		
@@ -459,7 +459,7 @@ class Parser {
 			if (f.ret == null) {
 
 				if (env.yieldExplicit)
-					Context.fatalError( "Method must have a return type when using " + env.yieldKeywork + " expressions", pos );
+					Context.fatalError( "Method must have a return type when using " + env.yieldKeyword + " expressions", pos );
 
 				RUnknown(null);
 				
