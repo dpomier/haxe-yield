@@ -40,6 +40,9 @@ class Tests
 		r.addCase(new options.parsing.subparsing.unparsed.UnparsedTests());
 		r.addCase(new options.parsing.recursive.RecursiveParsingTests());
 		r.addCase(new options.parsing.recursive.parsed.RecursiveSubParsingTests());
+
+		// issues
+		r.addCases(issues);
 		
 		Report.create(r);
 

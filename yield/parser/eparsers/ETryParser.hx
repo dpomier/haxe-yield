@@ -113,26 +113,33 @@ class ETryParser extends BaseParser {
 		
 		previousCatchScope = m_we.openScope(true, previousCatchScope);
 		
-		switch (c.type) {
+		var t = switch c.type {
+			#if (haxe_ver >= 4.100)
+			case null | (macro:haxe.Exception):
+				previousCatchScope.defaultCondition = true;
+				macro:haxe.Exception;
+			#end
 			case (macro:Dynamic) | (macro:StdTypes.Dynamic):
 				previousCatchScope.defaultCondition = true;
+				c.type;
 			default:
+				c.type;
 		}
 		
 		// Add catch-argument as property
 		var initializationValue:Expr = {expr:EConst(CIdent(c.name)), pos:c.expr.pos};
 		var ldefinition:Expr = {
-			expr: EVars([{name: c.name, type: c.type, expr: initializationValue}]),
+			expr: EVars([{name: c.name, type: t, expr: initializationValue}]),
 			pos: c.expr.pos
 		};
-		m_we.addLocalDefinition([c.name], [true], [c.type], false, IdentRef.IEVars(ldefinition), IdentChannel.Normal, [], ldefinition.pos);
+		m_we.addLocalDefinition([c.name], [true], [t], false, IdentRef.IEVars(ldefinition), IdentChannel.Normal, [], ldefinition.pos);
 		
 		
 		var posOriginal = m_ys.cursor;
 		
 		var posFirst = m_ys.cursor;
 		
-		m_ys.parseComplexType(c.type, true);
+		m_ys.parseComplexType(t, true);
 		m_ys.parse(c.expr, false);
 		
 		// Replace the body with Goto action to the first catch sub-expressions
