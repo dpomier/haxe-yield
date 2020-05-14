@@ -5,6 +5,6 @@
   "tags": [ "cross", "utility", "macro" ],
   "description": "Cross platform C#-like `yield` generator for Haxe",
   "version": "3.0.0",
-  "releasenote": "updated for haxe 4.0.0-rc.5, added yield macro callbacks, many enhancements",
+  "releasenote": "fixed inferred exceptions",
   "contributors": ["dpomier"]
 }
