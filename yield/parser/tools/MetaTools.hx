@@ -473,8 +473,15 @@ class MetaTools {
 	}
 	
 	private static function hasMetaCatch (name:String, c:Catch): Bool {
+
+		var t = switch c.type {
+			#if (haxe_ver >= 4.100)
+			case null: macro:haxe.Exception;
+			#end
+			case t: t;
+		}
 		
-		return hasMetaCT(name, c.type) || hasMetaExpr(name, c.expr);
+		return hasMetaCT(name, t) || hasMetaExpr(name, c.expr);
 	}
 
 	private static function typeResolution (e:Null<Expr>):Bool {
