@@ -11,7 +11,9 @@ class Issue5 extends Test {
 	
 	function iterator ():Iterator<Dynamic> {
 		
+		#if (haxe_ver >= 4.100)
 		try Math.random() catch (e) {}
+		#end
 
 		@yield break;
 
