@@ -560,8 +560,9 @@ class WorkEnv {
 	}
 	
 	public static function isDynamicTarget (): Bool {
-		
-		return Context.defined("neko")
+
+		return if (Context.defined("haxe3")) {
+			Context.defined("neko")
 			|| Context.defined("js")
 			|| Context.defined("php")
 			|| Context.defined("python")
@@ -569,6 +570,9 @@ class WorkEnv {
 			|| Context.defined("flash6")
 			|| Context.defined("flash7")
 			|| Context.defined("flash8");
+		} else {
+			!Context.defined("static");
+		}
 	}
 	
 	public static function getDefaultValue (t:Null<ComplexType>): Expr {
