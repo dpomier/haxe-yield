@@ -15,7 +15,9 @@ haxe:
   
 matrix:
   allow_failures:
-    - haxe: development
+    - haxe:
+      - development
+      - 4.0.0-rc.3
     
 install:
   - haxelib install travix
