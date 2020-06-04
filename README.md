@@ -85,20 +85,40 @@ counter.next(); // n
 Advanced usage
 -----
 
+##### Defines
+
 You can compile with some haxe compilation parameters (or pass several `yield.YieldOption` into the `:yield` metadata):
 
- - `yield-extend`
+ - `yield-extend`<br/>
 		If the option is enabled, all extending classes will be able to use `@yield` expressions. If this option affects an interface, all implementing classes and all extending interfaces will be able to use `@yield` expressions. This is disabled by default.
 		Compile with `-D yield-extend`.
- - `yield-explicit`
+
+ - `yield-explicit`<br/>
 		If the option is enabled, the return type of iterative functions needs to be explicitly specified. This is disabled by default.
 		Compile with `-D yield-explicit`.
- - `yield-keyword`
+
+ - `yield-keyword`<br/>
 		Use a custom keyword instead of "yield".
 		Compile with `-D yield-keyword=myCustomMetaName`.
- - `yield-parse`
+
+ - `yield-parse`<br/>
 		Specifies packages or classpaths to include in the yield parser. All the impacted classes will no longer need to be annotated with `:yield` to be able to use the `@yield` expressions. This can be recursive using the `*` wildcard.
 		Compile with `-D yield-parse= my.package.one, my.packages.*, my.class.Foo`.
+
+ - `yield-types`<br/>
+		Specifies types which automatilally trigger the yield parser when imported. 
+		Compile with `-D yield-types= foo.Bar, foo.Bar.Subtype`.
+        Available from init-macros through `yield.parser.Parser.parseOnImport`.
+
+##### Macro API
+
+ - `yield.parser.Parser.parseOnImport`<br/>
+		Similar to `-D yield-types=some.Type`. 
+
+ - `yield.parser.Parser.onYield`<br/>
+		Adds a callback which allows transforming each yielded expression.
+
+	See [the coroutine library](https://github.com/dpomier/haxe-coroutine) for an example. You can also browse the unit tests.
 
 Install
 -----
