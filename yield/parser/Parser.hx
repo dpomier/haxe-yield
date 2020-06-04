@@ -88,7 +88,7 @@ class Parser {
 	#if (macro || display)
 
 	/**
-	 * Adds a callback function `f` which allow transforming each yielded expression.
+	 * Adds a callback `f` which allows transforming each yielded expression.
 	 * The callback receives the expression and its type, then returns a transformed expression.
 	 * 
 	 * If the returned expression is null, the callback have no effect.
