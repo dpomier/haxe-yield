@@ -247,8 +247,8 @@ abstract AbstractGenericTest <T> (String) {
 
 @:yield
 class GenericFunctions <A> {
-    
-    public function new () {}
+	
+	public function new () {}
 
 	public static function getIt <T> (v:T):Iterator<T> {
 

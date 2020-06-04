@@ -164,8 +164,8 @@ class DefaultGenerator {
 			name:   name,
 			access: access,
 			kind:   FVar( type != null ? type : macro:StdTypes.Dynamic, null ),
-			pos:    pos,
-			doc:    null,
+			pos:	pos,
+			doc:	null,
 			meta:   null
 		});
 	}
@@ -174,17 +174,17 @@ class DefaultGenerator {
 		
 		var fn:Function = {
 			args:   args,
-			ret:    ret,
+			ret:	ret,
 			expr:   expr,
 			params: null
 		}
 		
 		bd.typeDefinition.fields.push({
 			name:   name,
-			doc:    null,
+			doc:	null,
 			access: access,
 			kind:   FFun( fn ),
-			pos:    pos,
+			pos:	pos,
 			meta:   metadata
 		});
 	}
@@ -194,7 +194,7 @@ class DefaultGenerator {
 		bd.typeDefinition.meta.push({
 			name:   name,
 			params: params,
-			pos:    pos
+			pos:	pos
 		});
 	}
 	
@@ -500,7 +500,7 @@ class DefaultGenerator {
 	private static function initTypeParams (bd:BuildingData, env:WorkEnv, pos:Position): Void {
 		
 		bd.typeDefinition.params = [];
-		var ids:Array<String>    = [];
+		var ids:Array<String> = [];
 		
 		function addTypeParameters (params:Array<TypeParameter>): Void {
 			
@@ -529,9 +529,9 @@ class DefaultGenerator {
 			
 			var p:TypeParamDecl = {
 				constraints: param.constraints,
-				meta:        param.meta,
-				name:        param.name,
-				params:      param.params
+				meta: param.meta,
+				name: param.name,
+				params: param.params
 			};
 			
 			bd.typeDefinition.params.push(p);
@@ -695,7 +695,7 @@ class DefaultGenerator {
 						Context.fatalError("Unknown identifier : " + _data.names[0], _data.pos);
 					}
 					
-					newNames    = newNameChannels[_data.channel][scopeDefenition.id];
+					newNames	= newNameChannels[_data.channel][scopeDefenition.id];
 					nameCounter = nameCounterChannels[_data.channel][scopeDefenition.id];
 					
 					// Change the accession
@@ -731,7 +731,7 @@ class DefaultGenerator {
 						nameCounterChannels[_data.channel].set( _data.scope.id, new Map<String, UInt>() );
 					}
 					
-					newNames    = newNameChannels[_data.channel][_data.scope.id];
+					newNames	= newNameChannels[_data.channel][_data.scope.id];
 					nameCounter = nameCounterChannels[_data.channel][_data.scope.id];
 					
 					if (_data.names[0] == null) continue;

@@ -388,7 +388,7 @@ class Parser {
 			
 			case FFun(_f):
 				
-				func               = _f;
+				func			   = _f;
 				alternativeRetType = null;
 				
 			case FProp(_, _, _t, _e) | FVar(_t, _e):
@@ -397,7 +397,7 @@ class Parser {
 				
 				if (MetaTools.hasMeta(env.yieldKeyword, _e)) {
 					
-					func               = MetaTools.selectedFunc;
+					func			   = MetaTools.selectedFunc;
 					alternativeRetType = switch (_t) {
 						case ComplexType.TFunction(__args, __ret): 	__ret;
 						default: null;

@@ -383,7 +383,7 @@ class EForTests extends utest.Test {
 		
 		for (i in 0...20) {
 			@yield return i;
-            if (i < 1) @yield return i;
+			if (i < 1) @yield return i;
 			if (i <= 1) @yield return i;
 			if (i == 1) @yield return i;
 			if (i != 1) @yield return i;
@@ -405,8 +405,8 @@ class EForTests extends utest.Test {
 			if ((i...1) != null) @yield return i;
 			if ((0...i) != null) @yield return i;
 			if ([i => 0] != null) @yield return i;
-            if (-i < 1) @yield return i;
-            if (~i < 1) @yield return i;
+			if (-i < 1) @yield return i;
+			if (~i < 1) @yield return i;
 		}
 	}
 

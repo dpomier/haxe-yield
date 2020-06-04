@@ -86,8 +86,8 @@ class ESwitchParser extends BaseParser {
 						predefineNativeVars.push({ ref: IdentRef.IEConst(econst), type: macro:StdTypes.Dynamic });
 						
 						var initValue:Expr = { expr: econst.expr, pos: econst.pos };
-						var v:Var          = { name: ExpressionTools.getConstIdent(econst), type: macro:StdTypes.Dynamic, expr: initValue };
-						var evars:Expr     = { expr: EVars([v]), pos: econst.pos };
+						var v:Var		  = { name: ExpressionTools.getConstIdent(econst), type: macro:StdTypes.Dynamic, expr: initValue };
+						var evars:Expr	 = { expr: EVars([v]), pos: econst.pos };
 						
 						lexprs.unshift(evars);
 					}

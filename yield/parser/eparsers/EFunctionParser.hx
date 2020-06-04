@@ -106,8 +106,8 @@ class EFunctionParser extends BaseParser {
 					}
 					
 					var initValue:Expr = { expr: EConst(CIdent(arg.name)), pos: f.expr.pos };
-					var v:Var          = { name: arg.name, type: arg.type, expr: initValue };
-					var evars:Expr     = { expr: EVars([v]), pos: f.expr.pos };
+					var v:Var		  = { name: arg.name, type: arg.type, expr: initValue };
+					var evars:Expr	 = { expr: EVars([v]), pos: f.expr.pos };
 					
 					fExprs.unshift(evars);
 				}

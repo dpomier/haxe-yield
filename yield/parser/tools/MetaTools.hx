@@ -45,7 +45,7 @@ class MetaTools {
 	public static var selectedExpr (default, set):Null<Expr>;
 	public static var selectedPos  (default, set):Null<Position>;
 	public static var resolvedType (default, null):Null<Type>;
-	public static var metaFound    (default, null):Bool = false;
+	public static var metaFound	(default, null):Bool = false;
 
 	private static function set_selectedFunc (v:Function):Function {
 		return selectedFunc = (!resolveType || resolvedType == null) ? v : selectedFunc;
@@ -68,7 +68,7 @@ class MetaTools {
 		selectedFunc = null;
 		selectedPos  = null;
 		resolvedType = null;
-		metaFound    = false;
+		metaFound	= false;
 		
 		if (f == null && e == null) return false;
 		

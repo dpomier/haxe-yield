@@ -90,15 +90,15 @@ class EConstParser extends BaseParser {
 							} else {
 								
 								var data:IdentData = {
-									names:       [_s],
+									names: [_s],
 									initialized: [initialized],
-									types:       [type],
-									ident:       IdentRef.IEConst(e),
-									channel:     ic,
-									options:     __definition.options.copy(),
-									scope:       m_we.currentScope,
-									env:         m_we,
-									pos:         e.pos
+									types: [type],
+									ident: IdentRef.IEConst(e),
+									channel: ic,
+									options: __definition.options.copy(),
+									scope: m_we.currentScope,
+									env: m_we,
+									pos: e.pos
 								};
 								
 								if (__definition.options.indexOf(IdentOption.KeepAsVar) != -1) {

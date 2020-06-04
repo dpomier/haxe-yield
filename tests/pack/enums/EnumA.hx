@@ -1,7 +1,7 @@
 package pack.enums;
 
 enum EnumA {
-    A;
-    AA;
-    AAA;
+	A;
+	AA;
+	AAA;
 }

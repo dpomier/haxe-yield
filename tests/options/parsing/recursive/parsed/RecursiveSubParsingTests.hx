@@ -4,7 +4,7 @@ import utest.Assert;
 
 class RecursiveSubParsingTests extends utest.Test {
 
-    function testParsing () {
+	function testParsing () {
 		var it = simpleSplit();
 		Assert.equals(1, it.next());
 		Assert.equals(2, it.next());

@@ -32,21 +32,21 @@ import yield.parser.YieldSplitter.IteratorBlockData;
 class BuildingData {
 	
 	public var typeDefinition   (default, null):TypeDefinition;
-	public var typePath         (default, null):TypePath;
+	public var typePath			(default, null):TypePath;
 	public var constructorArgs  (default, null):Array<FunctionArg>;
 	public var constructorBlock (default, null):Array<Expr>;
 	public var givenArguments   (default, null):Array<Expr>;
-	public var lastSequence     (default, null):Int;
+	public var lastSequence		(default, null):Int;
 	public var instanceFunctionBody:Expr;
 	
 	public function new (td:TypeDefinition, tpack:TypePath, ibd:IteratorBlockData) {
 		
 		typeDefinition   = td;
-		typePath         = tpack;
+		typePath		 = tpack;
 		constructorArgs  = [];
 		constructorBlock = [];
 		givenArguments   = [];
-		lastSequence     = ibd.length - 1;
+		lastSequence	 = ibd.length - 1;
 		instanceFunctionBody = null;
 		
 		typeDefinition.pack = typePath.pack;

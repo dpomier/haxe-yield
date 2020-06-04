@@ -106,7 +106,7 @@ class EWhileParser extends BaseParser {
 			var posAfterWhile:Int	= m_ys.cursor+1;
 			
 			// goto actions
-			var lgotoWhileDecl:Expr    = { expr: null, pos: _e.pos };
+			var lgotoWhileDecl:Expr	= { expr: null, pos: _e.pos };
 			var lgotoFirstSubExpr:Expr = { expr: null, pos: _e.pos };
 			var lgotoAfterWhile:Expr   = { expr: null, pos: _e.pos };
 			

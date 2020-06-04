@@ -22,7 +22,7 @@ class LoopType {
 @:yield
 class OnTypeYieldedTests extends utest.Test {
 
-    function testSimpleModification () {
+	function testSimpleModification () {
 		var it:Iterator<Dynamic> = simpleModification();
 		Assert.equals(3, it.next());
 	}

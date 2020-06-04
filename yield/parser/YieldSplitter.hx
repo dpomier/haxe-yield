@@ -38,21 +38,21 @@ typedef IteratorBlockData = Array<IteratorBlock>;
 
 class YieldSplitter {
 	
-	public var eblockParser    (default, null):EBlockParser;
-	public var ewhileParser    (default, null):EWhileParser;
-	public var eforParser      (default, null):EForParser;
-	public var eifParser       (default, null):EIfParser;
-	public var eswitchParser   (default, null):ESwitchParser;
-	public var eternaryParser  (default, null):ETernaryParser;
-	public var econstParser    (default, null):EConstParser;
-	public var emetaParser     (default, null):EMetaParser;
-	public var efunctionParser (default, null):EFunctionParser;
-	public var evarsParser     (default, null):EVarsParser;
-	public var etryParser      (default, null):ETryParser;
+	public var eblockParser	(default, null):EBlockParser;
+	public var ewhileParser	(default, null):EWhileParser;
+	public var eforParser	(default, null):EForParser;
+	public var eifParser	(default, null):EIfParser;
+	public var eswitchParser	(default, null):ESwitchParser;
+	public var eternaryParser	(default, null):ETernaryParser;
+	public var econstParser		(default, null):EConstParser;
+	public var emetaParser		(default, null):EMetaParser;
+	public var efunctionParser	(default, null):EFunctionParser;
+	public var evarsParser	(default, null):EVarsParser;
+	public var etryParser	(default, null):ETryParser;
 	
-	public var actionParser    (default, null):ActionParser;
+	public var actionParser (default, null):ActionParser;
 	
-	public var cursor         (default, null):UInt;
+	public var cursor (default, null):UInt;
 	public var iteratorBlocks (default, null):IteratorBlockData = [];
 	public var yieldedScope:Bool;
 	
@@ -65,18 +65,18 @@ class YieldSplitter {
 	public function new (env:WorkEnv) {
 		m_env = env;
 		yieldedScope = true;
-		actionParser    = new ActionParser(this, env);
-		eblockParser    = new EBlockParser(this, env);
-		ewhileParser    = new EWhileParser(this, env);
-		eforParser      = new EForParser(this, env);
-		eifParser       = new EIfParser(this, env);
-		eswitchParser   = new ESwitchParser(this, env);
-		eternaryParser  = new ETernaryParser(this, env);
-		econstParser    = new EConstParser(this, env);
-		emetaParser     = new EMetaParser(this, env);
+		actionParser = new ActionParser(this, env);
+		eblockParser = new EBlockParser(this, env);
+		ewhileParser = new EWhileParser(this, env);
+		eforParser = new EForParser(this, env);
+		eifParser = new EIfParser(this, env);
+		eswitchParser = new ESwitchParser(this, env);
+		eternaryParser = new ETernaryParser(this, env);
+		econstParser = new EConstParser(this, env);
+		emetaParser	= new EMetaParser(this, env);
 		efunctionParser = new EFunctionParser(this, env);
-		evarsParser     = new EVarsParser(this, env);
-		etryParser      = new ETryParser(this, env);
+		evarsParser	= new EVarsParser(this, env);
+		etryParser = new ETryParser(this, env);
 	}
 	
 	public function split (f:Function, pos:Position): IteratorBlockData {
@@ -292,8 +292,8 @@ class YieldSplitter {
 				case EConst(__c):
 					var beingModified:Bool = switch (_op) { case OpAssign, OpAssignOp(_): true; case _: false; }
 					switch (_op) {
-					case Binop.OpAssign: econstParser.run(_e1, true, __c, ic, true, beingModified);
-					case _:              econstParser.run(_e1, true, __c, ic, false, beingModified);
+					case Binop.OpAssign: 	econstParser.run(_e1, true, __c, ic, true, beingModified);
+					case _:					econstParser.run(_e1, true, __c, ic, false, beingModified);
 					}
 				default:
 					parse(_e1, true, ic);
@@ -318,8 +318,8 @@ class YieldSplitter {
 			case EUnop(_op, _postFix, _e):
 				var beingModified:Bool = switch (_op) { case OpIncrement, OpDecrement: true; case _: false; }
 				switch (_e.expr) {
-					case EConst(_c): econstParser.run(_e, true, _c, ic, false, beingModified);
-					case _:           parse(_e, true);
+					case EConst(_c):	econstParser.run(_e, true, _c, ic, false, beingModified);
+					case _:				parse(_e, true);
 				}
 				if (!subParsing) addIntoBlock(e);
 				

@@ -4,7 +4,7 @@ import utest.Assert;
 
 class UnparsedTests extends utest.Test {
 
-    function testUnparsed () {
+	function testUnparsed () {
 		var value:Int = unparsed();
 		Assert.equals(1, value);
 	}

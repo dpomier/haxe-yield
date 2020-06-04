@@ -30,18 +30,18 @@ import yield.parser.tools.ImportTools;
 
 class ClassData {
 
-	public var module           (default, null):Array<Type>;
-	public var localClass       (default, null):ClassType;
-	public var localType        (default, null):Type;
+	public var module			(default, null):Array<Type>;
+	public var localClass		(default, null):ClassType;
+	public var localType		(default, null):Type;
 	public var localComplexType (default, null):ComplexType;
-	public var isPrivate        (default, null):Bool;
-	public var isAbstract       (default, null):Bool;
-	public var abstractType     (default, null):Null<AbstractType>;
-	public var classFields      (default, null):Array<Field>;
-	public var imports          (default, null):Array<ImportExpr>;
-	public var importedFields   (default, null):Array<String>;
-	public var importedEnums    (default, null):Array<EnumType>;
-	public var usings           (default, null):Array<Ref<ClassType>>;
+	public var isPrivate		(default, null):Bool;
+	public var isAbstract		(default, null):Bool;
+	public var abstractType		(default, null):Null<AbstractType>;
+	public var classFields		(default, null):Array<Field>;
+	public var imports			(default, null):Array<ImportExpr>;
+	public var importedFields	(default, null):Array<String>;
+	public var importedEnums	(default, null):Array<EnumType>;
+	public var usings			(default, null):Array<Ref<ClassType>>;
 
 	private inline function new () {
 
@@ -67,11 +67,11 @@ class ClassData {
 		
 		data.isPrivate = ct.isPrivate;
 		
-		data.classFields    = Context.getBuildFields();
-		data.imports        = Context.getLocalImports();
+		data.classFields	= Context.getBuildFields();
+		data.imports		= Context.getLocalImports();
 		data.importedFields = ImportTools.getFieldShorthands(data.imports);
 		data.importedEnums  = ImportTools.getEnumConstructors(data.imports, data.module);
-		data.usings         = Context.getLocalUsing();
+		data.usings			= Context.getLocalUsing();
 
 		return data;
 	}

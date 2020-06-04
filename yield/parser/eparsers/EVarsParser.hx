@@ -42,8 +42,8 @@ class EVarsParser extends BaseParser {
 			options = [];
 		}
 		
-		var names:Array<String>      = [];
-		var initialized:Array<Bool>  = [];
+		var names:Array<String> = [];
+		var initialized:Array<Bool> = [];
 		var types:Array<ComplexType> = [];
 
 		var isFinal:Bool = false;

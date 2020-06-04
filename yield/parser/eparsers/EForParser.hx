@@ -52,8 +52,8 @@ class EForParser extends BaseParser {
 	private function runSplitMode (e:Expr, subParsing:Bool, _it:Expr, _expr:Expr, loopExprs:Array<Expr>): Void {
 		
 		var ewhileEcond:Expr = {expr: null, pos:e.pos};
-		var ewhileE:Expr     = {expr: _expr.expr, pos:e.pos};
-		var ewhile:Expr      = {expr: EWhile(ewhileEcond,ewhileE, true), pos:e.pos};
+		var ewhileE:Expr	 = {expr: _expr.expr, pos:e.pos};
+		var ewhile:Expr	  = {expr: EWhile(ewhileEcond,ewhileE, true), pos:e.pos};
 		
 		var updateExprs:Array<Expr> = new Array<Expr>();
 		

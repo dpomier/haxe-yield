@@ -75,25 +75,25 @@ class WorkEnv {
 	
 	public var classData (default, null):ClassData;
 	
-	public var functionName       (default, null):String;
-	public var classField         (default, null):Field;
-	public var functionDefinition (default, null):Function;
-	public var functionKind       (default, null):ReturnKind;
-	public var functionReturns    (default, null):Array<Expr>;
-	public var isLocalFunction    (default, null):Bool;
-	public var yieldedType        (default, null):Null<ComplexType>;
-	public var defaultYieldedValue (default, null):Expr;
+	public var functionName			(default, null):String;
+	public var classField			(default, null):Field;
+	public var functionDefinition	(default, null):Function;
+	public var functionKind			(default, null):ReturnKind;
+	public var functionReturns		(default, null):Array<Expr>;
+	public var isLocalFunction		(default, null):Bool;
+	public var yieldedType			(default, null):Null<ComplexType>;
+	public var defaultYieldedValue	(default, null):Expr;
 	
 	/**
 	 * [ClassName, FunctionName, FunctionName1, ... FunctionNameN] where FunctionNameN is the parent of the current parsed function.
 	 */
 	public var functionsPack (default, null):Array<String>;
 	
-	public var localStack     (default, null):Array<Statement>;
-	public var instanceStack  (default, null):Array<Statement>;
-	public var parentStack    (default, null):Array<Statement>;
-	public var parentDependencies	   (default, null):Array<WorkEnv>;
-	public var parentAsVarDependencies (default, null):Array<{env:WorkEnv, identData:IdentData}>;
+	public var localStack		(default, null):Array<Statement>;
+	public var instanceStack	(default, null):Array<Statement>;
+	public var parentStack		(default, null):Array<Statement>;
+	public var parentDependencies		(default, null):Array<WorkEnv>;
+	public var parentAsVarDependencies	(default, null):Array<{env:WorkEnv, identData:IdentData}>;
 	
 	public var functionArguments (default, null):Array<ArgIdentData>;
 	
@@ -118,7 +118,7 @@ class WorkEnv {
 	
 	public function new () {
 		
-		parentDependencies      = [];
+		parentDependencies = [];
 		parentAsVarDependencies = [];
 		parent = null;
 
@@ -143,18 +143,18 @@ class WorkEnv {
 		
 		isLocalFunction = false;
 		classField = field;
-		currentScope  = {
-			id    : 0,
-			level : 0,
+		currentScope = {
+			id: 0,
+			level: 0,
 			parent: null,
 			children: [],
-			conditional            : false,
+			conditional: false,
 			conditionalAlternatives: null,
-			defaultCondition       : false,
+			defaultCondition: false,
 			localIdentStack: new Array<Statement>()
 		};
 		scopeCounter = 0;
-		yieldMode    = true;
+		yieldMode = true;
 		requiredBySubEnv = false;
 		requiresInstance = false;
 	}
@@ -162,7 +162,7 @@ class WorkEnv {
 	public function setFunctionData (name:String, f:Function, r:ReturnKind): Void {
 		
 		// reset
-		localStack    = new Array<Statement>();
+		localStack	= new Array<Statement>();
 		instanceStack = new Array<Statement>();
 		parentStack   = new Array<Statement>();
 		
@@ -186,7 +186,7 @@ class WorkEnv {
 		addConstructorArgs(f.args, f.expr.pos);
 		
 		// init type definition
-		generatedIteratorClass      = DefaultGenerator.makeTypeDefinition(this);
+		generatedIteratorClass = DefaultGenerator.makeTypeDefinition(this);
 		generatedIteratorClass.pack = getExtraTypePath().pack;
 	}
 
@@ -235,8 +235,8 @@ class WorkEnv {
 			}
 			
 			var initValue:Expr = { expr: EConst(CIdent("null")), pos: pos };
-			var v:Var          = { name: arg.name, type: arg.type, expr: initValue };
-			var evars:Expr     = { expr: EVars([v]), pos: pos };
+			var v:Var		  = { name: arg.name, type: arg.type, expr: initValue };
+			var evars:Expr	 = { expr: EVars([v]), pos: pos };
 			
 			var ltype:Null<ComplexType> = TypeInferencer.tryInferArg(arg);
 			if (ltype == null) ltype = macro:StdTypes.Dynamic;
@@ -256,12 +256,12 @@ class WorkEnv {
 		we.functionsPack = functionsPack.copy();
 		we.functionsPack.push( functionName );
 
-		we.parent        = this;
+		we.parent = this;
 		we.isLocalFunction = true;
-		we.classField    = classField;
-		we.currentScope  = currentScope;
-		we.untypedMode   = untypedMode;
-		we.scopeCounter  = 0;
+		we.classField	= classField;
+		we.currentScope	= currentScope;
+		we.untypedMode	= untypedMode;
+		we.scopeCounter	= 0;
 		we.setOptions(yieldKeyword, yieldExplicit, yieldExtend);
 		
 		#if yield_debug
@@ -337,13 +337,13 @@ class WorkEnv {
 		scopeCounter += 1;
 
 		var s:Scope = {
-			id    : scopeCounter,
-			level : currentScope.level + 1,
+			id: scopeCounter,
+			level: currentScope.level + 1,
 			parent: currentScope,
 			children: [],
-			conditional            : isConditional,
+			conditional: isConditional,
 			conditionalAlternatives: null,
-			defaultCondition       : false,
+			defaultCondition: false,
 			localIdentStack: new Array<Statement>()
 		};
 		
@@ -385,15 +385,15 @@ class WorkEnv {
 	public function addLocalDefinition (names:Array<String>, initialized:Array<Bool>, types:Array<ComplexType>, inlined:Bool, ident:IdentRef, ic:IdentChannel, options:Array<IdentOption>, pos:Position): IdentData {
 		
 		var data:IdentData = {
-			names:       names, 
+			names: names, 
 			initialized: initialized,
-			types:       types,
-			ident:       ident,
-			channel:     ic,
-			options:     options,
-			scope:       currentScope,
-			env:         this,
-			pos:         pos
+			types: types,
+			ident: ident,
+			channel: ic,
+			options: options,
+			scope: currentScope,
+			env: this,
+			pos: pos
 		};
 		
 		if (options.indexOf(ReadOnly) != -1) {
@@ -422,15 +422,15 @@ class WorkEnv {
 		}
 		
 		var data:IdentData = {
-			names:       [name], 
+			names: [name], 
 			initialized: [initialized],
-			types:       [type],
-			ident:       ident,
-			channel:     ic,
-			options:     defIdent.options,
-			scope:       currentScope,
-			env:         this,
-			pos:         pos
+			types: [type],
+			ident: ident,
+			channel: ic,
+			options: defIdent.options,
+			scope: currentScope,
+			env: this,
+			pos: pos
 		};
 		
 		if (!initialized) {
@@ -447,15 +447,15 @@ class WorkEnv {
 	public function addInstanceAccession (field:Null<String>, type:Null<ComplexType>, ident:IdentRef, ic:IdentChannel, pos:Position): Void {
 		
 		var data:IdentData = {
-			names:       field == null ? null : [field], 
+			names: field == null ? null : [field], 
 			initialized: null,
-			types:       [type],
-			ident:       ident,
-			channel:     ic,
-			options:     [],
-			scope:       currentScope,
-			env:         this,
-			pos:         pos
+			types: [type],
+			ident: ident,
+			channel: ic,
+			options: [],
+			scope: currentScope,
+			env: this,
+			pos: pos
 		};
 		
 		instanceStack.push(Statement.Accession(data, null));
