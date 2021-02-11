@@ -562,7 +562,6 @@ class WorkEnv {
 	public static function isDynamicTarget (): Bool {
 
 		return #if (haxe_ver < 4.000)
-			throw "haxe 3 is defined, 4? " + Context.defined("haxe4");
 			Context.defined("neko")
 			|| Context.defined("js")
 			|| Context.defined("php")
