@@ -52,7 +52,7 @@ class YieldSplitter {
 	
 	public var actionParser (default, null):ActionParser;
 	
-	public var cursor (default, null):UInt;
+	public var cursor (default, null):Int;
 	public var iteratorBlocks (default, null):IteratorBlockData = [];
 	public var yieldedScope:Bool;
 	
@@ -372,7 +372,7 @@ class YieldSplitter {
 
 				if (!subParsing) addIntoBlock(e);
 				
-			case ECheckType(_e, _t):
+			case ECheckType(_e, _t) #if (haxe_ver >= 4.200) | EIs(_e, _t) #end:
 				parse(_e, true, ic);
 				parseComplexType(_t, true);
 				if (!subParsing) addIntoBlock(e);

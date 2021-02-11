@@ -198,7 +198,7 @@ class MetaTools {
 			case ETernary(_econd, _eif, _eelse):
 				return hasMetaExpr(name, _econd) || hasMetaExpr(name, _eif) || hasMetaExpr(name, _eelse);
 				
-			case ECheckType(_e, _t):
+			case ECheckType(_e, _t) #if (haxe_ver >= 4.200) | EIs(_e, _t) #end:
 				return hasMetaExpr(name, _e) || hasMetaCT(name, _t);
 				
 			case EMeta(_s, _e):
