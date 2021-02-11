@@ -3,7 +3,7 @@ yield
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.md)
 [![TravisCI Build Status](https://travis-ci.org/dpomier/haxe-yield.svg?branch=master)](https://travis-ci.org/dpomier/haxe-yield)
 
-*Support from Haxe `3.4.x` to `4.1.x`*
+*Support from Haxe `3.4` to `4.2`*
 
 This library adds the `yield` metadata, which is similar to the `yield` keyword in C#.
 
