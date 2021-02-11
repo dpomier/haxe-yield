@@ -11,13 +11,11 @@ haxe:
   - "4.0.5"
   - "4.1.5"
   - "4.2.0"
-  - "4.0.0-rc.3"
   - development
   
 matrix:
   allow_failures:
     - haxe: development
-    - haxe: 4.0.0-rc.3
     
 install:
   - haxelib install travix
