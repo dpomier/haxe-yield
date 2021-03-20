@@ -197,7 +197,7 @@ class TypeInferencer {
 	}
 
 	public static function resolveComplexType (expr:Null<Expr>, env:WorkEnv):Null<ComplexType> {
-		return switch TypeInferencer.tryInferExpr(expr, env, IdentChannel.Normal) {
+		return switch tryInferExpr(expr, env, IdentChannel.Normal) {
 			case null: TypeTools.toComplexType(Context.typeof(expr));
 			case t: t;
 		}
@@ -389,14 +389,14 @@ class TypeInferencer {
 	
 	public static function checkArgumentType (a:FunctionArg, pos:Position): Void {
 		if (a.type == null) {
-			a.type = TypeInferencer.tryInferExpr(a.value, null);
+			a.type = tryInferExpr(a.value, null);
 			if (a.type == null) throwTypeRequiredFor(a.name, pos);
 		}
 	}
 	
 	public static function checkLocalVariableType (v:Var, env:WorkEnv, ic:IdentChannel, pos:Position): Void {
 		if (v.type == null) {
-			v.type = TypeInferencer.tryInferExpr(v.expr, env, ic);
+			v.type = tryInferExpr(v.expr, env, ic);
 			if (v.type == null) throwTypeRequiredFor(v.name, pos);
 		}
 	}
