@@ -49,6 +49,10 @@ import yield.parser.tools.ExpressionTools;
 import yield.parser.tools.FieldTools;
 import yield.parser.tools.IdentCategory;
 import haxe.macro.Printer;
+#if (haxe_ver >= 4.000)
+using haxe.macro.PositionTools;
+#end
+
 class DefaultGenerator {
 	
 	private static var extraTypeCounter:UInt = 0;
@@ -423,13 +427,33 @@ class DefaultGenerator {
 			lswitch;
 		}
 
+		var lprocess = if (env.positionMapping) {
+			var file = #if (haxe_ver >= 4.000) pos.toLocation().file.toString() #else Context.getPosInfos(pos).file #end;
+			macro try {
+				${lsetCurrent};
+			} #if (haxe_ver >= 4.100) catch(e:haxe.ValueException) {
+				throw new haxe.ValueException(e.value, new haxe.Exception($v{file} + ":" + _line_ + ": " + e.message));
+			} catch(e:haxe.Exception) {
+				throw new haxe.exceptions.PosException(e.message, {
+					lineNumber: _line_,
+					fileName: $v{file},
+					methodName: $v{env.classField.name},
+					className: $v{env.classData.localClass.name}
+				});
+			} #else catch(e:Any) {
+				throw $v{file} + ":" + _line_ + ": " + e;
+			} #end
+		} else {
+			lsetCurrent;
+		}
+
 		// public function hasNext():Bool
 
 		var body:Expr = {
 			expr: EBlock([
 			  macro if (!$i{NameController.fieldIsConsumed()}) return true;
 					else if ($i{NameController.fieldCursor()} < $v{bd.lastSequence}) {
-						$lsetCurrent;
+						$lprocess;
 						if (!$i{NameController.fieldCompleted()}) { $i{NameController.fieldIsConsumed()} = false; return true; }
 						else return false;
 					},
@@ -870,14 +894,71 @@ class DefaultGenerator {
 	}
 	
 	private static function initIterativeFunctions (bd:BuildingData, env:WorkEnv, ibd:IteratorBlockData): Void {
+
+		function positionMapping(e:Expr, prevLine = -1):Expr {
+			var line = #if (haxe_ver >= 4.000) e.pos.toLocation().range.start.line #else 0 #end;
+			var e = switch e.expr {
+
+				// Skipped expressions
+				case EBinop(op = OpAssign | OpAssignOp(_),e1,e2): // skip declaration
+					return { expr: EBinop(op,e1,positionMapping(e2,prevLine)), pos: e.pos }
+				case EFor(it = { expr: EBinop(OpIn,e1,e2) }, e3): // skip capture variable
+					e2.expr = positionMapping(e2,prevLine).expr;
+					e3.expr = positionMapping(e3,prevLine).expr;
+					return e;
+				case EArrayDecl(values):
+					return e;
+				case ESwitch(e1,cases,edef): // skip case's values
+					e1.expr = positionMapping(e1,prevLine).expr;
+					for(c in cases) {
+						if(c.expr != null)
+							c.expr.expr = positionMapping(c.expr,prevLine).expr;
+						if(c.guard != null)
+							c.guard.expr = positionMapping(c.guard,prevLine).expr;
+					}
+					if(edef != null)
+						edef.expr = positionMapping(edef,prevLine).expr;
+					return e;
+				case EFunction(name,f): // skip arg initialisation
+					if(f.expr != null)
+						f.expr = positionMapping(f.expr,line);
+					e;
+
+				// Maybe throwing expressions
+				case EField(_,_):
+					e;
+				case ECall(_,_) | EThrow(_) | ECast(_,_) | EBinop(_,_,_) | EUnop(_,_):
+					ExprTools.map(e, positionMapping.bind(_,line));
+
+				// Loop
+				case _:
+					return ExprTools.map(e, positionMapping.bind(_,prevLine));
+			}
+			var mapping = #if (haxe_ver < 4.000)
+				macro this._line_ = @:pos(e.pos) (function(?p:haxe.PosInfos) return p.lineNumber)()
+			#else if (line != prevLine)
+					macro this._line_ = $v{line}
+				else
+					null
+			#end;
+			return mapping == null ? e : macro @:pos(e.pos) @:mergeBlock {
+				$mapping;
+				$e;
+			};
+		}
+
+		if (env.positionMapping) {
+			addProperty(bd, "_line_", [APrivate], macro:Int, bd.typeDefinition.pos);
+		}
 		
 		for (i in 0...ibd.length) {
 			
 			var lExpressions:Array<Expr> = ibd[i];
+			var pos = lExpressions[0].pos;
+			var exprs = { expr: EBlock(lExpressions), pos: pos };
+			var body:Expr = env.positionMapping ? positionMapping(exprs) : exprs;
 			
-			var body:Expr = { expr: EBlock(lExpressions), pos: lExpressions[0].pos };
-			
-			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.yieldedType, body, lExpressions[0].pos, env.classField.meta.copy());
+			addMethod(bd, NameController.iterativeFunction(i), [APrivate], [], env.yieldedType, body, pos, env.classField.meta.copy());
 		}
 	}
 	

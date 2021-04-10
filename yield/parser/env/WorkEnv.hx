@@ -69,6 +69,7 @@ class WorkEnv {
 	public var yieldKeyword  (default, null):String;
 	public var yieldExplicit (default, null):Bool;
 	public var yieldExtend   (default, null):Bool;
+	public var positionMapping (default, never):Bool = #if (debug && !no_yield_follow_positions && haxe_ver >= 4.000 || yield_position_mapping) true #else false #end;
 	
 	public var currentScope (default, null):Scope;
 	public var scopeCounter (default, null):UInt;

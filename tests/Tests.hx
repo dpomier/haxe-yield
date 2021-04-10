@@ -30,6 +30,7 @@ class Tests
 		r.addCase(new misc.InheritanceTests());
 		r.addCase(new misc.PrivateTests());
 		r.addCase(new misc.OnTypeYieldedTests());
+		r.addCase(new misc.ErrorTests());
 		
 		// options tests
 		r.addCase(new options.ExtendTests());

@@ -5,6 +5,7 @@
 -dce full
 -D yield-parse= options.parsing.ParsingTests, options.parsing.subparsing, options.parsing.recursive.*
 -D yield-types= misc.EmptyImport
+-D yield-position-mapping
 --macro misc.OnTypeYieldedTestMacro.init()
 
 # -js bin/Tests.js

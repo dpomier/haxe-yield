@@ -110,7 +110,7 @@ class EForParser extends BaseParser {
 						
 						// initialization
 						
-						var getIteratorField = macro yield.macrotime.Tools.getIterator;
+						var getIteratorField = macro @:pos(__e2.pos) yield.macrotime.Tools.getIterator;
 						
 						var lexprOp:Expr = {
 							expr: EConst(CIdent("null")),

@@ -110,6 +110,10 @@ You can compile with some haxe compilation parameters (or pass several `yield.Yi
 		Compile with `-D yield-types= foo.Bar, foo.Bar.Subtype`.
         Available from init-macros through `yield.parser.Parser.parseOnImport`.
 
+ - `yield-position-mapping`<br/>
+		Gives more accurate positions when an exception arises. This is the default behavior in debug mode only when using Haxe 4.1 or above. It can be disabled with `-D no-yield-position-mapping`.
+		Compile with `-D yield-position-mapping` to enforce this behavior in release mode too.
+
 ##### Macro API
 
  - `yield.parser.Parser.parseOnImport`<br/>
