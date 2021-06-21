@@ -35,7 +35,7 @@ Iterator methods can be run through using a `for` expression or [Lambda](https:/
 
 The return type must be [Iterator&lt;T&gt;](http://api.haxe.org/Iterator.html) or [Iterable&lt;T&gt;](http://api.haxe.org/Iterable.html). If no return type is defined, the type will be [Dynamic](https://haxe.org/manual/types-dynamic.html), and can be unified to both Iterator or Iterable.
 
-Exemple
+Example
 -----
 
 Here’s an example of the `yield` metadata usage:
