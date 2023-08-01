@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": [ "cross", "utility", "macro" ],
   "description": "Cross platform C#-like `yield` generator for Haxe",
-  "version": "3.2.0",
-  "releasenote": "Support for Haxe 4.2",
+  "version": "3.2.1",
+  "releasenote": "Support for Haxe 4.3",
   "contributors": ["dpomier"]
 }
