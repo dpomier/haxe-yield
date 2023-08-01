@@ -1,9 +1,9 @@
 yield
 =======
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.md)
-[![TravisCI Build Status](https://travis-ci.org/dpomier/haxe-yield.svg?branch=master)](https://travis-ci.org/dpomier/haxe-yield)
+[![GitHub CI Status](https://github.com/dpomier/haxe-yield/actions/workflows/build.yml/badge.svg)](https://github.com/dpomier/haxe-yield/actions/workflows/build.yml)
 
-*Support from Haxe `3.4` to `4.2`*
+*Support from Haxe `3.4` to `4.3`*
 
 This library adds the `yield` metadata, which is similar to the `yield` keyword in C#.
 
