@@ -5,7 +5,7 @@ import utest.Assert;
 @:yield
 class ErrorTests extends utest.Test {
 	
-	#if (debug && !no_yield_follow_positions && haxe_ver >= 4.000 || yield_position_mapping)
+	#if (debug && !no_yield_follow_positions && (haxe_ver >= 4.000) || yield_position_mapping)
 	function positionMapping (test:Int): Iterator<Any> {
 
 		@yield return 0;
