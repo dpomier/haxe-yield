@@ -193,7 +193,10 @@ class MetaTools {
 				return hasMetaExpr(name, _e) || _t != null && hasMetaCT(name, _t);
 				
 			case EDisplay(_e, _isCall):
+			
+			#if (haxe_ver < 4.300)
 			case EDisplayNew(_t):
+			#end
 				
 			case ETernary(_econd, _eif, _eelse):
 				return hasMetaExpr(name, _econd) || hasMetaExpr(name, _eif) || hasMetaExpr(name, _eelse);
@@ -518,7 +521,9 @@ class MetaTools {
 				case EThrow(e): null;
 				// case ECast(e, t):
 				case EDisplay(e, displayKind): null;
+				#if (haxe_ver < 4.300)
 				case EDisplayNew(t): null;
+				#end
 				// case ETernary(econd, eif, eelse):
 				// case ECheckType(e, t):
 				case EMeta(s, _e): _e;

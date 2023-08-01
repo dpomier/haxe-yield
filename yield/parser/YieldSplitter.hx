@@ -378,7 +378,10 @@ class YieldSplitter {
 				eswitchParser.run(e, subParsing, _e, _cases, _edef);
 				
 			case EDisplay(_e, _isCall):
+
+			#if (haxe_ver < 4.300)
 			case EDisplayNew(_t):
+			#end
 		}
 		
 		return m_yieldMetaCounter - yieldCount;
