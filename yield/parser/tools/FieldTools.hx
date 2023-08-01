@@ -38,7 +38,7 @@ import yield.parser.checks.TypeInferencer;
 
 class FieldTools {
 	
-	public static function makeFieldFromVar (v:Var, access:Array<Access>, initialValue:Expr, pos:Position): Field {
+	public static function makeFieldFromVar (v:Var, access:Array<Access>, initialValue:Null<Expr>, pos:Position): Field {
 		return {
 			name	: v.name,
 			doc		: null,
