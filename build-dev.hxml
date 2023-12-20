@@ -1,5 +1,8 @@
+-D yield=999.999.999
+-cp .
+extraParams.hxml
+
 -cp tests
--lib yield
 -lib utest
 -main Tests
 -dce full
