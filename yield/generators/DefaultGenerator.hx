@@ -434,12 +434,16 @@ class DefaultGenerator {
 			} #if (haxe_ver >= 4.100) catch(e:haxe.ValueException) {
 				throw new haxe.ValueException(e.value, new haxe.Exception($v{file} + ":" + _line_ + ": " + e.message));
 			} catch(e:haxe.Exception) {
+				#if (haxe_ver >= 4.200)
 				throw new haxe.exceptions.PosException(e.message, {
 					lineNumber: _line_,
 					fileName: $v{file},
 					methodName: $v{env.classField.name},
 					className: $v{env.classData.localClass.name}
 				});
+				#else
+				throw $v{file} + ":" + _line_ + ": " + e.message;
+				#end
 			} #else catch(e:Any) {
 				throw $v{file} + ":" + _line_ + ": " + e;
 			} #end
