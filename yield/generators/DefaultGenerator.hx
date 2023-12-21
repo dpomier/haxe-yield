@@ -660,17 +660,8 @@ class DefaultGenerator {
 							if (_data.names[0] == null) {
 								eRef.expr = EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName );
 							} else {
-
 								var fieldName:String = NameController.localVar(_data.names[0], _defData.scope, _defData.channel, _defData.env.getParentCount() + 1);
-
-								var lfield:Expr = {
-									expr: EField({
-										expr: EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName ),
-										pos : eRef.pos
-									}, fieldName ),
-									pos: eRef.pos
-								};
-								
+								var lfield:Expr = MacroStringTools.toFieldExpr(['this', parentFieldName, fieldName], eRef.pos);
 								eRef.expr = lfield.expr;
 							}
 							
@@ -685,8 +676,6 @@ class DefaultGenerator {
 					
 					switch (_data.ident) {
 						case IdentRef.IEConst(eRef):
-							eRef.expr = EField({ expr: EConst(CIdent("this")), pos: eRef.pos }, parentFieldName);
-							
 							eRef.expr = EConst(CIdent(parentFieldName));
 						default: throw "irrelevant ident reference : " + _data.ident;
 					}
