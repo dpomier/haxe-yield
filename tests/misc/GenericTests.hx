@@ -21,7 +21,7 @@ class GenericTests extends utest.Test {
 	}
 	#end
 	
-	#if (haxe_ver >= 4.000)
+	#if (haxe_ver >= 4.200)
 	function testSelectiveFunctionsWrapper () {
 		var a = new SFWrapper(new SelectiveFunctions("bar"));
 		
@@ -51,6 +51,7 @@ class GenericTests extends utest.Test {
 		//Statics.testConstraints([3]); // Constraint check failure
 	}
 	
+	#if (haxe_ver >= 4.200)
 	function testFunctionTypeParams () {
 		
 		var a = new AbstractWithConstraints(["5"]);
@@ -58,6 +59,7 @@ class GenericTests extends utest.Test {
 		
 		Assert.isTrue(true);
 	}
+	#end
 
 	function testGenericType () {
 		var g = new GenericTest<Int>(4);
@@ -140,18 +142,21 @@ abstract SelectiveFunctions<T>(T) from T {
 }
 #end
 
+#if (haxe_ver >= 4.200)
 @:build(yield.parser.Parser.run())
 abstract SFWrapper<T>(T) from T {
 	public function new(t:T) this = t;
 
 	function get() return this;
 
-	public function getSource():Iterator<T> {
+	@:impl
+	static public function getSource(v:SFWrapper<T>):Iterator<T> {
 		while (true) {
-			@yield return get();
+			@yield return v.get();
 		}
 	}
 }
+#end
 
 @:yield
 class Statics {
@@ -173,12 +178,9 @@ typedef Measurable = {
   public var length(default, null):Int;
 }
 
+#if (haxe_ver >= 4.200)
 @:build(yield.parser.Parser.run())
-#if (haxe_ver < 4.000)
-abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
-#else
 abstract AbstractWithConstraints<T:Iterable<String> & Measurable>(T) from T {
-#end
 	public function new(t:T) this = t;
 
 	function get() return this;
@@ -189,6 +191,7 @@ abstract AbstractWithConstraints<T:Iterable<String> & Measurable>(T) from T {
 		}
 	}
 }
+#end
 
 @:yield
 @:generic
