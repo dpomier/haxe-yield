@@ -445,7 +445,7 @@ class DefaultGenerator {
 				throw $v{file} + ":" + _line_ + ": " + e.message;
 				#end
 			} #else catch(e:Any) {
-				throw $v{file} + ":" + _line_ + ": " + e;
+				throw e;
 			} #end
 		} else {
 			lsetCurrent;
