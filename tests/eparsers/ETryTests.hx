@@ -13,7 +13,11 @@ class ETryTests extends utest.Test {
 		try {
 			it.next();
 		} catch (err:Dynamic) {
-			error = err;
+			#if (haxe_ver >= 4.300)
+			error = (err:haxe.ValueException).value;
+			#else
+			error = err; // TInt
+			#end
 		}
 		
 		Assert.equals(1, error);
