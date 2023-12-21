@@ -630,7 +630,7 @@ class DefaultGenerator {
 								name: env.classData.abstractType.name,
 								sub: null,
 								pack: env.classData.abstractType.pack,
-								params: env.classData.abstractType.params.map(tp -> TPType(Context.toComplexType(tp.t))),
+								params: env.classData.abstractType.params.map(function(tp) return TPType(Context.toComplexType(tp.t))),
 							});
 							einstance.expr = ECheckType(macro @:pos(einstance.pos) cast ${{ expr: einstance.expr, pos: einstance.pos }}, ct);
 						}
@@ -665,7 +665,13 @@ class DefaultGenerator {
 								eRef.expr = EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName );
 							} else {
 								var fieldName:String = NameController.localVar(_data.names[0], _defData.scope, _defData.channel, _defData.env.getParentCount() + 1);
-								var lfield:Expr = MacroStringTools.toFieldExpr(['this', parentFieldName, fieldName], eRef.pos);
+								var lfield:Expr = {
+									expr: EField({
+										expr: EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, parentFieldName ),
+										pos : eRef.pos
+									}, fieldName ),
+									pos: eRef.pos
+								};
 								eRef.expr = lfield.expr;
 							}
 							
