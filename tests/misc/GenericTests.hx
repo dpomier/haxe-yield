@@ -149,10 +149,9 @@ abstract SFWrapper<T>(T) from T {
 
 	function get() return this;
 
-	@:impl
-	static public function getSource(v:SFWrapper<T>):Iterator<T> {
+	public function getSource():Iterator<T> {
 		while (true) {
-			@yield return v.get();
+			@yield return get();
 		}
 	}
 }
