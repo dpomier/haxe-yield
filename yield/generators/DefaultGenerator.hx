@@ -914,7 +914,11 @@ class DefaultGenerator {
 				// Skipped expressions
 				case EBinop(op = OpAssign | OpAssignOp(_),e1,e2): // skip declaration
 					return { expr: EBinop(op,e1,positionMapping(e2,prevLine)), pos: e.pos }
-				case EFor(it = { expr: EBinop(OpIn,e1,e2) }, e3): // skip capture variable
+				#if (haxe_ver >= 4.000)
+				case EFor({ expr: EBinop(OpIn,e1,e2) }, e3): // skip capture variable
+				#else
+				case EFor({ expr: EIn(e1,e2) }, e3): // skip capture variable
+				#end
 					e2.expr = positionMapping(e2,prevLine).expr;
 					e3.expr = positionMapping(e3,prevLine).expr;
 					return e;
