@@ -616,10 +616,21 @@ class DefaultGenerator {
 					if (_data.names == null) {
 						eRef.expr = EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, NameController.fieldInstance() );
 					} else {
-						eRef.expr = EField({
+						var einstance:Expr = {
 							expr: EField( {expr: EConst(CIdent('this')), pos: eRef.pos}, NameController.fieldInstance() ),
 							pos : eRef.pos
-						}, _data.names[0]);
+						}
+						if(env.classData.isAbstract) {
+							// cast the instance as the abstract to access its fields
+							var ct:ComplexType = TPath({
+								name: env.classData.abstractType.name,
+								sub: null,
+								pack: env.classData.abstractType.pack,
+								params: env.classData.abstractType.params.map(tp -> TPType(Context.toComplexType(tp.t))),
+							});
+							einstance.expr = ECheckType(macro @:pos(einstance.pos) cast ${{ expr: einstance.expr, pos: einstance.pos }}, ct);
+						}
+						eRef.expr = EField(einstance, _data.names[0]);
 					}
 					
 				default: throw "irrelevant ident reference : " + _data.ident;
