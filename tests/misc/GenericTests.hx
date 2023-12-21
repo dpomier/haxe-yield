@@ -5,7 +5,7 @@ import yield.parser.Parser;
 
 class GenericTests extends utest.Test {
 	
-	#if (!cs && !java || haxe_ver >= 4.000)
+	#if (haxe_ver >= 4.000)
 	function testSelectiveFunctions () {
 		var a = new SelectiveFunctions("foo");
 		var it = a.getString();
@@ -13,17 +13,15 @@ class GenericTests extends utest.Test {
 		for (j in 0...10) Assert.equals("foo", it.next());
 		Assert.isTrue(it.hasNext());
 		
-		#if (!cs && !java)
 		var b = new SelectiveFunctions(13);
 		var it = b.getAny();
 		Assert.isTrue(it.hasNext());
 		for (j in 0...10) Assert.equals(13, it.next());
 		Assert.isTrue(it.hasNext());
-		#end
 	}
 	#end
 	
-	#if (!cs && !java) 
+	#if (haxe_ver >= 4.000)
 	function testSelectiveFunctionsWrapper () {
 		var a = new SFWrapper(new SelectiveFunctions("bar"));
 		
@@ -53,7 +51,6 @@ class GenericTests extends utest.Test {
 		//Statics.testConstraints([3]); // Constraint check failure
 	}
 	
-	#if (!cs && !java)
 	function testFunctionTypeParams () {
 		
 		var a = new AbstractWithConstraints(["5"]);
@@ -61,7 +58,6 @@ class GenericTests extends utest.Test {
 		
 		Assert.isTrue(true);
 	}
-	#end
 
 	function testGenericType () {
 		var g = new GenericTest<Int>(4);
@@ -71,14 +67,12 @@ class GenericTests extends utest.Test {
 		Assert.equals("444", it.next());
 	}
 
-	#if (!cs && !java || haxe_ver >= 4.000)
 	function testAbstractGenericType () {
 		var g = new AbstractGenericTest<Int>(8);
 		var it = g.getMore();
 		Assert.equals("88", it.next());
 		Assert.equals("8888", it.next());
 	}
-	#end
 
 	function testGenericFunction () {
 		var it = GenericFunctions.getIt(4);
@@ -124,46 +118,40 @@ class GenericTests extends utest.Test {
 	// }
 }
 
-#if (!cs && !java || haxe_ver >= 4.000) // error CS1004 repeated modifier
+#if (haxe_ver >= 4.000)
 @:yield
+@:using(misc.GenericTests.SelectiveFunctions)
 abstract SelectiveFunctions<T>(T) from T {
 	public function new(t:T) this = t;
 
 	function get() return this;
 
-	@:impl
 	static public function getString(v:SelectiveFunctions<String>):Iterator<String> {
 		while (true) {
 			@yield return v.get();
 		}
 	}
 
-	#if (!cs && !java) // error CS0246: `T' could not be found (https://github.com/HaxeFoundation/haxe/issues/8573)
-	@:impl
-	static public function getAny(v:SelectiveFunctions<T>):Iterator<T> {
+	static public function getAny<T>(v:SelectiveFunctions<T>):Iterator<T> {
 		while (true) {
 			@yield return v.get();
 		}
 	}
-	#end
 }
 #end
 
-#if (!cs && !java) // error CS0246: The type or namespace name 'T' could not be found
 @:build(yield.parser.Parser.run())
 abstract SFWrapper<T>(T) from T {
 	public function new(t:T) this = t;
 
 	function get() return this;
 
-	@:impl
-	static public function getSource(v:SFWrapper<T>):Iterator<T> {
+	public function getSource():Iterator<T> {
 		while (true) {
-			@yield return v.get();
+			@yield return get();
 		}
 	}
 }
-#end
 
 @:yield
 class Statics {
@@ -185,7 +173,6 @@ typedef Measurable = {
   public var length(default, null):Int;
 }
 
-#if (!cs && !java) // error CS0246: The type or namespace name 'T' could not be found
 @:build(yield.parser.Parser.run())
 #if (haxe_ver < 4.000)
 abstract AbstractWithConstraints<T:(Iterable<String>, Measurable)>(T) from T {
@@ -196,15 +183,12 @@ abstract AbstractWithConstraints<T:Iterable<String> & Measurable>(T) from T {
 
 	function get() return this;
 	
-
-	@:impl
-	static public function getSource(v:AbstractWithConstraints<T>):Iterator<T> {
+	public function getSource():Iterator<T> {
 		while (true) {
-			@yield return v.get();
+			@yield return get();
 		}
 	}
 }
-#end
 
 @:yield
 @:generic
@@ -226,7 +210,6 @@ class GenericTest <T> {
 
 }
 
-#if (!cs && !java || haxe_ver >= 4.000)
 @:yield
 @:generic
 abstract AbstractGenericTest <T> (String) {
@@ -243,7 +226,6 @@ abstract AbstractGenericTest <T> (String) {
 	}
 
 }
-#end
 
 @:yield
 class GenericFunctions <A> {
