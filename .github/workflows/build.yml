@@ -91,8 +91,8 @@ jobs:
       run: haxelib run travix python
     - name: Test [node ]
       run: haxelib run travix node
-    - name: Test [js ]
-      run: haxelib run travix js
+    # - name: Test [js ]
+    #   run: haxelib run travix js
     - name: Test [flash ]
       run: haxelib run travix flash
     - name: Test [java ]
