@@ -13,7 +13,7 @@ class ETryTests extends utest.Test {
 		try {
 			it.next();
 		} catch (err:Dynamic) {
-			#if (haxe_ver >= 4.300)
+			#if (haxe_ver >= 4.300 && interp)
 			error = (err:haxe.ValueException).value;
 			#else
 			error = err; // TInt
