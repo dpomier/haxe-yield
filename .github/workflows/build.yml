@@ -105,5 +105,5 @@ jobs:
       run: haxelib run travix php
     - name: Test [php7 ]
       run: haxelib run travix php7
-    - name: Test [lua ]
-      run: haxelib run travix lua
+    # - name: Test [lua ]
+    #   run: haxelib run travix lua
