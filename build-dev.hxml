@@ -11,8 +11,17 @@ extraParams.hxml
 -D yield-position-mapping
 --macro misc.OnTypeYieldedTestMacro.init()
 
-# -js bin/Tests.js
 --interp
+
+# --python bin/tests.py
+# --cmd python3 bin/tests.py
+
+# --neko bin/tests.n
+# --cmd neko bin/tests.n
+
+# --js bin/tests.js
+# -D hxnode
+# --cmd node bin/tests.js
 
 # -debug
 # -D yield-debug=functionName
