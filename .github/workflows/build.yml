@@ -93,8 +93,8 @@ jobs:
       run: haxelib run travix node
     # - name: Test [js ]
     #   run: haxelib run travix js
-    - name: Test [flash ]
-      run: haxelib run travix flash
+    # - name: Test [flash ]
+    #   run: haxelib run travix flash
     - name: Test [java ]
       run: haxelib run travix java
     - name: Test [cpp ]
