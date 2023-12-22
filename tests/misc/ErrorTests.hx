@@ -16,7 +16,7 @@ class ErrorTests extends utest.Test {
 		@yield return v;
 
 		var s:String = test == 1 ? null : "test-1";
-		var v = s.substr(0, 4); // call
+		var v:String = s.substr(0, 4); // call
 
 		@yield return v;
 	}
