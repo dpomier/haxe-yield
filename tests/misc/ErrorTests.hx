@@ -27,10 +27,8 @@ class ErrorTests extends utest.Test {
 		function stringContains(best, otherwise, text, ?pos:haxe.PosInfos) {
 			if(StringTools.contains(text, best))
 				Assert.stringContains(best, text, pos);
-			#if python
 			else if(StringTools.contains(text, otherwise))
-				trace('WARNING: "${text.split('\n')[0]}" contains "$otherwise" but should better contains "$best"', pos);
-			#end
+				Assert.stringContains(otherwise, text, pos);
 			else
 				Assert.stringContains(best, text, pos);
 		}
