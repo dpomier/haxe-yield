@@ -97,6 +97,7 @@ jobs:
     #   run: haxelib run travix flash
     - name: Test [java ]
       run: haxelib run travix java
+      if: ${{ matrix.haxe != '3.4.7' }}
     - name: Test [cpp ]
       run: haxelib run travix cpp
     - name: Test [cs ]
