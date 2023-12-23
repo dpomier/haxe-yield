@@ -102,6 +102,7 @@ jobs:
       run: haxelib run travix cpp
     - name: Test [cs ]
       run: haxelib run travix cs
+      if: ${{ matrix.haxe != '3.4.7' }}
     - name: Test [php ]
       run: haxelib run travix php
     - name: Test [php7 ]
