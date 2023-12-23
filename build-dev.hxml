@@ -23,6 +23,9 @@ extraParams.hxml
 # -D hxnode
 # --cmd node bin/tests.js
 
+# --cpp bin/cpp
+# --cmd call "bin/cpp/Tests.exe"
+
 # -debug
 # -D yield-debug=functionName
 # -D yield-debug-display
